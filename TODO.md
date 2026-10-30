@@ -29,8 +29,16 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - [x] `laser` and `plasma` tags added 2026-10-30 (see Done). Open: should Nova / Quasar Cannon keep `laser`?
 - [x] ~~Tag consistency checks~~ done 2026-10-29 as a manual Claude procedure (`TAG_CHECK.md`), deliberately NOT in the build. (The beam -> fire rule, and the Orbital Laser exception to it, were dropped 2026-10-30.)
 - [x] ~~Reroll one slot~~ done 2026-10-29: every card has a lock toggle and a reroll button, and each loadout has a "Reroll all unlocked" button (see README). Possible follow-ups: lock/unlock-all buttons; one "reroll all loadouts" button when generating several; card locks are per-loadout and are NOT copied back into the Locks panel.
-- [ ] **Shareable loadouts**: encode a build in the URL (`#...`) so it can be sent to a friend; maybe a
-      copy-as-text button for Discord.
+- [ ] **Shareable loadouts** (parked, Boss 2026-10-30: "not super important long term", do later): encode a build in the URL
+      (`#...`) so it can be sent to a friend; maybe a copy-as-text button for Discord. Design notes from the discussion:
+      link = faction + item ids per slot (ids are stable across renames), several loadouts joined with `~`, a version marker,
+      placeholder for unknown ids; build and faction only (not the recipient's rules or My Gear); "Copy link" and "Copy as text"
+      buttons per card. Open: include locks? one link for a whole batch? text format for Discord?
+- [ ] **Weapon lock UI** (Boss, 2026-10-30): format the lock options (the Locks panel) the same way as the Randomizer output
+      cards (same card layout, thumbnails, pills, AP icons), instead of the plain lock grid.
+- [ ] **My Gear list order** (Boss, 2026-10-30): show the My Gear lists in the order the game does (menu / warbond /
+      chronological order) instead of `hd2gear.csv` order. Needs an order for the items inside each category (a column in the
+      CSV or a rank from the wiki) and for the warbonds.
 - [ ] **Odds transparency**: explain why a build was flagged or why the faction was relaxed (tooltips / details).
 
 ## Rules
@@ -46,6 +54,12 @@ Items we agreed to come back to. Nothing below is started unless marked.
       Partly done 2026-10-29: a required tag now overrides the cap for its own tag (Eagle 3, mines 2...), and FRV / tank /
       exosuit (max 1 each) are in-game limits that sit ABOVE the ranking. Still open: should the backpack join the in-game
       limits? Where do the other caps and faction fit rank?
+- [ ] **Turn the default rules into preset Additional rules** (under discussion, Boss 2026-10-30): e.g. "Vehicle <= 1"
+      shown as an editable rule row instead of an on/off switch. Rules that are a plain tag count over the whole build convert
+      cleanly (Anti-Tank >= 1, Medium Killer >= 1, Base Breaker >= 1, Panic >= 1, Vehicle <= 1, Eagle <= 2, Mines <= 1,
+      Backpack = 1, Expendable <= 2); the rest need new engine features (category rules for "support weapon", a slot scope for
+      "chaff killer in primary or secondary", and the conditional / multi-tag rules: balance, two base breakers, shield, supply).
+      Presets would keep their priority tier and their `disabledRules` ids so saved settings still work.
 - [~] **"Rules" menu** - first version done 2026-10-29: one Rules panel with a switch for every default rule (grouped by
       priority, caps included, in-game limits locked) and the "Additional rules" (at least / at most / exactly, ranges,
       bans). Possible follow-ups:
