@@ -6,7 +6,7 @@ CSV to fix a flag unless Boss says to (one standing exception: `panic` on a stra
 1. Run `python3 tools/tag_checks.py` (reads `hd2gear.csv`, rules in `tools/tag_rules.json`).
 2. Report every `flag:` line to Boss, grouped as:
    - missing implied tags (heal/taunt/stun/smoke -> assist; smoke -> stealth; mortar -> sentry;
-     a secondary with demo -> explosive; handheld -> shield; the old beam -> fire rule was dropped on 2026-10-30, beam items do not need fire). Listed exceptions in `tag_rules.json`
+     a secondary with demo -> explosive; handheld -> shield; beam -> laser; the old beam -> fire rule was dropped on 2026-10-30, beam items do not need fire). Listed exceptions in `tag_rules.json`
      are not flagged.
    - duplicate tags on one item.
    - WEAPON-ONLY TAG on the wrong item (`weapon_only_tags`; today `panic` on anything that is not a primary, secondary

@@ -3,6 +3,7 @@
 
   "implications": [
     { "if": "handheld", "then": "shield" },
+    { "if": "beam",    "then": "laser" },
     { "if": "heal",    "then": "assist" },
     { "if": "taunt",   "then": "assist" },
     { "if": "stun",    "then": "assist" },
