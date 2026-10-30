@@ -63,13 +63,16 @@ Items we agreed to come back to. Nothing below is started unless marked.
 - [ ] **Faction rules: sub-factions.** Extend the faction rules (`works_for` / the `factions` column) to
       specify sub-factions (e.g. unit types within Terminids / Automatons / Illuminate).
 - [x] ~~Editable faction recommendations~~ done 2026-10-29 (My Gear > "Edit factions"; see README). Possible follow-ups:
-      - bulk faction buttons per warbond / per search result ("tick Automaton for everything shown");
+      - bulk faction buttons per warbond / per search result ("tick Automaton for everything shown"); "Enable for all factions" is done (2026-10-30);
       - export / import your edits (a small file or a copy-paste code) so friends can share faction lists, plus a
         "reset to the game-wide defaults" confirmation that lists what will change;
       - a "show edited only" filter and a way to see which edits the CSV has since made redundant;
       - faction presets such as "anti-armor first for Automatons";
       - when sub-factions arrive, the same grid could gain columns, or an item could carry per-sub-faction ticks;
       - lock/block-style undo for the last faction edit.
+
+## Done 2026-10-30
+- **Enable for all factions** button in Edit factions mode, next to Reset to defaults: ticks all three factions for the items shown (second click to confirm; respects the search filter). Reset to defaults undoes it.
 
 ## Done 2026-10-29
 - **Rules panel**: the "Require tags" section is now "Rules" with **Default rules** (a switch per rule, grouped by priority, caps switchable, in-game limits locked, "Turn all default rules back on") and **Additional rules** (tag + at least / at most / exactly + count; at least + at most make a range; 0 bans a tag). Engine: requirements are `{min?, max?}`, `disabledRules` option, `Engine.RULES` list. Switched-off rules are saved in `hd2_settings` and cleared by Reset. 17 new engine tests and a UI section cover it.

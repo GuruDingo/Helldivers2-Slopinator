@@ -2,6 +2,8 @@
 
 A loadout randomizer fan project for Helldivers 2.
 
+**Use it online: https://gurudingo.github.io/Helldivers2-Slopinator/**
+
 A static website: the loadout randomizer and warbond tracker run entirely in the visitor's browser.
 No server, no accounts, nothing to host except the files in `docs/`.
 
@@ -71,6 +73,7 @@ tiny tilts of a couple of percent. **After an intentional rule change, or after 
 On the My Gear tab, the **Edit factions** switch (top right) shows three ticks on every item: **T**erminid, **A**utomaton, **I**lluminate. They show the faction emblems (the same emblems are on the faction buttons on the Randomizer tab; Any uses the Super Earth emblem, white) and start from the CSV's `factions` column (`any` = all three ticked). The emblems are linked from the Helldivers wiki like the item images and are flattened and tinted with CSS filters in the faction colours (dark on the selected faction button) - if you ever change a faction colour, regenerate its filter in `style.css`; if one can't load, the tick shows T / A / I and the button just shows its name. Change them and the randomizer, the pool counts and the Randomizer-tab pool line use your version. Details:
 - All three ticked is the same as `any`. With none ticked an item only rolls when the faction is Any.
 - Edited items get a coloured edge and a ↺ button that puts that one item back; **Reset to defaults** (only shown in this mode) resets everything, needs a second click to confirm, and while the search box is filtering it only resets the items shown.
+- **Enable for all factions** (next to Reset) ticks all three for every item that isn't already for all factions, with the same second-click confirmation and the same "shown only" behaviour while searching. It counts as an edit for any item whose CSV default was narrower, and Reset to defaults undoes it.
 - Only differences from the CSV are saved (`hd2_factions`), so when the CSV changes its defaults, items you haven't edited follow the new CSV. Edits are keyed by item name, so renaming an item in the CSV orphans its edit.
 - Results already on screen are not changed; the next Generate or reroll uses the new lists.
 

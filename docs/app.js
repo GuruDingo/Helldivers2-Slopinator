@@ -926,34 +926,43 @@
     updatePoolLine();
   }
 
-  // ---- Edit factions: switch, count and reset button ----
-  var resetArmed = null;
-  function disarmReset() { if (resetArmed) { clearTimeout(resetArmed); resetArmed = null; } }
+  // ---- Edit factions: switch, count and the two bulk buttons ----
+  // Both bulk buttons act on the items shown (the search filter applies, like the other bulk buttons) and need a
+  // second click within 4 seconds, so a stray click can't overwrite your edits.
+  var armed = null;   // { which: "reset" | "all", timer }
+  function disarm() { if (armed) { clearTimeout(armed.timer); armed = null; } }
+  function allTicked(item) { return facFlags(item.factions).every(Boolean); }
+  function resetScope() { return shownOnly(ALL_ITEMS).filter(isCustomised); }
+  function allScope() { return shownOnly(ALL_ITEMS).filter(function (i) { return !allTicked(i); }); }
   function updateFacTools() {
     var on = $("edit-factions").checked;
     $("view-gear").classList.toggle("edit-factions", on);
     $("fac-tools").hidden = !on;
-    if (!on) { disarmReset(); return; }
+    if (!on) { disarm(); return; }
     var total = customisedCount();
-    var scope = shownOnly(ALL_ITEMS).filter(isCustomised).length;
     var filtered = gearFiltered();
     $("fac-count").textContent = total ? total + " item" + (total === 1 ? "" : "s") + " edited" : "No edits: everything is on the default factions";
-    var btn = $("fac-reset");
-    btn.disabled = scope === 0;
-    if (resetArmed) { btn.textContent = "Click again to reset " + scope; return; }
-    btn.textContent = (filtered ? "Reset shown to defaults" : "Reset to defaults") + (scope ? " (" + scope + ")" : "");
+    function label(btn, which, scope, idle, idleShown) {
+      btn.disabled = scope === 0;
+      if (armed && armed.which === which) { btn.textContent = "Click again to " + (which === "reset" ? "reset " : "enable ") + scope; return; }
+      btn.textContent = (filtered ? idleShown : idle) + (scope ? " (" + scope + ")" : "");
+    }
+    label($("fac-reset"), "reset", resetScope().length, "Reset to defaults", "Reset shown to defaults");
+    label($("fac-all"), "all", allScope().length, "Enable for all factions", "Enable shown for all factions");
   }
-  function onResetFactionsClick() {
-    var scope = shownOnly(ALL_ITEMS).filter(isCustomised).length;
-    if (!scope) return;
-    if (!resetArmed) {
-      // Two clicks, so a stray click can't wipe your edits.
-      resetArmed = setTimeout(function () { resetArmed = null; updateFacTools(); }, 4000);
+  function onBulkFactionClick(which) {
+    var scope = which === "reset" ? resetScope() : allScope();
+    if (!scope.length) return;
+    if (!armed || armed.which !== which) {
+      disarm();
+      armed = { which: which, timer: setTimeout(function () { armed = null; updateFacTools(); }, 4000) };
       updateFacTools();
       return;
     }
-    disarmReset();
-    resetFactions(ALL_ITEMS);
+    disarm();
+    if (which === "reset") { resetFactions(ALL_ITEMS); return; }
+    scope.forEach(function (i) { setItemFactions(i, [true, true, true]); });
+    onFactionEdit();
   }
 
   // Search: every word must appear in the item's name, a nickname, or its warbond's name/key
@@ -1023,7 +1032,8 @@
 
     $("gear-search").addEventListener("input", function () { filterGear(); updateFacTools(); });
     $("edit-factions").addEventListener("change", updateFacTools);
-    $("fac-reset").addEventListener("click", onResetFactionsClick);
+    $("fac-reset").addEventListener("click", function () { onBulkFactionClick("reset"); });
+    $("fac-all").addEventListener("click", function () { onBulkFactionClick("all"); });
     $("gear-expand").addEventListener("click", function () {
       document.querySelectorAll("#gear-list .wb-items").forEach(function (el) { el.classList.add("open"); });
     });

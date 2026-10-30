@@ -499,6 +499,34 @@ function check(label, cond, extra) {
   check("with no search the button resets everything", /Click again to reset 1/.test($("fac-reset").textContent), $("fac-reset").textContent);
   click($("fac-reset"));
   check("...and everything is back on the defaults", customCount() === 0 && /No edits/.test($("fac-count").textContent) && itemFactions(LIB) === "any", $("fac-count").textContent);
+  // "Enable for all factions": all three ticked for the items on screen, with the same two-click guard
+  const narrow = Object.keys(DEFAULTS).filter((n) => DEFAULTS[n] !== "any" && DEFAULTS[n] !== "none" && DEFAULTS[n] !== "");
+  const NARROW = narrow[0], NARROW2 = narrow[1];
+  check("test items exist that aren't already for every faction", !!NARROW && !!NARROW2 && rowOf(NARROW) && rowOf(NARROW2));
+  const allCount = () => Object.keys(DEFAULTS).filter((n) => DEFAULTS[n] !== "none" && itemFactions(n) !== "any").length;
+  check("'Enable for all factions' is shown next to reset, counts the items that aren't already all-factions", /^Enable for all factions \(\d+\)$/.test($("fac-all").textContent) && !$("fac-all").disabled && $("fac-all").textContent === "Enable for all factions (" + allCount() + ")", $("fac-all").textContent);
+  search(NARROW.toLowerCase());
+  check("with a search active it says 'shown'", /^Enable shown for all factions \(\d+\)$/.test($("fac-all").textContent), $("fac-all").textContent);
+  click($("fac-all"));
+  check("first click only asks for confirmation", /^Click again to enable \d+$/.test($("fac-all").textContent) && itemFactions(NARROW) === DEFAULTS[NARROW] && itemFactions(NARROW2) === DEFAULTS[NARROW2], $("fac-all").textContent);
+  click($("fac-all"));
+  check("second click ticks all three for the item shown only", itemFactions(NARROW) === "any" && facTicks(NARROW) === "bug,bot,squid" && rowOf(NARROW).classList.contains("fac-custom") && rowOf(NARROW2).hidden && itemFactions(NARROW2) === DEFAULTS[NARROW2], itemFactions(NARROW) + " / " + itemFactions(NARROW2) + " hidden=" + rowOf(NARROW2).hidden);
+  check("...saved as an edit, and the edit survives a reload of the saved data", JSON.parse(win.localStorage.getItem("hd2_factions"))[NARROW].join() === "any");
+  check("...and the per-item revert puts it back", (click(rowOf(NARROW).querySelector(".fac-revert")), itemFactions(NARROW) === DEFAULTS[NARROW]));
+  search("");
+  click($("fac-all")); click($("fac-all"));
+  check("with no search it enables every item", allCount() === 0 && $("fac-all").disabled && /^Enable for all factions$/.test($("fac-all").textContent), $("fac-all").textContent);
+  check("...and every enabled item now counts as edited", customCount() > 0 && /items edited/.test($("fac-count").textContent), $("fac-count").textContent);
+  click($("fac-reset"));
+  check("reset to defaults still undoes it (after its own confirmation)", /Click again to reset/.test($("fac-reset").textContent));
+  click($("fac-reset"));
+  check("...everything back on the CSV defaults", customCount() === 0 && itemFactions(NARROW) === DEFAULTS[NARROW] && allCount() > 0, $("fac-count").textContent);
+  tick(facBox(LIB, "bug"), false);   // gives Reset something to do
+  click($("fac-all"));
+  click($("fac-reset"));
+  check("arming one button cancels the other's confirmation", /^Enable for all factions \(\d+\)$/.test($("fac-all").textContent) && /^Click again to reset 1$/.test($("fac-reset").textContent), $("fac-all").textContent + " | " + $("fac-reset").textContent);
+  click($("fac-reset"));
+  check("(cleanup) back on the defaults", customCount() === 0);
   check("faction emblems are tinted per faction (unselected buttons + ticks + legend), dark when selected", (() => {
     const c = css; return ["bug", "bot", "squid"].every((f) => new RegExp('input\\[value="' + f + '"\\]:not\\(:checked\\) \\+ span \\.fac-icon[^{]*\\.fac-' + f + ' \\.fac-icon\\s*\\{[^}]*hue-rotate').test(c)) && /input:checked \+ span \.fac-icon\s*\{\s*filter: brightness\(0\)/.test(c);
   })());
