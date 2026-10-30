@@ -340,4 +340,15 @@ test("armor_pen: every weapon has valid armor-penetration data, and so does ever
   assert.deepStrictEqual([by("Eagle Airstrike"), by("Eagle Strafing Run"), by("Orbital Railcannon Strike"), by("A/MG-43 Machine Gun Sentry"), by("EXO-45 Patriot Exosuit"), by("B-100 Portable Hellbomb")], [[5], [5], [7], [3], [3, 6], [10]]);
 });
 
+test("hand-held shields need a one-handed weapon, bubble shields do not", () => {
+  const noOneHand = (l) => !HD2Engine.has(l.primary, "onehand") && !HD2Engine.has(l.secondary, "onehand");
+  // lock a two-handed primary and secondary so the shield rule is what is being tested (unlocked, the generator picks a one-hander)
+  const run = (name, n) => Array.from({ length: n }, () => engine.generateLoadoutRelaxed({ faction: "any", locks: { primary: pick("AR-23 Liberator"), secondary: pick("P-19 Redeemer"), strat1: pick(name) } }));
+  const hand = run("SH-20 Ballistic Shield Backpack", 50);
+  assert(hand.every(noOneHand), "the locked weapons should not be one-handed (pick other weapons for this test)");
+  hand.forEach((l) => assert(l.unmet.some((u) => u.id === "shield"), "handheld shield without one-hander should be flagged"));
+  // the bubble generator pack and the shield relay never trigger it
+  ["SH-32 Shield Generator Pack", "FX-12 Shield Generator Relay"].forEach((n) => run(n, 50).forEach((l) => assert(!l.unmet.some((u) => u.id === "shield"), n + " should not need a one-hander")));
+});
+
 console.log("\n" + passed + " engine rule tests passed" + (process.exitCode ? " (with failures)" : ""));
