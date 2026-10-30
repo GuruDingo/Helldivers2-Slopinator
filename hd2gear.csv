@@ -102,7 +102,7 @@ id,category,name,nicknames,tags,factions,warbond,img_url,armor_pen
 100,throwable,G-89 Smokescreen,"g-89 smokescreen,g-89,smokescreen,smokescreen grenade,smoke impact,smoke impact grenade","assist,smoke,stealth",bot,superstore,https://helldivers.wiki.gg/images/G-89_Smokescreen_Throwable_Render.png,-1
 101,throwable,G/SH-39 Shield,"g/sh-39 shield,g-sh-39,shield,shield grenade","assist,bubble",bot,siege_breakers,https://helldivers.wiki.gg/images/G-SH-39_Shield_Throwable_Render.png,-1
 102,throwable,G-48 Giga Grenade,"g-48 giga grenade,g-48,giga grenade,giga","armor,demo",any,entrenched_division,https://helldivers.wiki.gg/images/G-48_Giga_Grenade_Throwable_Render.png,5
-103,throwable,G/40-K Meltamine,"g/40-k meltamine,g/40-k,meltamine,melta mine,landmine","med,armor,demo",any,40k,https://helldivers.wiki.gg/images/G-40-K_Melta_Mine_Throwable_Render.png,7
+103,throwable,G/40-K Melta Mine,"g/40-k melta mine,g/40-k,melta mine,meltamine,landmine","med,armor,demo",any,40k,https://helldivers.wiki.gg/images/G-40-K_Melta_Mine_Throwable_Render.png,7
 104,throwable,G-8 Immolation,"g-8 immolation,g-8,immolation,molotov","fire,chaff,stun,assist",any,ironclad_democracy,https://helldivers.wiki.gg/images/G-8_Immolation_Throwable_Render.png,0
 105,throwable,G-60 Anti-Tank Seeker,"g-60 anti-tank seeker,g-60,anti-tank seeker,at seeker,anti-tank seeker grenade,at seeker grenade",armor,any,ironclad_democracy,https://helldivers.wiki.gg/images/G-60_Anti-Tank_Seeker_Throwable_Render.png,5
 106,throwable,G-11 Caltrops,"g-11 caltrops,g-11,caltrops","chaff,stun,assist",bug,scope_of_authority,https://helldivers.wiki.gg/images/G-11_Caltrops_Throwable_Render.png,3
