@@ -13,10 +13,12 @@ No server, no accounts, nothing to host except the files in `docs/`.
 hd2gear.csv            gear database - you edit this (Excel is fine)
 hd2warbonds.csv        warbond keys + display names + cover image URLs (img_url), in display order
 tools/build_gear.py    validates both CSVs and writes docs/gear-data.js
+tools/fetch_images.py  saves the wiki images into docs/img/ (see "Saved images")
 docs/                  the website (this folder is what gets published)
   index.html  style.css  app.js        page + UI
   engine.js                            generation rules (port of try_build)
   gear-data.js                         GENERATED - don't edit by hand
+  img/                                 saved copies of the wiki images + manifest.json (made by fetch_images.py)
 tests/                 rule tests, seeded regression test, UI smoke test (run_all.js runs them all); archive/ = old Python parity test
 TODO.md                pinned follow-ups and open decisions
 ```
@@ -49,6 +51,26 @@ Base Game gear is always owned. A browser with no saved data starts with everyth
 Repo -> Settings -> Pages -> Source: "Deploy from a branch" -> Branch `main`, folder `/docs` -> Save.
 The site appears at `https://<your-user>.github.io/<repo-name>/` after a minute or so.
 
+## Saved images (no more hotlinking)
+
+The page shows pictures from the Helldivers wiki: item art (about 200), the faction emblems, the warbond title icons, the Requisition slip and the 13 armor-penetration icons. `tools/fetch_images.py` saves them all into `docs/img/` so the published site serves its own copies and keeps working if the wiki changes a file or blocks hotlinking.
+
+```
+pip install pillow                       # once, for resizing
+python tools/fetch_images.py             # download what is missing (about 280 files, a few minutes; polite rate limit)
+python tools/build_gear.py               # copies the list into docs/gear-data.js
+python tools/fetch_images.py --list      # what is saved / still missing, no downloading
+python tools/fetch_images.py --from-dir D   # use pictures you downloaded yourself into folder D (by wiki file name)
+```
+
+- The wiki address stays in the CSVs as the source. The fetch writes `docs/img/manifest.json` (wiki address -> saved file); the build copies it into `docs/gear-data.js` as `HD2_DATA.images`, and the page uses the saved copy of any picture that has one, otherwise the wiki link. So a half-finished run never breaks the site.
+- Item art and warbond covers are shrunk (320 px / 480 px longest side) and saved as WebP; SVGs (all the stratagem icons) and the small icons are kept as they are. Files that already exist are skipped (`--force` redoes them).
+- If a download fails (the script says which), the site keeps using that wiki link; run it again later.
+- **No computer needed:** Actions tab -> "Fetch images" -> Run workflow. It runs the same script on GitHub, saves the pictures to a branch called `images-fetched` and attaches them to the run as a download; then open a pull request from that branch.
+- The single-file build (`dist/hd2-randomizer.html`) embeds the saved pictures, so it works offline (several MB).
+- When you add an item or warbond with a new `img_url`, or a new wiki image in `app.js`, run the fetch again.
+- The pictures belong to Arrowhead Game Studios and come from the community-run [Helldivers Wiki](https://helldivers.wiki.gg/); this is an unofficial fan project.
+
 ## Tests
 
 ```
@@ -56,7 +78,7 @@ npm install jsdom                 # once, for the UI test (not needed to run the
 node tests/run_all.js             # rebuild + every test, ~12 seconds
 ```
 
-`run_all.js` runs, in order: the build (`tools/build_gear.py --bundle`), `engine_rules.js` (best-effort builds, lock
+`run_all.js` runs, in order: the build (`tools/build_gear.py --bundle`), `fetch_images_test.py` (the image tool, offline; needs Pillow, skipped without it), `engine_rules.js` (best-effort builds, lock
 exemptions, flagged rules), `regression.js` and `ui_smoke.js` (clicks through the page in jsdom).
 
 `regression.js` draws 2000 seeded builds for each scenario in `tests/scenarios.json` and checks (1) invariants on
@@ -101,7 +123,7 @@ The **in-game limits** (one FRV, one tank, one exosuit) are shown with a lock an
 
 Values came from the wiki's Weapons page (primaries, secondaries, throwables) and each support weapon's own page, with a few single-attack support weapons taken from the wiki's Damage Comparison table (MGX-42, MG-206, LAS-98, CQC-1, TX-41, B/MD C4, CQC-9, B/FLAM-80, AMW-20). Where a weapon has several attacks (a rocket plus its explosion, a rifle plus an underbarrel launcher) the value is the weapon's main/highest attack as the wiki lists it, so a few explosive weapons are rated by the explosion. The three support weapons the wiki's Weapons page shows with two icons were set by hand from it: Recoilless Rifle `5/6`, Epoch `4/5` and Defoliation Tool `3/5`. Re-check a number against the wiki whenever it looks wrong; the game changes these in patches.
 
-Icons are linked from the wiki like the other images:
+Icons come from the wiki (saved locally once `tools/fetch_images.py` has been run; see "Saved images"):
 
 | n | Name | Icon |
 |---|---|---|

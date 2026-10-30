@@ -600,6 +600,28 @@ function check(label, cond, extra) {
   dom2.window.close();
   click(doc.querySelector('.tab[data-view="randomizer"]'));
 
+  console.log("Saved images");
+  {
+    // a page whose data lists saved copies: those are used for every kind of picture; anything not listed keeps its wiki link
+    const WIKI = "https://helldivers.wiki.gg/images/";
+    const libUrl = win.HD2_DATA.items.find((i) => i.name === "AR-23 Liberator").imgUrl;
+    const map = { [libUrl]: "img/items/lib.webp", [WIKI + "Armor_AP2_Icon.png"]: "img/icons/Armor_AP2_Icon.png", [WIKI + "Terminid_Icon.svg"]: "img/icons/Terminid_Icon.svg", [WIKI + "Super_Earth_Icon.svg"]: "img/icons/Super_Earth_Icon.svg" };
+    const html = fs.readFileSync(indexFile, "utf8");
+    check("(the bundle has an empty image list to swap)", html.includes('"images": {}'));
+    const dom3 = new JSDOM(html.replace('"images": {}', '"images": ' + JSON.stringify(map)), { runScripts: "dangerously", pretendToBeVisual: true, url: "http://localhost/" });
+    await new Promise((resolve) => dom3.window.addEventListener("load", resolve));
+    const w3 = dom3.window, d3 = w3.document;
+    w3.HTMLElement.prototype.scrollIntoView = function () {};
+    const srcs = (sel) => Array.from(d3.querySelectorAll(sel)).map((i) => i.getAttribute("src"));
+    check("My Gear thumbnails use the saved copy when there is one", d3.querySelector('#gear-list input[data-item="AR-23 Liberator"]').closest(".gear-row").querySelector("img.gear-thumb").getAttribute("src") === "img/items/lib.webp");
+    check("...and keep the wiki link for an item that isn't saved", d3.querySelector('#gear-list input[data-item="AR-23P Liberator Penetrator"]').closest(".gear-row").querySelector("img.gear-thumb").getAttribute("src").startsWith(WIKI));
+    check("faction emblems and the Base Game icon use the saved copies", srcs(".fac-icon").some((x) => x === "img/icons/Terminid_Icon.svg") && srcs(".wb-icon").some((x) => x === "img/icons/Super_Earth_Icon.svg"), srcs(".fac-icon").join());
+    w3.document.querySelector("#lock-primary").value = "SMG/FLAM-34 Stoker";
+    w3.document.getElementById("controls").dispatchEvent(new w3.Event("submit", { bubbles: true, cancelable: true }));
+    check("loadout cards use the saved armor-penetration icon", srcs("#results .ap-icon").includes("img/icons/Armor_AP2_Icon.png") && srcs("#results .ap-icon").some((x) => x.startsWith(WIKI)), srcs("#results .ap-icon").join());
+    dom3.window.close();
+  }
+
   console.log("Reset");
   click($("reset-all"));
   check("reset restores faction any + 1 loadout", doc.querySelector('input[name="faction"]:checked').value === "any" && $("count").value === "1");
