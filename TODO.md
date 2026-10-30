@@ -25,9 +25,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
 - [ ] **Check the "meme" elemental builds are tagged properly** (fire, arc, gas, explosive, stealth, laser/beam, ...),
       and explore which other meme tags are worth having. Then expand the pill options and colours to include the
       meme tags (today only 9 tags get pills).
-- [ ] **"Crayon mode" setting**: swap tag names and pill colours for YouTuber CommissarKai's "crayon system" of
-      enemy levels. Needs the exact crayon-to-tag mapping from Boss (or the reference video) before building.
-- [x] ~~Tag consistency checks~~ done 2026-10-29 as a manual Claude procedure (`TAG_CHECK.md`), deliberately NOT in the build. Orbital Laser is a deliberate exception to beam -> fire.
+- [x] ~~Tag consistency checks~~ done 2026-10-29 as a manual Claude procedure (`TAG_CHECK.md`), deliberately NOT in the build. (The beam -> fire rule, and the Orbital Laser exception to it, were dropped 2026-10-30.)
 - [x] ~~Reroll one slot~~ done 2026-10-29: every card has a lock toggle and a reroll button, and each loadout has a "Reroll all unlocked" button (see README). Possible follow-ups: lock/unlock-all buttons; one "reroll all loadouts" button when generating several; card locks are per-loadout and are NOT copied back into the Locks panel.
 - [ ] **Shareable loadouts**: encode a build in the URL (`#...`) so it can be sent to a friend; maybe a
       copy-as-text button for Discord.
@@ -65,6 +63,8 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
+- **Crayon colours instead of a Crayon mode** (Boss: the crayon system is already built into his tags, so no mode): the Chaff Killer pill is green (#27ae32), Medium Killer is now blue (#2f80ed, was orange) and Anti-Armor red (#c62828), each a little different from the green / blue / red of the stratagem icons (#699655 / #55b9d2 / #dc6455). Panic Weapon is still indigo (#2943b9), the closest neighbour of the new blue.
+- **beam no longer implies fire** (Boss changed his mind): `fire` removed from every item that has `beam` (LAS-5 Scythe, LAS-7 Dagger, LAS-98 Laser Cannon, AX/LAS-5 Rover, A/LAS-98 Laser Sentry), the beam -> fire rule removed from `tools/tag_rules.json` and `TAG_CHECK.md`. Heads-up for the meme-build tagging item: a "Fire" requirement no longer matches beam items.
 - **AP proofing** (Boss checked every multi-icon and flagged item): PLAS-15 Loyalist 3, Orbital EMS Strike 6, A/M-23 EMS Mortar Sentry 3/6, Eagle Airstrike 5, TD-110 Maelstrom 4/5, MD-I4 Incendiary Mines 3; everything else confirmed as it was. Follow-up the same day: the explosion-based strikes now use the explosion's core AP (Eagle Gas Airstrike 6, Cluster Bomb 3, 500kg Bomb 6, Napalm Airstrike 3; Orbital Gas Strike 6, 120mm HE 5, Airburst 3, 380mm HE 6, Walking Barrage 6, Napalm Barrage 3); Eagle 110mm Rocket Pods (7), Orbital Precision Strike (8) and Orbital Railcannon Strike (7) stay projectile-based. Kept as they were by Boss: Eagle Strafing Run 5, Orbital Gatling Barrage 5, Orbital Laser 6.
 - **Wiki scan decisions** (Boss): the two temporary Liberty Day 2026 stratagems (Orbital Confetti, Eagle Fly By) are skipped on purpose, because the game doesn't let you pick temporary stratagems in a loadout. The Halo: ODST warbond and the wiki's "Obedient Democracy Support Troopers" are the same warbond; no change needed. "G/40-K Meltamine" renamed "G/40-K Melta Mine" to match the wiki; "melta mine" and "meltamine" are both nicknames (saved ticks / faction edits under the old name are orphaned).
 - **My Gear thumbnails confirmed working on the live site** (Boss). **Mobile layout** checked on Boss's phone: fine, closed for now. **Warbond header art** and **AP icons in My Gear rows** dropped from the list for now (Boss); the covers stay saved in `docs/img/warbonds/` in case we want them later.
