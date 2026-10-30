@@ -6,8 +6,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
 - [x] ~~Show armor penetration on weapon cards~~ done 2026-10-30: `armor_pen` column in `hd2gear.csv` for all 141 weapons
       (main attack, `2/4` for two-mode weapons), validated by the build, exported as `armorPen`, and shown on the loadout
       cards as the wiki's icons (both, side by side, for two-mode weapons). Possible follow-ups: show it in My Gear rows
-      too; use it for the "anti-armor" tag/rules and sub-faction advice; stratagem attacks (sentries, Eagles, orbitals)
-      have ratings but are not in the column; `LAS-12 Sai` is on the wiki's primary list but not in the CSV; check
+      too; use it for the "anti-armor" tag/rules and sub-faction advice; `LAS-12 Sai` is on the wiki's primary list but not in the CSV; check
       whether any other support weapon shows two icons on the wiki's Weapons page (Boss set Recoilless Rifle 5/6, Epoch
       4/5 and Defoliation Tool 3/5 on 2026-10-30; the page's support section didn't load for me, so the rest use one
       main value).
@@ -23,7 +22,19 @@ Items we agreed to come back to. Nothing below is started unless marked.
       (6) add a credit line / wiki link, since the images are Arrowhead's. Depends on the web-hosting decision below.
 - [ ] **Host the tool at a URL** (Boss, 2026-10-30): see the hosting notes in the reply of 2026-10-30; first step is
       turning on GitHub Pages for `/docs`. Open choices: custom domain, analytics/feedback, shareable-loadout links.
-- [ ] **Artwork in My Gear** (item thumbnails and warbond covers). The loadout cards ALREADY show item images,
+- [ ] **Proof the new stratagem AP values BEFORE merging PR #3** (Boss, 2026-10-30). Wiki pages were summarised, not
+      read in full, so check these against the wiki: K-9 (7), Orbital EMS Strike (7), EMS Mortar Sentry (6), Eagle
+      Strafing Run (5) vs the other Eagles (7), Maelstrom (4, missiles 5), Rover (2, fire is 4), Incendiary Mines (4,
+      explosion 3), Gas Mortar Sentry (6) and Mortar Sentry (3, headline is AV only), the four two-value ones (Patriot
+      3/6, Lumberer 4/6, Bastion 4/8, Dog Breath 5/6), and whether the two smoke strikes should really be blank.
+- [ ] **Condensed loadout cards** (Boss, 2026-10-30; do before the image migration). A "Compact cards" toggle on the
+      Randomizer tab: one short row per item (small thumbnail, name, AP icons, tag pills, lock/reroll buttons) instead
+      of the 180px / 376px image cards. Setting saved in `hd2_settings`; the card code (`itemCard`) gets a compact
+      variant so everything else (locks, flags, rerolls) is shared.
+- [ ] **Artwork in My Gear** (Boss, 2026-10-30: wanted before the image migration). Plan: a small thumbnail (~32px) at the
+      left of each `.gear-row` using the item's `img_url`, `loading="lazy"` so only the warbond dropdowns you open fetch
+      images, with a blank placeholder on error. Warbond header art after that.
+      Background: the loadout cards ALREADY show item images,
       hotlinked from helldivers.wiki.gg (all 201 items have an `img_url` there). Warbonds also have `img_url`
       now (28 of 36 filled; the Requisition shops, Superstore and Campaign/Event Rewards are blank) but My Gear
       doesn't show them yet. Hotlinking is OK for now (friends-only); reassess before sharing publicly.
@@ -77,6 +88,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
+- **Armor penetration on stratagems** (icons moved to the right of the item name): 50 attacking stratagems now have `armor_pen` (page's lead AP icon; two values for Patriot, Lumberer, Bastion, Dog Breath). Worth a second look on the wiki: K-9 (7), EMS Strike (7) and EMS Mortar Sentry (6) look high for what they do, Eagle Strafing Run (5) vs the other Eagles (7), and Maelstrom (4, missiles are 5).
 - **Armor penetration data**: new `armor_pen` column in `hd2gear.csv` (141 weapons), build validation, `armorPen` in the exported data, and the wiki icon links in the README. The cards now show it (both icons for two-mode weapons).
 - **Enable for all factions** button in Edit factions mode, next to Reset to defaults: ticks all three factions for the items shown (second click to confirm; respects the search filter). Reset to defaults undoes it.
 

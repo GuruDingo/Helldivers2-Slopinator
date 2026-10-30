@@ -178,8 +178,7 @@
         h("span", { class: "slot-btns" }, rerollBtn, lockBtn)),
       imageNode(item),
       h("div", { class: "card-body" },
-        h("div", { class: "item-name" }, item.name),
-        apRow(item),
+        h("div", { class: "name-row" }, h("div", { class: "item-name" }, item.name), apRow(item)),
         warbondRow,
         h("div", { class: "tag-row" }, tagPills(item))));
   }

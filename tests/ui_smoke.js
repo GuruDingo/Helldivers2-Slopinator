@@ -101,7 +101,7 @@ function check(label, cond, extra) {
   check("a two-mode weapon shows both icons, in order, with a separator", apSrc("SMG/FLAM-34 Stoker").join() === "Armor_AP2_Icon.png,Armor_AP4_Icon.png" && cardOf("SMG/FLAM-34 Stoker").querySelectorAll(".ap-sep").length === 1, apSrc("SMG/FLAM-34 Stoker").join());
   check("a single-mode weapon shows one icon (Autocannon = Heavy)", apSrc("AC-8 Autocannon").join() === "Armor_AP4_Icon.png" && cardOf("AC-8 Autocannon").querySelectorAll(".ap-sep").length === 0, apSrc("AC-8 Autocannon").join());
   check("icons come from the wiki and have a readable name", /^https:\/\/helldivers\.wiki\.gg\/images\/Armor_AP4_Icon\.png$/.test(cardOf("AC-8 Autocannon").querySelector(".ap-icon").getAttribute("src")) && /Heavy/.test(cardOf("AC-8 Autocannon").querySelector(".ap-icon").getAttribute("alt")));
-  check("a stratagem that isn't a weapon has no armor-penetration row", cardOf("Eagle Airstrike").querySelector(".ap-row") === null);
+  check("an attacking stratagem shows its icon too (Eagle Airstrike = Anti-Tank III)", apSrc("Eagle Airstrike").join() === "Armor_AP7_Icon.png");
   const ic = cardOf("SMG/FLAM-34 Stoker").querySelector(".ap-icon");
   ic.dispatchEvent(new win.Event("error"));
   check("an icon that fails to load is replaced by its name", cardOf("SMG/FLAM-34 Stoker").querySelector(".ap-text") && cardOf("SMG/FLAM-34 Stoker").querySelector(".ap-text").textContent === "Light", (cardOf("SMG/FLAM-34 Stoker").querySelector(".ap-row") || {}).textContent);
