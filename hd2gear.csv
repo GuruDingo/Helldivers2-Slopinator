@@ -44,7 +44,7 @@ id,category,name,nicknames,tags,factions,warbond,img_url,armor_pen
 43,primary,GL-15 Evictor,"gl-15 evictor,gl-15,evictor","explosive,chaff,med,demo",any,ironclad_democracy,https://helldivers.wiki.gg/images/GL-15_Evictor_Primary_Render.png,3
 44,primary,SG-8P Punisher Plasma,"sg-8p punisher plasma,sg-8p,punisher plasma,pp","shotgun,chaff,med,panic,plasma",any,cutting_edge,https://helldivers.wiki.gg/images/SG-8P_Punisher_Plasma_Primary_Render.png,3
 45,primary,PLAS-39 Accelerator Rifle,"plas-39 accelerator rifle,plas-39,accelerator rifle,accelerator,killzone sniper,killzone plasma","marksman rifle,med,plasma",any,killzone,https://helldivers.wiki.gg/images/PLAS-39_Accelerator_Rifle_Primary_Render.png,3
-46,primary,ARC-12 Blitzer,"arc-12 blitzer,arc-12,blitzer","shotgun,chaff,med,charge,panic",bug,cutting_edge,https://helldivers.wiki.gg/images/ARC-12_Blitzer_Primary_Render.png,3
+46,primary,ARC-12 Blitzer,"arc-12 blitzer,arc-12,blitzer","shotgun,chaff,med,charge,panic,arc",bug,cutting_edge,https://helldivers.wiki.gg/images/ARC-12_Blitzer_Primary_Render.png,3
 47,primary,LAS-5 Scythe,"las-5 scythe,las-5,scythe","beam,chaff,charge,panic,laser","bug,squid",helldivers_mobilize,https://helldivers.wiki.gg/images/LAS-5_Scythe_Primary_Render.png,2
 48,primary,LAS-16 Sickle,"las-16 sickle,las-16,sickle","assault rifle,chaff,charge,panic,laser",any,cutting_edge,https://helldivers.wiki.gg/images/LAS-16_Sickle_Primary_Render.png,2
 49,primary,LAS-17 Double-Edge Sickle,"las-17 double-edge sickle,las-17,double-edge sickle,double-edge,de sickle","assault rifle,charge,chaff,med,panic,laser",any,servants_of_freedom,https://helldivers.wiki.gg/images/LAS-17_Double-Edge_Sickle_Primary_Render.png,2/4

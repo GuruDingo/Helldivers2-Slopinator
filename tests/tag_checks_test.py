@@ -9,6 +9,7 @@ RULES = {
     "implications": [
         {"if": "beam", "then": "fire", "except": ["Deliberate"]},
         {"if": "demo", "then": "explosive", "category": "secondary"},
+        {"if": "laser", "then": "charge", "category": ["primary", "support"]},
     ],
     "weapon_only_tags": [{"tag": "panic", "categories": ["primary", "secondary", "throwable"]}],
     "min_items_per_tag": 3,
@@ -38,6 +39,10 @@ check("listed exception is NOT flagged", not any("Deliberate" in f for f in flag
 flags = check_tags(filler + [it("Sec", "secondary", "demo,common"), it("Prim", "primary", "demo,common")], RULES)
 check("category-limited rule flags the secondary", any("'Sec' has 'demo' but not 'explosive'" in f for f in flags), flags)
 check("...and leaves the primary alone", not any("'Prim'" in f for f in flags), flags)
+
+flags = check_tags(filler + [it("LasP", "primary", "laser,common"), it("LasS", "support", "laser,common"), it("LasO", "orbital", "laser,common")], RULES)
+check("a rule limited to a list of categories flags each listed one", all(f"'{n}' has 'laser' but not 'charge'" in "\n".join(flags) for n in ("LasP", "LasS")), flags)
+check("...and leaves the other categories alone", not any("'LasO'" in f for f in flags), flags)
 
 flags = check_tags(filler + [it("Twice", "primary", "common,demo,explosive,demo")], RULES)
 check("a tag listed twice is flagged", any("'Twice' lists the same tag twice: demo" in f for f in flags), flags)

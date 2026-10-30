@@ -4,6 +4,7 @@
   "implications": [
     { "if": "handheld", "then": "shield" },
     { "if": "beam",    "then": "laser" },
+    { "if": "laser",   "then": "charge", "category": ["primary", "secondary", "support", "backpack"] },
     { "if": "heal",    "then": "assist" },
     { "if": "taunt",   "then": "assist" },
     { "if": "stun",    "then": "assist" },
