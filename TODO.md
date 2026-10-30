@@ -17,14 +17,15 @@ Items we agreed to come back to. Nothing below is started unless marked.
       single-file build embeds them (2.3 MB, works offline). Re-run the fetch (Actions -> Fetch images, or the script)
       when a new item / warbond / wiki image is added. The warbond covers are saved too, but not shown anywhere (header art is parked, 2026-10-30).
 - [x] ~~Host the tool at a URL~~ done 2026-10-30: live at https://gurudingo.github.io/Helldivers2-Slopinator/ (GitHub Pages, `main` / `/docs`). Open choices still: custom domain, analytics/feedback, shareable-loadout links.
-- [~] **Give every tag a display title.** 17 of 40 tags have titles now (the 9 old ones, "assist" is shown as
-      "Team Assist", plus Fire, Stealth, Orbital, Eagle, Sentry, Gas, Vehicle, Arc). Only titled tags appear in the
-      "Require tags" dropdown; the other 23 are hidden until they get a title. `hd2-tags.xlsx` (sent earlier) is now
+- [~] **Give every tag a display title.** 21 of 42 tags have titles now (the 9 old ones, "assist" is shown as
+      "Team Assist", plus Fire, Stealth, Orbital, Eagle, Sentry, Gas, Vehicle, Arc, and since 2026-10-30 Explosive, Laser,
+      Plasma and Hand-Held Shield). Only titled tags appear in the "Require tags" dropdown; the other 21 are hidden until
+      they get a title. `hd2-tags.xlsx` (sent earlier) is now
       out of date. Possible next step: move tag titles/pill colours into a `hd2tags.csv` instead of `TAG_NAMES` in
       `docs/app.js`.
 - [ ] **Check the "meme" elemental builds are tagged properly** (fire, arc, gas, explosive, stealth, laser/beam, ...),
       and explore which other meme tags are worth having. Then expand the pill options and colours to include the
-      meme tags (today only 9 tags get pills).
+      meme tags. (Done 2026-10-30 for the seven known meme tags, see Done; any new meme tag gets a pill from now on.)
       - [ ] `explosive` (Boss, 2026-10-30): go through ALL the throwables and stratagems and tag everything that is
             explosive (today it sits on a few weapons, plus the rule "secondary + demo -> explosive").
       - [x] `laser` and `plasma` tags added 2026-10-30 (see Done). Open: should Nova / Quasar Cannon keep `laser`?
@@ -53,7 +54,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - [ ] **Challenge mode**: presets such as "no support weapon" or "all Eagles", built from rule switches + rules.
       - [ ] Per-rule priority editing (drag to re-rank the tiers) - today the tiers are fixed in `RULE_TIER`.
       - [ ] Rules for item categories (e.g. "no Orbitals") rather than only tags.
-      - [ ] Optional: let a tag with no title be chosen in Additional rules (the dropdown still lists only the 17 titled tags).
+      - [ ] Optional: let a tag with no title be chosen in Additional rules (the dropdown still lists only the 21 titled tags).
 - [ ] **Faction rules: sub-factions.** Extend the faction rules (`works_for` / the `factions` column) to
       specify sub-factions (e.g. unit types within Terminids / Automatons / Illuminate).
 - [x] ~~Editable faction recommendations~~ done 2026-10-29 (My Gear > "Edit factions"; see README). Possible follow-ups:
@@ -66,6 +67,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
+- **Meme-tag pills and three new titles** (Boss): pills for all the meme tags, Fire, Gas, Arc, Stealth, Explosive, Laser and Plasma, and laser / plasma count as meme tags from now on (any new meme tag gets a title and a pill). New titles: Laser, Plasma, Hand-Held Shield (`handheld`) and Explosive (needed for its pill). Pill colours are first guesses in `TAG_COLORS` (`docs/app.js`): fire #c8541a, gas #7d8a1d, arc #0c8a96, stealth #37474f, explosive #a0700a, laser #d6336c, plasma #8f3fe0. The `explosive` pass over all throwables and stratagems is saved for later (still open under the meme-tag item).
 - **"Anti-Armor" is now "Anti-Tank"** (Boss): the pill title and the rule text in the Rules panel / unmet-rule messages now say Anti-Tank (README and test names too). The tag id stays `armor`, so saved settings and the CSV are unaffected. Boss also confirmed Quasar Cannon and Nova keep `laser`.
 - **Talon and Dagger get `charge`** (Boss): every laser weapon now has `charge` (it feeds the "no supply with 2+ no-ammo" rule). Odds baseline re-saved.
 - **Blitzer is `arc`** (Boss) and a new tag rule `laser` -> `charge` (laser weapons are assumed to be charge weapons; the tags otherwise stay separate). It applies to primaries, secondaries, support weapons and the Rover only: the Orbital Laser and Laser Sentry are not carried weapons, so they stay laser-only (`charge` on a stratagem would also count toward the no-supply rule). Note the Arc Thrower and Blitzer are `charge` but not `laser`, so charge does not imply laser.
