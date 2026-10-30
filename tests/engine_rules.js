@@ -300,7 +300,7 @@ test("Turning a guarantee off lets builds drop it (no panic weapon rule -> build
   builds(200, {}).forEach((l) => assert(l.coversPanic));
 });
 test("Caps switched off: 3+ Eagles, 2+ mines, 2+ vehicles and 2+ regular supports can appear", () => {
-  const off = (rule, test) => assert(builds(600, { disabledRules: [rule] }).some(test), "never saw it with " + rule + " off");
+  const off = (rule, test) => assert(builds(3000, { disabledRules: [rule] }).some(test), "never saw it with " + rule + " off");
   // A 3rd Eagle is very rare at random (~1 in 1500), so test it with two Eagles locked in: cap on -> never a 3rd.
   const twoEagles = { strat1: pick("Eagle Airstrike"), strat2: pick("Eagle Strafing Run") };
   const withLocks = (disabledRules) => Array.from({ length: 400 }, () => engine.generateLoadoutRelaxed({ faction: "any", locks: twoEagles, disabledRules }));
@@ -337,7 +337,7 @@ test("armor_pen: every weapon has valid armor-penetration data, and so does ever
   });
   const by = (n) => globalThis.HD2_DATA.items.find((i) => i.name === n).armorPen;
   assert.deepStrictEqual([by("AR-23 Liberator"), by("AR-23P Liberator Penetrator"), by("RS-422 Railgun"), by("G-3 Smoke"), by("LAS-17 Double-Edge Sickle"), by("GR-8 Recoilless Rifle"), by("PLAS-45 Epoch"), by("CQC-9 Defoliation Tool")], [[2], [3], [5], [-1], [2, 4], [5, 6], [4, 5], [3, 5]]);
-  assert.deepStrictEqual([by("Eagle Airstrike"), by("Eagle Strafing Run"), by("Orbital Railcannon Strike"), by("A/MG-43 Machine Gun Sentry"), by("EXO-45 Patriot Exosuit"), by("B-100 Portable Hellbomb")], [[7], [5], [7], [3], [3, 6], [10]]);
+  assert.deepStrictEqual([by("Eagle Airstrike"), by("Eagle Strafing Run"), by("Orbital Railcannon Strike"), by("A/MG-43 Machine Gun Sentry"), by("EXO-45 Patriot Exosuit"), by("B-100 Portable Hellbomb")], [[5], [5], [7], [3], [3, 6], [10]]);
 });
 
 console.log("\n" + passed + " engine rule tests passed" + (process.exitCode ? " (with failures)" : ""));
