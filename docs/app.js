@@ -125,6 +125,28 @@
       });
   }
 
+  // Armor penetration: the wiki's own icon for each level a weapon has, side by side when it has two (e.g. a
+  // rifle and its underbarrel launcher). Linked from the wiki like the other images; if one can't load, the level's
+  // name is shown as text instead.
+  var AP_NAMES = {
+    "-1": "No hitbox", 0: "Unarmored", 1: "Very light", 2: "Light", 3: "Medium", 4: "Heavy", 5: "Anti-tank I",
+    6: "Anti-tank II", 7: "Anti-tank III", 8: "Anti-tank IV", 9: "Anti-tank V", 10: "Anti-tank VI", 11: "Indestructible",
+  };
+  function apIconUrl(n) { return "https://helldivers.wiki.gg/images/Armor_AP" + n + "_Icon.png"; }
+  function apRow(item) {
+    var levels = item.armorPen || [];
+    if (!levels.length) return null;
+    var row = h("div", { class: "ap-row", title: "Armor penetration: " + levels.map(function (n) { return AP_NAMES[n] || ("AP" + n); }).join(" / ") });
+    levels.forEach(function (n, i) {
+      var name = AP_NAMES[n] || ("AP" + n);
+      if (i) row.appendChild(h("span", { class: "ap-sep", "aria-hidden": "true" }, "/"));
+      var img = h("img", { src: apIconUrl(n), alt: "Armor penetration: " + name, class: "ap-icon", loading: "lazy", referrerpolicy: "no-referrer" });
+      img.addEventListener("error", function () { img.replaceWith(h("span", { class: "ap-text" }, name)); });
+      row.appendChild(img);
+    });
+    return row;
+  }
+
   function itemCard(item, slotLabel, opts) {
     var locked = opts.locked, suboptimal = opts.suboptimal;
     var cls = (opts.wide ? "item-card2" : "item-card") + (suboptimal ? " suboptimal" : "") + (locked ? " is-locked" : "");
@@ -157,6 +179,7 @@
       imageNode(item),
       h("div", { class: "card-body" },
         h("div", { class: "item-name" }, item.name),
+        apRow(item),
         warbondRow,
         h("div", { class: "tag-row" }, tagPills(item))));
   }

@@ -93,6 +93,22 @@ function check(label, cond, extra) {
   check("switching faction later leaves existing results in their own colour", $("results").style.getPropertyValue("--accent").toLowerCase() === "#ff6161" && doc.documentElement.getAttribute("data-faction") === "squid");
   setFaction("any");
 
+  console.log("Armor penetration icons");
+  $("lock-primary").value = "SMG/FLAM-34 Stoker"; $("lock-strat1").value = "Eagle Airstrike"; $("lock-strat2").value = "AC-8 Autocannon";
+  generate();
+  const cardOf = (name) => Array.from(doc.querySelectorAll("#results .item-card, #results .item-card2")).find((c) => c.querySelector(".item-name").textContent === name);
+  const apSrc = (name) => Array.from(cardOf(name).querySelectorAll(".ap-icon")).map((i) => i.getAttribute("src").replace(/^.*\//, ""));
+  check("a two-mode weapon shows both icons, in order, with a separator", apSrc("SMG/FLAM-34 Stoker").join() === "Armor_AP2_Icon.png,Armor_AP4_Icon.png" && cardOf("SMG/FLAM-34 Stoker").querySelectorAll(".ap-sep").length === 1, apSrc("SMG/FLAM-34 Stoker").join());
+  check("a single-mode weapon shows one icon (Autocannon = Heavy)", apSrc("AC-8 Autocannon").join() === "Armor_AP4_Icon.png" && cardOf("AC-8 Autocannon").querySelectorAll(".ap-sep").length === 0, apSrc("AC-8 Autocannon").join());
+  check("icons come from the wiki and have a readable name", /^https:\/\/helldivers\.wiki\.gg\/images\/Armor_AP4_Icon\.png$/.test(cardOf("AC-8 Autocannon").querySelector(".ap-icon").getAttribute("src")) && /Heavy/.test(cardOf("AC-8 Autocannon").querySelector(".ap-icon").getAttribute("alt")));
+  check("a stratagem that isn't a weapon has no armor-penetration row", cardOf("Eagle Airstrike").querySelector(".ap-row") === null);
+  const ic = cardOf("SMG/FLAM-34 Stoker").querySelector(".ap-icon");
+  ic.dispatchEvent(new win.Event("error"));
+  check("an icon that fails to load is replaced by its name", cardOf("SMG/FLAM-34 Stoker").querySelector(".ap-text") && cardOf("SMG/FLAM-34 Stoker").querySelector(".ap-text").textContent === "Light", (cardOf("SMG/FLAM-34 Stoker").querySelector(".ap-row") || {}).textContent);
+  // every weapon in the data produces an icon row on its card
+  check("every weapon category has armor data to show", win.HD2_DATA.items.filter((i) => ["primary", "secondary", "throwable", "support"].includes(i.cat)).every((i) => i.armorPen.length >= 1));
+  $("lock-primary").value = ""; $("lock-strat1").value = ""; $("lock-strat2").value = "";
+
   console.log("Pool line follows the faction");
   const validFor = (f) => win.HD2_DATA.items.filter((i) => win.HD2Engine.worksFor(i, f)).length;
   check("any -> 'of N items' with N = every active item", new RegExp("of " + validFor("any") + " items").test(poolText()) && validFor("any") === 200, poolText());

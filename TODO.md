@@ -3,12 +3,13 @@
 Items we agreed to come back to. Nothing below is started unless marked.
 
 ## UI / design
-- [~] **Show armor penetration on weapon cards** (Boss, 2026-10-29): DATA DONE 2026-10-30 - `armor_pen` column in
-      `hd2gear.csv` for all 141 weapons (main attack, `2/4` for two-mode weapons), validated by the build and exported
-      as `armorPen` in `gear-data.js`; icon links are listed in the README. Still to do: show the icon (and label) on each
-      weapon card next to the tag pills, and decide how to show two-mode weapons (two icons?). Could later feed the
-      "anti-armor" tag/rules and sub-faction advice. Open: stratagem attacks (sentries, Eagles, orbitals) have ratings
-      too but are not in the column; `LAS-12 Sai` is on the wiki's primary list but not in the CSV.
+- [x] ~~Show armor penetration on weapon cards~~ done 2026-10-30: `armor_pen` column in `hd2gear.csv` for all 141 weapons
+      (main attack, `2/4` for two-mode weapons), validated by the build, exported as `armorPen`, and shown on the loadout
+      cards as the wiki's icons (both, side by side, for two-mode weapons). Possible follow-ups: show it in My Gear rows
+      too; use it for the "anti-armor" tag/rules and sub-faction advice; stratagem attacks (sentries, Eagles, orbitals)
+      have ratings but are not in the column; `LAS-12 Sai` is on the wiki's primary list but not in the CSV; check
+      whether the wiki's Weapons page shows two icons for any support weapon (its support section didn't load, so
+      those use one main value).
 - [ ] **Colour the rest of the UI**: weapon tags (the pills only cover ~9 of the ~40 tags) and the faction buttons
       themselves (the selected one already takes the faction colour).
 - [ ] **Migrate images from wiki hotlinks to saved files** (Boss, 2026-10-30). Plan: (1) `tools/fetch_images.py` reads the
@@ -75,7 +76,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
-- **Armor penetration data**: new `armor_pen` column in `hd2gear.csv` (141 weapons), build validation, `armorPen` in the exported data, and the wiki icon links in the README. Display on the cards is still to do.
+- **Armor penetration data**: new `armor_pen` column in `hd2gear.csv` (141 weapons), build validation, `armorPen` in the exported data, and the wiki icon links in the README. The cards now show it (both icons for two-mode weapons).
 - **Enable for all factions** button in Edit factions mode, next to Reset to defaults: ticks all three factions for the items shown (second click to confirm; respects the search filter). Reset to defaults undoes it.
 
 ## Done 2026-10-29
