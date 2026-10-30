@@ -42,7 +42,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
 - [ ] **Odds transparency**: explain why a build was flagged or why the faction was relaxed (tooltips / details).
 
 ## Rules
-- [ ] **Redo the rule priority list later, with MORE rules in it** (Boss, 2026-10-29). Today's tiers only cover the
+- [ ] **Redo the rule priority list later, with MORE rules in it** (Boss, 2026-10-29). Boss, 2026-10-30: assume a FULL RESET of rule priority when this is tackled, which also settles what tier an edited default row has (today it becomes one of the player's own requirements and ranks at the top). Today's tiers only cover the
       12 rules a finished build is checked against. To add to the ranking:
       - the fill-time caps, which are currently hard limits that only locks can break (and a lock breaks them silently):
         max 1 non-expendable support weapon; max 2 expendable support weapons; never mix regular + expendable
@@ -54,7 +54,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       Partly done 2026-10-29: a required tag now overrides the cap for its own tag (Eagle 3, mines 2...), and FRV / tank /
       exosuit (max 1 each) are in-game limits that sit ABOVE the ranking. Still open: should the backpack join the in-game
       limits? Where do the other caps and faction fit rank?
-- [~] **More default rules as editable rows** (Boss, 2026-10-30): the eight plain tag-count rules are now rows in Additional rules (see Done). The other seven still need new engine features before they can be rows: category rules ("at least one support weapon", "one regular support weapon..."), a slot scope ("chaff killer in primary or secondary"), and the conditional / multi-tag rules (balance, two base breakers, shield needs a one-hander, no supply with 2+ no-ammo). Design options are in `claude/RULES_ENGINE_OPTIONS.md` (project doc); nothing is built yet.
+- [~] **More default rules as editable rows** (Boss, 2026-10-30): the eight plain tag-count rules are now rows in Additional rules (see Done). The other seven still need new engine features before they can be rows: category rules ("at least one support weapon", "one regular support weapon..."), a slot scope ("chaff killer in primary or secondary"), and the conditional / multi-tag rules (balance, two base breakers, shield needs a one-hander, no supply with 2+ no-ammo). Design options are in `claude/RULES_ENGINE_OPTIONS.md` (project doc); nothing is built yet. Priority tiers for converted rows wait for the full priority reset below.
 - [~] **"Rules" menu** - first version done 2026-10-29: one Rules panel with a switch for every default rule (grouped by
       priority, caps included, in-game limits locked) and the "Additional rules" (at least / at most / exactly, ranges,
       bans). Possible follow-ups:
@@ -74,6 +74,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
+- **Clear custom rules** button next to Reset to system defaults (Boss): removes the rules the player added for tags that have no default row; the default rows (edited or not) stay. Hidden while there are none.
 - **Eight default rules are now editable rows** (Boss): Backpack = 1, Anti-Tank >= 1, Medium Killer >= 1, Base Breaker >= 1, Panic Weapon >= 1, Vehicle <= 1, Eagle <= 2 and Mines <= 1 moved from the Default rules switches to dim rows at the top of Additional rules. Adding a rule for the same tag edits the row (a clash with a default number lets the default give way); the x removes it; the new **Reset to system defaults** button restores all eight (rules added for other tags stay). An edited row is the player's own requirement, so it ranks as top priority; an untouched row is still the engine's default rule with its tier. Engine: `Engine.RULES` entries carry a `preset` ({tag, min, max}); no change to how builds are made (tests prove a preset handed over as a requirement behaves the same). Rules, edits and removals are now saved in `hd2_settings` (Additional rules used to be lost on reload). New title: Mines.
 - **Pill colours swapped** (Boss): Team Assist is now laser pink (#d6336c) and Laser is a brighter version of the old Team Assist yellow (#8a8210, was #534e05). **Colour the rest of the UI** removed from the to-do list: the pill colours are good for now (the faction buttons keep the faction accent).
 - **Meme-tag pills and three new titles** (Boss): pills for all the meme tags, Fire, Gas, Arc, Stealth, Explosive, Laser and Plasma, and laser / plasma count as meme tags from now on (any new meme tag gets a title and a pill). New titles: Laser, Plasma, Hand-Held Shield (`handheld`) and Explosive (needed for its pill). Pill colours are first guesses in `TAG_COLORS` (`docs/app.js`): fire #c8541a, gas #7d8a1d, arc #0c8a96, stealth #37474f, explosive #a0700a, laser #d6336c, plasma #8f3fe0. The `explosive` pass over all throwables and stratagems is saved for later (still open under the meme-tag item).

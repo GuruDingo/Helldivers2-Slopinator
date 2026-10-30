@@ -673,7 +673,16 @@
         } }, "×")));
     });
     $("presets-reset").hidden = !presetsChanged();
+    $("custom-clear").hidden = !customTags().length;
     renderRulesSummary();
+  }
+  // Rules the player added for tags that have no default row (edited default rows are not "custom": Reset handles those).
+  function customTags() {
+    return Object.keys(state.requirements).filter(function (tag) { return !presetForTag(tag); });
+  }
+  function clearCustom() {
+    customTags().forEach(function (tag) { delete state.requirements[tag]; });
+    onRulesChanged();
   }
   function resetPresets() {
     PRESETS.forEach(function (p) { delete state.disabledRules[p.id]; delete state.requirements[p.preset.tag]; });
@@ -1160,6 +1169,7 @@
       buildDefaultRules(); onRulesChanged();
     });
     $("presets-reset").addEventListener("click", resetPresets);
+    $("custom-clear").addEventListener("click", clearCustom);
     $("reset-all").addEventListener("click", resetAll);
     $("pool-edit").addEventListener("click", function () { showView("gear"); });
     document.querySelectorAll('input[name="faction"]').forEach(function (r) { r.addEventListener("change", saveSettings); });

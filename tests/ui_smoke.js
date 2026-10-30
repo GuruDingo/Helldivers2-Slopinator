@@ -317,6 +317,12 @@ function check(label, cond, extra) {
   addRule("armor", "min", 2); addRule("sentry", "min", 1);
   click($("presets-reset"));
   check("'Reset to system defaults' restores the defaults but keeps rules added for other tags", chipTexts().join("|") === DEFAULT_ROWS.join("|") + "|Sentry ≥ 1", chipTexts().join("|"));
+  check("'Clear custom rules' shows once a rule is added for a tag with no default row", !$("custom-clear").hidden);
+  addRule("armor", "min", 2); addRule("shield", "min", 1); addRule("laser", "max", 1);
+  click($("custom-clear"));
+  check("'Clear custom rules' removes only the added rules, not the default rows (edited ones included)", chipTexts().join("|") === DEFAULT_ROWS.join("|").replace("Anti-Tank ≥ 1", "Anti-Tank ≥ 2") && $("custom-clear").hidden && !$("presets-reset").hidden && /1 edited/.test($("rules-summary").textContent), chipTexts().join("|"));
+  click($("presets-reset"));
+  addRule("sentry", "min", 1);
   removeChip("sentry");
   check("...and removing the last extra rule leaves just the defaults, nothing counted", chipTexts().join("|") === DEFAULT_ROWS.join("|") && $("rules-summary").textContent === "");
 
