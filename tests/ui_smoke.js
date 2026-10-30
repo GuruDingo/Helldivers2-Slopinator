@@ -53,6 +53,9 @@ function check(label, cond, extra) {
   check("no script errors / HD2Engine loaded", typeof win.HD2Engine === "object");
   check("My Gear: 36 warbonds, the six Requisition shops grouped under one header (31 top-level blocks)", doc.querySelectorAll("#gear-list .wb-block:not(.wb-group)").length === 36 && doc.querySelectorAll("#gear-list .wb-group").length === 1 && doc.querySelectorAll("#gear-list > .wb-block").length === 31, doc.querySelectorAll("#gear-list .wb-block").length);
   check("200 gear rows", doc.querySelectorAll("#gear-list .gear-row").length === 200);
+  check("every gear row has a lazy thumbnail from the item's image link", Array.from(doc.querySelectorAll("#gear-list .gear-row")).every((r) => { const i = r.querySelector("img.gear-thumb"); return i && i.getAttribute("loading") === "lazy" && /^https:\/\//.test(i.getAttribute("src")); }));
+  { const t = rowOf("AR-23 Liberator").querySelector("img.gear-thumb"); t.dispatchEvent(new win.Event("error"));
+    check("a thumbnail that can't load becomes a blank square of the same size", !rowOf("AR-23 Liberator").querySelector("img.gear-thumb") && !!rowOf("AR-23 Liberator").querySelector(".gear-thumb-blank")); }
   check("new browser starts with everything owned", $("grand-total").textContent === "200 / 200 items owned", $("grand-total").textContent);
   check("pool line on the Randomizer tab", /Rolling from 200 of 200 items\./.test(poolText()), poolText());
   check("old Warbonds / Exclude sections are gone", !$("warbond-grid") && !$("exclude-input"));

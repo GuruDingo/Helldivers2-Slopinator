@@ -27,17 +27,11 @@ Items we agreed to come back to. Nothing below is started unless marked.
       Strafing Run (5) vs the other Eagles (7), Maelstrom (4, missiles 5), Rover (2, fire is 4), Incendiary Mines (4,
       explosion 3), Gas Mortar Sentry (6) and Mortar Sentry (3, headline is AV only), the four two-value ones (Patriot
       3/6, Lumberer 4/6, Bastion 4/8, Dog Breath 5/6), and whether the two smoke strikes should really be blank.
-- [ ] **Condensed loadout cards** (Boss, 2026-10-30; do before the image migration). A "Compact cards" toggle on the
-      Randomizer tab: one short row per item (small thumbnail, name, AP icons, tag pills, lock/reroll buttons) instead
-      of the 180px / 376px image cards. Setting saved in `hd2_settings`; the card code (`itemCard`) gets a compact
-      variant so everything else (locks, flags, rerolls) is shared.
-- [ ] **Artwork in My Gear** (Boss, 2026-10-30: wanted before the image migration). Plan: a small thumbnail (~32px) at the
-      left of each `.gear-row` using the item's `img_url`, `loading="lazy"` so only the warbond dropdowns you open fetch
-      images, with a blank placeholder on error. Warbond header art after that.
-      Background: the loadout cards ALREADY show item images,
-      hotlinked from helldivers.wiki.gg (all 201 items have an `img_url` there). Warbonds also have `img_url`
-      now (28 of 36 filled; the Requisition shops, Superstore and Campaign/Event Rewards are blank) but My Gear
-      doesn't show them yet. Hotlinking is OK for now (friends-only); reassess before sharing publicly.
+- [~] **Artwork in My Gear** (Boss, 2026-10-30). DONE: a lazy-loaded thumbnail (44x32) at the left of every item row, from the
+      item's `img_url` (blank square if it can't load; the loadout cards are unchanged, no compact mode on the Randomizer
+      tab, per Boss). STILL TO DO: warbond cover art in the warbond headers (28 of 36 warbonds have an `img_url`; the
+      Requisition shops, Superstore and Campaign/Event Rewards are blank). Hotlinking is OK for now (friends-only);
+      the image migration replaces the links later.
 - [~] **Give every tag a display title.** 17 of 40 tags have titles now (the 9 old ones, "assist" is shown as
       "Team Assist", plus Fire, Stealth, Orbital, Eagle, Sentry, Gas, Vehicle, Arc). Only titled tags appear in the
       "Require tags" dropdown; the other 23 are hidden until they get a title. `hd2-tags.xlsx` (sent earlier) is now
