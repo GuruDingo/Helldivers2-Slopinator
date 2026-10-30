@@ -185,6 +185,8 @@ hr.divider { border: none; border-top: 1px solid var(--accent); margin: 1.5rem 0
 .gear-main { display: flex; align-items: center; gap: .75rem; flex: 1; min-width: 0; cursor: pointer; padding: .15rem 0; }
 .gear-main input[type=checkbox] { accent-color: var(--accent); width: 15px; height: 15px; flex-shrink: 0; }
 .gear-main input:disabled { cursor: default; }
+.gear-thumb { width: 44px; height: 32px; flex-shrink: 0; object-fit: contain; background: #222323; border-radius: 3px; }
+.gear-thumb-blank { display: inline-block; }
 .tr-name { flex: 1; font-size: .82rem; color: #ddd; min-width: 0; }
 .gear-main input:checked ~ .tr-name { color: #4caf50; }
 .gear-row.is-blocked .gear-main input ~ .tr-name { color: #e57373; text-decoration: line-through; }

@@ -151,7 +151,7 @@ id,category,name,nicknames,tags,factions,warbond,img_url,armor_pen
 150,backpack,B-100 Portable Hellbomb,"b-100 portable hellbomb,b-100,portable hellbomb,hellbomb","armor,demo,backpack",any,servants_of_freedom,https://helldivers.wiki.gg/images/Portable_Hellbomb_Stratagem_Icon_Background.svg,10
 151,backpack,AX/ARC-3 K-9,"ax/arc-3 k-9,ax/arc-3,k-9,arc rover,arc guard dog","rover,chaff,arc,backpack",any,force_of_law,https://helldivers.wiki.gg/images/K-9_Stratagem_Icon_Background.svg,7
 152,backpack,LIFT-860 Hover Pack,"lift-860 hover pack,lift-860,hover pack","jump,stealth,backpack",any,borderline_justice,https://helldivers.wiki.gg/images/Hover_Pack_Stratagem_Icon_Background.svg,
-153,backpack,AX/TX-13 Dog Breath,"ax/tx-13 dog breath,ax/tx-13,dog breath,gas rover,gas guard dog","rover,gas,chaff,backpack",any,chemical_agents,https://helldivers.wiki.gg/images/Dog_Breath_Stratagem_Icon_Background.svg,5/6
+153,backpack,AX/TX-13 Dog Breath,"ax/tx-13 dog breath,ax/tx-13,dog breath,gas rover,gas guard dog","rover,gas,chaff,backpack",any,chemical_agents,https://helldivers.wiki.gg/images/Dog_Breath_Stratagem_Icon_Background.svg,5
 154,backpack,LIFT-182 Warp Pack,"lift-182 warp pack,lift-182,warp pack","jump,stealth,backpack",any,control_group,https://helldivers.wiki.gg/images/Warp_Pack_Stratagem_Icon_Background.svg,
 155,vehicle,M-102 Gunner FRV,"m-102 gunner frv,m-102 fast recon vehicle,m-102,fast recon vehicle,frv,gunner frv","vehicle,frv,assist",any,req_h,https://helldivers.wiki.gg/images/Fast_Recon_Vehicle_Stratagem_Icon_Background.svg,4
 156,vehicle,M-103 Supply FRV,"m-103 supply frv,m-103,supply frv","vehicle,frv,assist,supply",any,req_h,https://helldivers.wiki.gg/images/Supply_FRV_Stratagem_Icon_Background.svg,3

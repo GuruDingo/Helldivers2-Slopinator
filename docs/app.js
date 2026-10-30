@@ -117,6 +117,15 @@
     return img;
   }
 
+  // Small picture for a My Gear row: lazy-loaded (rows inside a closed warbond don't fetch anything), and a blank
+  // square of the same size if there is no image or it can't load, so the names stay lined up.
+  function gearThumb(item) {
+    if (!item.imgUrl) return h("span", { class: "gear-thumb gear-thumb-blank", "aria-hidden": "true" });
+    var img = h("img", { src: item.imgUrl, alt: "", class: "gear-thumb", loading: "lazy", referrerpolicy: "no-referrer" });
+    img.addEventListener("error", function () { img.replaceWith(h("span", { class: "gear-thumb gear-thumb-blank", "aria-hidden": "true" })); });
+    return img;
+  }
+
   function tagPills(item) {
     return Object.keys(TAG_COLORS)
       .filter(function (tag) { return Engine.has(item, tag); })
@@ -855,7 +864,7 @@
             facBoxes[k], facIcon(f, FAC_LETTER[f]));
         }), revert);
       var row = h("div", { class: "gear-row", "data-search": [item.name].concat(item.nicknames || [], [w.name, w.key]).join(" ").toLowerCase() },
-        h("label", { class: "gear-main" }, cb,
+        h("label", { class: "gear-main" }, cb, gearThumb(item),
           h("span", { class: "tr-name" }, item.name),
           h("span", { class: "tr-type" }, TYPE_LABELS[item.cat] || WEAPON_CAT_LABELS[item.cat] || item.cat)),
         facSet, nv);
