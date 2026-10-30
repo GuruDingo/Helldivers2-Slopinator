@@ -28,7 +28,7 @@
     fire: "Fire", stealth: "Stealth", orbital: "Orbital", eagle: "Eagle", sentry: "Sentry",
     gas: "Gas", vehicle: "Vehicle", arc: "Arc",
     explosive: "Explosive", laser: "Laser", plasma: "Plasma", handheld: "Hand-Held Shield", mines: "Mines",
-    onehand: "One-Handed", supply: "Supply",
+    onehand: "One-Handed", supply: "Supply", support: "Support Weapon",
   };
   // Order here = order of the pills on a card. Tags not listed here still work in the rules,
   // they just don't get a pill. (Pills need a title in TAG_NAMES above too.)

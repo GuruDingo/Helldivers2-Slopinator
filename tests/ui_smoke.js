@@ -72,7 +72,7 @@ function check(label, cond, extra) {
   check("first visit wrote the owned list to localStorage", Object.keys(JSON.parse(win.localStorage.getItem("hd2_tracker"))).length === ACTIVE - win.HD2_DATA.items.filter((i) => i.warbond === "base" && i.factions.indexOf("none") === -1).length); // everything except the always-owned Base Game items
   check("7 lock inputs", doc.querySelectorAll("#lock-grid input").length === 7);
   check("datalists filled", $("dl-primary").children.length > 40 && $("dl-strat").children.length > 60);
-  check("require tag dropdown lists only titled tags (24), by title", (() => { const o = Array.from($("require-tag").children); const t = o.map((x) => x.textContent); return o.length === 24 && t.includes("Team Assist") && t.includes("Fire") && t.includes("Laser") && t.includes("Plasma") && t.includes("Hand-Held Shield") && t.includes("Explosive") && t.includes("One-Handed") && t.includes("Supply") && t.every((x, i) => i === 0 || t[i - 1].localeCompare(x) <= 0) && !o.some((x) => ["stun", "smg", "mortar"].includes(x.value)) && o.some((x) => x.value === "assist"); })(), Array.from($("require-tag").children).map((x) => x.textContent).join(", "));
+  check("require tag dropdown lists only titled tags (25), by title", (() => { const o = Array.from($("require-tag").children); const t = o.map((x) => x.textContent); return o.length === 25 && t.includes("Team Assist") && t.includes("Fire") && t.includes("Laser") && t.includes("Plasma") && t.includes("Hand-Held Shield") && t.includes("Explosive") && t.includes("One-Handed") && t.includes("Supply") && t.includes("Support Weapon") && t.every((x, i) => i === 0 || t[i - 1].localeCompare(x) <= 0) && !o.some((x) => ["stun", "smg", "mortar"].includes(x.value)) && o.some((x) => x.value === "assist"); })(), Array.from($("require-tag").children).map((x) => x.textContent).join(", "));
   check("autocomplete options carry names only (no category labels)",
     Array.from(doc.querySelectorAll("#dl-strat option")).every((o) => !o.hasAttribute("label")) &&
     $("dl-strat").querySelector("option[value='AC-8 Autocannon']") !== null);
@@ -263,7 +263,7 @@ function check(label, cond, extra) {
   const chipFor = (tag) => doc.querySelector('#require-chips .chip[data-tag="' + tag + '"]');
   const removeChip = (tag) => click(chipFor(tag).querySelector("button"));
   // Every default rule is a row, listed from the highest priority tier to the lowest, the limits last.
-  const DEFAULT_ROWS = ["Backpack = 1", "A shield backpack needs a one-handed weapon", "No supply pack alongside 2+ no-ammo items",
+  const DEFAULT_ROWS = ["Backpack = 1", "A hand-held shield needs a one-handed weapon", "No supply pack alongside 2+ no-ammo items",
     "Anti-Tank ≥ 1", "A chaff killer in primary or secondary", "Base Breaker ≥ 1",
     "At least one support weapon", "Medium Killer ≥ 1", "Panic Weapon ≥ 1",
     "Chaff / medium / anti-tank counts within 3 of each other", "Two base breakers when no weapon is one",

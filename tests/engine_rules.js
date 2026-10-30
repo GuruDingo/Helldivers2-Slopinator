@@ -487,4 +487,14 @@ test("Default rules written as generic rules still flag what a build misses (shi
   assert(!ids(noSupport).includes("support"));
 });
 
+test("Every support weapon carries the 'support' tag, so it works as a tag in rules", () => {
+  const sup = globalThis.HD2_DATA.items.filter((i) => i.cat === "support");
+  assert(sup.length > 0 && sup.every((i) => (i.tags || []).includes("support")), "a support weapon lacks the tag");
+  assert(!globalThis.HD2_DATA.items.some((i) => i.cat !== "support" && (i.tags || []).includes("support")), "a non-support item has it");
+  const bs = strict(300, { requirements: { support: { min: 0, max: 0 } }, disabledRules: ["support"] });
+  const byName = (n) => globalThis.HD2_DATA.items.find((i) => i.name === n);
+  bs.forEach((l) => assert(!l.strategems.some((n) => (byName(n.name || n) || {}).cat === "support"), "a support weapon was picked despite 'support = 0'"));
+  assert(strict(300, { requirements: { support: { min: 1, max: 1 } } }).every((l) => l.strategems.filter((n) => (byName(n.name || n) || {}).cat === "support").length === 1));
+});
+
 console.log("\n" + passed + " engine rule tests passed" + (process.exitCode ? " (with failures)" : ""));

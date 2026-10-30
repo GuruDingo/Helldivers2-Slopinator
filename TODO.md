@@ -15,9 +15,9 @@ Items we agreed to come back to. Nothing below is started unless marked.
       single-file build embeds them (2.3 MB, works offline). Re-run the fetch (Actions -> Fetch images, or the script)
       when a new item / warbond / wiki image is added. The warbond covers are saved too, but not shown anywhere (header art is parked, 2026-10-30).
 - [x] ~~Host the tool at a URL~~ done 2026-10-30: live at https://gurudingo.github.io/Helldivers2-Slopinator/ (GitHub Pages, `main` / `/docs`). Open choices still: custom domain, analytics/feedback, shareable-loadout links.
-- [~] **Give every tag a display title.** 24 of 42 tags have titles now (the 9 old ones, "assist" is shown as
+- [~] **Give every tag a display title.** 25 of 42 tags have titles now (the 9 old ones, "assist" is shown as
       "Team Assist", plus Fire, Stealth, Orbital, Eagle, Sentry, Gas, Vehicle, Arc, and since 2026-10-30 Explosive, Laser,
-      Plasma and Hand-Held Shield, then Mines, then One-Handed and Supply). Only titled tags appear in the Rules dropdown; the other 18 are hidden until
+      Plasma and Hand-Held Shield, then Mines, then One-Handed, Supply and Support Weapon). Only titled tags appear in the Rules dropdown; the other 17 are hidden until
       they get a title. `hd2-tags.xlsx` (sent earlier) is now
       out of date. Possible next step: move tag titles/pill colours into a `hd2tags.csv` instead of `TAG_NAMES` in
       `docs/app.js`.
@@ -60,7 +60,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - [ ] **Challenge mode**: presets such as "no support weapon" or "all Eagles", built from rule switches + rules.
       - [ ] Per-rule priority editing (drag to re-rank the tiers) - today the tiers are fixed in `RULE_TIER`.
       - [x] Rules for item categories (e.g. "no Orbitals"): done 2026-10-30 via the rule builder.
-      - [ ] Optional: let a tag with no title be chosen in Additional rules (the dropdown still lists only the 24 titled tags).
+      - [ ] Optional: let a tag with no title be chosen in Additional rules (the dropdown still lists only the 25 titled tags).
 - [ ] **Faction rules: sub-factions.** Extend the faction rules (`works_for` / the `factions` column) to
       specify sub-factions (e.g. unit types within Terminids / Automatons / Illuminate).
 - [x] ~~Editable faction recommendations~~ done 2026-10-29 (My Gear > "Edit factions"; see README). Possible follow-ups:

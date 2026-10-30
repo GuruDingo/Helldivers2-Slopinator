@@ -106,41 +106,41 @@ id,category,name,nicknames,tags,factions,warbond,img_url,armor_pen
 104,throwable,G-8 Immolation,"g-8 immolation,g-8,immolation,molotov","fire,chaff,stun,assist",any,ironclad_democracy,https://helldivers.wiki.gg/images/G-8_Immolation_Throwable_Render.png,0
 105,throwable,G-60 Anti-Tank Seeker,"g-60 anti-tank seeker,g-60,anti-tank seeker,at seeker,anti-tank seeker grenade,at seeker grenade",armor,any,ironclad_democracy,https://helldivers.wiki.gg/images/G-60_Anti-Tank_Seeker_Throwable_Render.png,5
 106,throwable,G-11 Caltrops,"g-11 caltrops,g-11,caltrops","chaff,stun,assist",bug,scope_of_authority,https://helldivers.wiki.gg/images/G-11_Caltrops_Throwable_Render.png,3
-107,support,EAT-17 Expendable Anti-Tank,"eat-17 expendable anti-tank,eat-17,expendable anti-tank,eat","expendable,armor,demo",any,req_p,https://helldivers.wiki.gg/images/Expendable_Anti-Tank_Stratagem_Icon_Background.svg,6
-108,support,MLS-4X Commando,"mls-4x commando,mls-4x,commando","expendable,med,armor,demo",any,req_p,https://helldivers.wiki.gg/images/Commando_Stratagem_Icon_Background.svg,6
-109,support,EAT-700 Expendable Napalm,"eat-700 expendable napalm,eat-700,expendable napalm","expendable,chaff,med,demo",any,dust_devils,https://helldivers.wiki.gg/images/Expendable_Napalm_Stratagem_Icon_Background.svg,3
-110,support,MS-11 Solo Silo,"ms-11 solo silo,ms-11,solo silo,silo","expendable,armor,demo",any,dust_devils,https://helldivers.wiki.gg/images/Solo_Silo_Stratagem_Icon_Background.svg,7
-111,support,EAT-411 Leveller,"eat-411 leveller,eat-411,leveller","expendable,med,armor,demo",any,siege_breakers,https://helldivers.wiki.gg/images/Leveller_Stratagem_Icon_Background.svg,6
-112,support,MGX-42 Bullet Storm,"mgx-42 bullet storm,mgx-42,bullet storm","expendable,chaff","bug,squid",exo_experts,https://helldivers.wiki.gg/images/Bullet_Storm_Stratagem_Icon_Background.svg,2
-113,support,MG-43 Machine Gun,"mg-43 machine gun,mg-43,machine gun","chaff,med","bug,squid",base,https://helldivers.wiki.gg/images/Machine_Gun_Stratagem_Icon_Background.svg,3
-114,support,APW-1 Anti-Materiel Rifle,"apw-1 anti-materiel rifle,apw-1,anti-materiel rifle,amr","stealth,med,armor",any,req_p,https://helldivers.wiki.gg/images/Anti-Materiel_Rifle_Stratagem_Icon_Background.svg,4
-115,support,M-105 Stalwart,"m-105 stalwart,m-105,stalwart",chaff,"bug,squid",req_p,https://helldivers.wiki.gg/images/Stalwart_Stratagem_Icon_Background.svg,2
-116,support,GR-8 Recoilless Rifle,"gr-8 recoilless rifle,gr-8,recoilless rifle","armor,demo,backpack",any,req_p,https://helldivers.wiki.gg/images/Recoilless_Rifle_Stratagem_Icon_Background.svg,5/6
-117,support,FLAM-40 Flamethrower,"flam-40 flamethrower,flam-40,flamethrower","chaff,fire","bug,squid",req_p,https://helldivers.wiki.gg/images/Flamethrower_Stratagem_Icon_Background.svg,4
-118,support,AC-8 Autocannon,"ac-8 autocannon,ac-8,autocannon","chaff,med,armor,demo,backpack",any,req_p,https://helldivers.wiki.gg/images/Autocannon_Stratagem_Icon_Background.svg,4
-119,support,MG-206 Heavy Machine Gun,"mg-206 heavy machine gun,mg-206,heavy machine gun,hmr","chaff,med,armor","bug,squid",req_p,https://helldivers.wiki.gg/images/Heavy_Machine_Gun_Stratagem_Icon_Background.svg,4
-120,support,RL-77 Airburst Rocket Launcher,"rl-77 airburst rocket launcher,rl-77,airburst rocket launcher,airburst rocket,airburst","chaff,backpack","bug,squid",req_p,https://helldivers.wiki.gg/images/Airburst_Rocket_Launcher_Stratagem_Icon_Background.svg,3
-121,support,RS-422 Railgun,"rs-422 railgun,rs-422,railgun",armor,"bug,bot",req_p,https://helldivers.wiki.gg/images/Railgun_Stratagem_Icon_Background.svg,5
-122,support,FAF-14 Spear,"faf-14 spear,faf-14,spear","armor,backpack","bug,bot",req_p,https://helldivers.wiki.gg/images/Spear_Stratagem_Icon_Background.svg,7
-123,support,StA-X3 W.A.S.P. Launcher,"sta-x3 w.a.s.p. launcher,sta-x3 wasp launcher,sta-x3,w.a.s.p. launcher,wasp launcher,wasp,w.a.s.p.","med,armor,backpack",squid,req_p,https://helldivers.wiki.gg/images/W.A.S.P._Launcher_Stratagem_Icon_Background.svg,6
-124,support,GL-21 Grenade Launcher,"gl-21 grenade launcher,gl-21,grenade launcher","chaff,med,demo",any,req_e,https://helldivers.wiki.gg/images/Grenade_Launcher_Stratagem_Icon_Background.svg,3
-125,support,LAS-98 Laser Cannon,"las-98 laser cannon,las-98,laser cannon","chaff,med,armor,charge,beam,laser","bug,squid",req_e,https://helldivers.wiki.gg/images/Laser_Cannon_Stratagem_Icon_Background.svg,4
-126,support,ARC-3 Arc Thrower,"arc-3 arc thrower,arc-3,arc thrower","arc,chaff,med,charge,stun,assist",any,req_e,https://helldivers.wiki.gg/images/Arc_Thrower_Stratagem_Icon_Background.svg,7
-127,support,LAS-99 Quasar Cannon,"las-99 quasar cannon,las-99,quasar cannon,quasar","armor,demo,charge,laser","bug,bot",req_e,https://helldivers.wiki.gg/images/Quasar_Cannon_Stratagem_Icon_Background.svg,6
-128,support,TX-41 Sterilizer,"tx-41 sterilizer,tx-41,sterilizer","gas,chaff","bug,squid",chemical_agents,https://helldivers.wiki.gg/images/Sterilizer_Stratagem_Icon_Background.svg,5
-129,support,CQC-1 One True Flag,"cqc-1 one true flag,cqc-1,one true flag,flag","melee,onehand,assist,taunt",any,masters_of_ceremony,https://helldivers.wiki.gg/images/One_True_Flag_Stratagem_Icon_Background.svg,3
-130,support,GL-52 De-Escalator,"gl-52 de-escalator,gl-52,de-escalator","arc,chaff,med","bug,squid",force_of_law,https://helldivers.wiki.gg/images/De-Escalator_Stratagem_Icon_Background.svg,4
-131,support,PLAS-45 Epoch,"plas-45 epoch,plas-45,epoch,epog","chaff,med,armor,plasma",any,control_group,https://helldivers.wiki.gg/images/Epoch_Stratagem_Icon_Background.svg,4/5
-132,support,S-11 Speargun,"s-11 speargun,s-11,speargun","gas,med,demo","bug,bot",dust_devils,https://helldivers.wiki.gg/images/Speargun_Stratagem_Icon_Background.svg,5
-133,support,M-1000 Maxigun,"m-1000 maxigun,m-1000,maxigun,minigun","chaff,med,backpack","bug,squid",python_commandos,https://helldivers.wiki.gg/images/Maxigun_Stratagem_Icon_Background.svg,3
-134,support,CQC-9 Defoliation Tool,"cqc-9 defoliation tool,cqc-9,defoliation tool,chainsaw","melee,med,stealth",bot,python_commandos,https://helldivers.wiki.gg/images/Defoliation_Tool_Stratagem_Icon_Background.svg,3/5
-135,support,B/MD C4 Pack,"b/md c4 pack,b/md,b-md,c4 pack,c4","armor,demo,stealth,backpack","bot,squid",redacted_regiment,https://helldivers.wiki.gg/images/C4_Pack_Stratagem_Icon_Background.svg,7
-136,support,CQC-20 Breaching Hammer,"cqc-20 breaching hammer,cqc-20,breaching hammer,hammer","melee,armor,demo",any,siege_breakers,https://helldivers.wiki.gg/images/Breaching_Hammer_Stratagem_Icon_Background.svg,3
-137,support,GL-28 Belt-Fed Grenade Launcher,"gl-28 belt-fed grenade launcher,gl-28,belt-fed grenade launcher,belt-fed grenade","chaff,med,demo,backpack",any,siege_breakers,https://helldivers.wiki.gg/images/Belt-Fed_Grenade_Launcher_Stratagem_Icon_Background.svg,4
-138,support,B/FLAM-80 Cremator,"b/flam-80 cremator,b-flam-80,b/flam-80,cremator","fire,chaff,med,backpack",any,entrenched_division,https://helldivers.wiki.gg/images/Cremator_Stratagem_Icon_Background.svg,4
-139,support,40-K Meltagun,"40-k meltagun,40-k,meltagun,melta gun,melta","armor,demo,fire",any,40k,https://helldivers.wiki.gg/images/Meltagun_Stratagem_Icon_Background.svg,7
-140,support,AMW-20 Apex,"amw-20 apex,amw-20,apex","med,armor,backpack","bug,bot",scope_of_authority,https://helldivers.wiki.gg/images/Apex_Stratagem_Icon_Background.svg,5
-141,support,LAS-44 Nova,"las-44 nova,las-44,nova","med,armor,charge,laser",bot,scope_of_authority,https://helldivers.wiki.gg/images/Nova_Stratagem_Icon_Background.svg,5
+107,support,EAT-17 Expendable Anti-Tank,"eat-17 expendable anti-tank,eat-17,expendable anti-tank,eat","expendable,armor,demo,support",any,req_p,https://helldivers.wiki.gg/images/Expendable_Anti-Tank_Stratagem_Icon_Background.svg,6
+108,support,MLS-4X Commando,"mls-4x commando,mls-4x,commando","expendable,med,armor,demo,support",any,req_p,https://helldivers.wiki.gg/images/Commando_Stratagem_Icon_Background.svg,6
+109,support,EAT-700 Expendable Napalm,"eat-700 expendable napalm,eat-700,expendable napalm","expendable,chaff,med,demo,support",any,dust_devils,https://helldivers.wiki.gg/images/Expendable_Napalm_Stratagem_Icon_Background.svg,3
+110,support,MS-11 Solo Silo,"ms-11 solo silo,ms-11,solo silo,silo","expendable,armor,demo,support",any,dust_devils,https://helldivers.wiki.gg/images/Solo_Silo_Stratagem_Icon_Background.svg,7
+111,support,EAT-411 Leveller,"eat-411 leveller,eat-411,leveller","expendable,med,armor,demo,support",any,siege_breakers,https://helldivers.wiki.gg/images/Leveller_Stratagem_Icon_Background.svg,6
+112,support,MGX-42 Bullet Storm,"mgx-42 bullet storm,mgx-42,bullet storm","expendable,chaff,support","bug,squid",exo_experts,https://helldivers.wiki.gg/images/Bullet_Storm_Stratagem_Icon_Background.svg,2
+113,support,MG-43 Machine Gun,"mg-43 machine gun,mg-43,machine gun","chaff,med,support","bug,squid",base,https://helldivers.wiki.gg/images/Machine_Gun_Stratagem_Icon_Background.svg,3
+114,support,APW-1 Anti-Materiel Rifle,"apw-1 anti-materiel rifle,apw-1,anti-materiel rifle,amr","stealth,med,armor,support",any,req_p,https://helldivers.wiki.gg/images/Anti-Materiel_Rifle_Stratagem_Icon_Background.svg,4
+115,support,M-105 Stalwart,"m-105 stalwart,m-105,stalwart","chaff,support","bug,squid",req_p,https://helldivers.wiki.gg/images/Stalwart_Stratagem_Icon_Background.svg,2
+116,support,GR-8 Recoilless Rifle,"gr-8 recoilless rifle,gr-8,recoilless rifle","armor,demo,backpack,support",any,req_p,https://helldivers.wiki.gg/images/Recoilless_Rifle_Stratagem_Icon_Background.svg,5/6
+117,support,FLAM-40 Flamethrower,"flam-40 flamethrower,flam-40,flamethrower","chaff,fire,support","bug,squid",req_p,https://helldivers.wiki.gg/images/Flamethrower_Stratagem_Icon_Background.svg,4
+118,support,AC-8 Autocannon,"ac-8 autocannon,ac-8,autocannon","chaff,med,armor,demo,backpack,support",any,req_p,https://helldivers.wiki.gg/images/Autocannon_Stratagem_Icon_Background.svg,4
+119,support,MG-206 Heavy Machine Gun,"mg-206 heavy machine gun,mg-206,heavy machine gun,hmr","chaff,med,armor,support","bug,squid",req_p,https://helldivers.wiki.gg/images/Heavy_Machine_Gun_Stratagem_Icon_Background.svg,4
+120,support,RL-77 Airburst Rocket Launcher,"rl-77 airburst rocket launcher,rl-77,airburst rocket launcher,airburst rocket,airburst","chaff,backpack,support","bug,squid",req_p,https://helldivers.wiki.gg/images/Airburst_Rocket_Launcher_Stratagem_Icon_Background.svg,3
+121,support,RS-422 Railgun,"rs-422 railgun,rs-422,railgun","armor,support","bug,bot",req_p,https://helldivers.wiki.gg/images/Railgun_Stratagem_Icon_Background.svg,5
+122,support,FAF-14 Spear,"faf-14 spear,faf-14,spear","armor,backpack,support","bug,bot",req_p,https://helldivers.wiki.gg/images/Spear_Stratagem_Icon_Background.svg,7
+123,support,StA-X3 W.A.S.P. Launcher,"sta-x3 w.a.s.p. launcher,sta-x3 wasp launcher,sta-x3,w.a.s.p. launcher,wasp launcher,wasp,w.a.s.p.","med,armor,backpack,support",squid,req_p,https://helldivers.wiki.gg/images/W.A.S.P._Launcher_Stratagem_Icon_Background.svg,6
+124,support,GL-21 Grenade Launcher,"gl-21 grenade launcher,gl-21,grenade launcher","chaff,med,demo,support",any,req_e,https://helldivers.wiki.gg/images/Grenade_Launcher_Stratagem_Icon_Background.svg,3
+125,support,LAS-98 Laser Cannon,"las-98 laser cannon,las-98,laser cannon","chaff,med,armor,charge,beam,laser,support","bug,squid",req_e,https://helldivers.wiki.gg/images/Laser_Cannon_Stratagem_Icon_Background.svg,4
+126,support,ARC-3 Arc Thrower,"arc-3 arc thrower,arc-3,arc thrower","arc,chaff,med,charge,stun,assist,support",any,req_e,https://helldivers.wiki.gg/images/Arc_Thrower_Stratagem_Icon_Background.svg,7
+127,support,LAS-99 Quasar Cannon,"las-99 quasar cannon,las-99,quasar cannon,quasar","armor,demo,charge,laser,support","bug,bot",req_e,https://helldivers.wiki.gg/images/Quasar_Cannon_Stratagem_Icon_Background.svg,6
+128,support,TX-41 Sterilizer,"tx-41 sterilizer,tx-41,sterilizer","gas,chaff,support","bug,squid",chemical_agents,https://helldivers.wiki.gg/images/Sterilizer_Stratagem_Icon_Background.svg,5
+129,support,CQC-1 One True Flag,"cqc-1 one true flag,cqc-1,one true flag,flag","melee,onehand,assist,taunt,support",any,masters_of_ceremony,https://helldivers.wiki.gg/images/One_True_Flag_Stratagem_Icon_Background.svg,3
+130,support,GL-52 De-Escalator,"gl-52 de-escalator,gl-52,de-escalator","arc,chaff,med,support","bug,squid",force_of_law,https://helldivers.wiki.gg/images/De-Escalator_Stratagem_Icon_Background.svg,4
+131,support,PLAS-45 Epoch,"plas-45 epoch,plas-45,epoch,epog","chaff,med,armor,plasma,support",any,control_group,https://helldivers.wiki.gg/images/Epoch_Stratagem_Icon_Background.svg,4/5
+132,support,S-11 Speargun,"s-11 speargun,s-11,speargun","gas,med,demo,support","bug,bot",dust_devils,https://helldivers.wiki.gg/images/Speargun_Stratagem_Icon_Background.svg,5
+133,support,M-1000 Maxigun,"m-1000 maxigun,m-1000,maxigun,minigun","chaff,med,backpack,support","bug,squid",python_commandos,https://helldivers.wiki.gg/images/Maxigun_Stratagem_Icon_Background.svg,3
+134,support,CQC-9 Defoliation Tool,"cqc-9 defoliation tool,cqc-9,defoliation tool,chainsaw","melee,med,stealth,support",bot,python_commandos,https://helldivers.wiki.gg/images/Defoliation_Tool_Stratagem_Icon_Background.svg,3/5
+135,support,B/MD C4 Pack,"b/md c4 pack,b/md,b-md,c4 pack,c4","armor,demo,stealth,backpack,support","bot,squid",redacted_regiment,https://helldivers.wiki.gg/images/C4_Pack_Stratagem_Icon_Background.svg,7
+136,support,CQC-20 Breaching Hammer,"cqc-20 breaching hammer,cqc-20,breaching hammer,hammer","melee,armor,demo,support",any,siege_breakers,https://helldivers.wiki.gg/images/Breaching_Hammer_Stratagem_Icon_Background.svg,3
+137,support,GL-28 Belt-Fed Grenade Launcher,"gl-28 belt-fed grenade launcher,gl-28,belt-fed grenade launcher,belt-fed grenade","chaff,med,demo,backpack,support",any,siege_breakers,https://helldivers.wiki.gg/images/Belt-Fed_Grenade_Launcher_Stratagem_Icon_Background.svg,4
+138,support,B/FLAM-80 Cremator,"b/flam-80 cremator,b-flam-80,b/flam-80,cremator","fire,chaff,med,backpack,support",any,entrenched_division,https://helldivers.wiki.gg/images/Cremator_Stratagem_Icon_Background.svg,4
+139,support,40-K Meltagun,"40-k meltagun,40-k,meltagun,melta gun,melta","armor,demo,fire,support",any,40k,https://helldivers.wiki.gg/images/Meltagun_Stratagem_Icon_Background.svg,7
+140,support,AMW-20 Apex,"amw-20 apex,amw-20,apex","med,armor,backpack,support","bug,bot",scope_of_authority,https://helldivers.wiki.gg/images/Apex_Stratagem_Icon_Background.svg,5
+141,support,LAS-44 Nova,"las-44 nova,las-44,nova","med,armor,charge,laser,support",bot,scope_of_authority,https://helldivers.wiki.gg/images/Nova_Stratagem_Icon_Background.svg,5
 142,backpack,B-1 Supply Pack,"b-1 supply pack,b-1,supply pack","assist,supply,backpack",any,req_e,https://helldivers.wiki.gg/images/Supply_Pack_Stratagem_Icon_Background.svg,
 143,backpack,LIFT-850 Jump Pack,"lift-850 jump pack,lift-850,jump pack","jump,stealth,backpack",any,req_h,https://helldivers.wiki.gg/images/Jump_Pack_Stratagem_Icon_Background.svg,
 144,backpack,SH-20 Ballistic Shield Backpack,"sh-20 ballistic shield backpack,sh-20,ballistic shield,sh-20 ballistic shield","shield,handheld,backpack",bot,req_e,https://helldivers.wiki.gg/images/Ballistic_Shield_Backpack_Stratagem_Icon_Background.svg,
