@@ -35,11 +35,11 @@
   // a little different from the green / blue / red of the stratagem icons (#699655 / #55b9d2 / #dc6455) so the two don't blur.
   var TAG_COLORS = {
     melee: "#382E02", expendable: "#0F0D02", chaff: "#27ae32", med: "#2f80ed", armor: "#c62828",
-    demo: "#4b058d", panic: "#2943b9", assist: "#534e05", backpack: "#555555",
+    demo: "#4b058d", panic: "#2943b9", assist: "#d6336c", backpack: "#555555",
     // The "meme" tags (elemental / themed builds) all get pills, and so do any meme tags added later: fire, gas, arc,
     // stealth, explosive, laser, plasma. Colours are first guesses, one hue family per tag.
     fire: "#c8541a", gas: "#7d8a1d", arc: "#0c8a96", stealth: "#37474f", explosive: "#a0700a",
-    laser: "#d6336c", plasma: "#8f3fe0",
+    laser: "#8a8210", plasma: "#8f3fe0",
   };
   var TYPE_COLORS = {
     support: "#011419", backpack: "#011419", vehicle: "#011419",

@@ -9,8 +9,6 @@ Items we agreed to come back to. Nothing below is started unless marked.
       whether any other support weapon shows two icons on the wiki's Weapons page (Boss set Recoilless Rifle 5/6, Epoch
       4/5 and Defoliation Tool 3/5 on 2026-10-30; the page's support section didn't load for me, so the rest use one
       main value).
-- [ ] **Colour the rest of the UI**: weapon tags (the pills only cover ~9 of the ~40 tags) and the faction buttons
-      themselves (the selected one already takes the faction colour).
 - [x] ~~Migrate images from wiki hotlinks to saved files~~ done 2026-10-30: `tools/fetch_images.py` + the "Fetch images" GitHub Action
       saved all 276 images (2.2 MB: 201 item pictures, 28 warbond covers, 47 icons) into `docs/img/`, `build_gear.py`
       exports them as `HD2_DATA.images`, the page prefers the saved copy (wiki link only as a fallback), and the
@@ -67,6 +65,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
+- **Pill colours swapped** (Boss): Team Assist is now laser pink (#d6336c) and Laser is a brighter version of the old Team Assist yellow (#8a8210, was #534e05). **Colour the rest of the UI** removed from the to-do list: the pill colours are good for now (the faction buttons keep the faction accent).
 - **Meme-tag pills and three new titles** (Boss): pills for all the meme tags, Fire, Gas, Arc, Stealth, Explosive, Laser and Plasma, and laser / plasma count as meme tags from now on (any new meme tag gets a title and a pill). New titles: Laser, Plasma, Hand-Held Shield (`handheld`) and Explosive (needed for its pill). Pill colours are first guesses in `TAG_COLORS` (`docs/app.js`): fire #c8541a, gas #7d8a1d, arc #0c8a96, stealth #37474f, explosive #a0700a, laser #d6336c, plasma #8f3fe0. The `explosive` pass over all throwables and stratagems is saved for later (still open under the meme-tag item).
 - **"Anti-Armor" is now "Anti-Tank"** (Boss): the pill title and the rule text in the Rules panel / unmet-rule messages now say Anti-Tank (README and test names too). The tag id stays `armor`, so saved settings and the CSV are unaffected. Boss also confirmed Quasar Cannon and Nova keep `laser`.
 - **Talon and Dagger get `charge`** (Boss): every laser weapon now has `charge` (it feeds the "no supply with 2+ no-ammo" rule). Odds baseline re-saved.
