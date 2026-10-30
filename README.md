@@ -34,6 +34,7 @@ Do this when a release adds weapons, stratagems or a warbond. The wiki's page fo
 4. **Rebuild**: `python tools/build_gear.py`. It checks for typos (unknown category or warbond, duplicate names or nicknames, bad `armor_pen`) and rebuilds `docs/gear-data.js`; it writes nothing if it finds an error. Warnings about a missing picture or `armor_pen` are only reminders.
 5. **Save the new pictures**: GitHub's Actions tab -> "Fetch images" -> Run workflow (or `python tools/fetch_images.py`), then merge the `images-fetched` branch it creates. Only missing files are downloaded. Until that is done the new items show their wiki pictures, so nothing breaks. See "Saved images".
 6. **Check the tags** (this is a manual step, not part of the build): follow `TAG_CHECK.md` (`python tools/tag_checks.py`). It flags missing implied tags and tags used by fewer than three items; nothing is changed without your say-so.
+   - A new **meme tag** (an elemental or themed build tag such as fire, arc, gas, stealth, explosive, laser or plasma) also needs a display title in `TAG_NAMES` and a pill colour in `TAG_COLORS` in `docs/app.js`; all meme tags get pills. Any other new tag only needs a title if it should appear in the Rules dropdown.
 7. **Re-save the odds baseline and run every test**: `node tests/regression.js --update-baseline`, then `node tests/run_all.js`. New items change the odds, so the regression test's baseline needs refreshing after an intentional change like this.
 8. **Publish**: commit the CSVs, `docs/gear-data.js`, `docs/img/` and `tests/baseline.json` on a branch, open a pull request (the test run attaches a downloadable build so you can try it first), merge it, and hard-refresh the live site.
 
@@ -120,7 +121,7 @@ Each card in a generated loadout has a lock toggle (🔒/🔓) and a reroll butt
 
 The **Rules** section of the randomizer page has two parts.
 
-**Default rules** - one switch for every rule the engine checks, grouped by priority (the same ranking used when a build can't meet everything): backpack / shield / supply, then anti-armor / chaff / base breaker, then support / medium killer / panic weapon, then balance and base-breaker escalation. The fill-time **limits** (one regular support weapon or up to two expendable ones, one vehicle, two Eagles, one mine) have switches too. Switched-off rules are never enforced and never flagged. They are saved in this browser, and "Turn all default rules back on" (or Reset) restores them. The list comes from `Engine.RULES`, so the panel can't drift from the engine; the engine option is `disabledRules: ["armor", "capEagle", ...]`.
+**Default rules** - one switch for every rule the engine checks, grouped by priority (the same ranking used when a build can't meet everything): backpack / shield / supply, then anti-tank / chaff / base breaker, then support / medium killer / panic weapon, then balance and base-breaker escalation. The fill-time **limits** (one regular support weapon or up to two expendable ones, one vehicle, two Eagles, one mine) have switches too. Switched-off rules are never enforced and never flagged. They are saved in this browser, and "Turn all default rules back on" (or Reset) restores them. The list comes from `Engine.RULES`, so the panel can't drift from the engine; the engine option is `disabledRules: ["armor", "capEagle", ...]`.
 
 The **in-game limits** (one FRV, one tank, one exosuit) are shown with a lock and cannot be switched off.
 
@@ -164,7 +165,7 @@ Not part of the build. It is a manual procedure Claude runs when `hd2gear.csv` i
 
 Locks, warbond choices, exclusions or requirements can make some guarantees impossible. The engine then
 tries, in order: (1) a build that follows every rule, (2) the same with the faction relaxed to "any"
-(off-faction picks are flagged), (3) the build that misses the least important rules (priority tiers: your own requirements > one backpack / shield needs a one-hander / no supply with 2+ no-ammo > anti-armor, chaff, base breaker > support weapon, medium killer, panic weapon > two base breakers, balance), fewer misses breaking ties. Case 3 is completed anyway and
+(off-faction picks are flagged), (3) the build that misses the least important rules (priority tiers: your own requirements > one backpack / shield needs a one-hander / no supply with 2+ no-ammo > anti-tank, chaff, base breaker > support weapon, medium killer, panic weapon > two base breakers, balance), fewer misses breaking ties. Case 3 is completed anyway and
 the missed rules are listed above the loadout. Locking all four stratagem slots waives the "exactly one
 backpack" and "at least one support weapon" rules. Only a build with *no* eligible items for a slot is an error.
 

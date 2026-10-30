@@ -32,12 +32,13 @@ def check_tags(items, rules):
 
     for rule in rules.get("implications", []):
         for it in items:
-            if rule.get("category") and it["cat"] != rule["category"]:
+            cats = rule.get("category")  # one category name, or a list of them
+            if cats and it["cat"] not in ([cats] if isinstance(cats, str) else cats):
                 continue
             if rule["if"] in it["tags"] and rule["then"] not in it["tags"]:
                 if it["name"] in rule.get("except", []):
                     continue
-                scope = f" (for {rule['category']} items)" if rule.get("category") else ""
+                scope = f" (for {cats if isinstance(cats, str) else '/'.join(cats)} items)" if cats else ""
                 flags.append(f"'{it['name']}' has '{rule['if']}' but not '{rule['then']}'{scope}")
 
     for rule in rules.get("weapon_only_tags", []):

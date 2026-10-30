@@ -29,7 +29,7 @@ test("locking all 4 stratagem slots with no backpack builds and does NOT flag th
   }
 });
 
-test("all 7 slots locked with nothing anti-armor: build completes and the armor rule is flagged", () => {
+test("all 7 slots locked with nothing anti-tank: build completes and the armor rule is flagged", () => {
   const first = (list) => list.find((i) => !HD2Engine.has(i, "armor") && i.factions.indexOf("none") === -1);
   const P = engine.pools;
   const locks = { primary: first(P.primaries), secondary: first(P.secondaries), throwable: first(P.throwables) };
@@ -48,14 +48,14 @@ test("free slots are used to satisfy rules the locks don't break (search still f
   for (let i = 0; i < 100; i++) assert.deepStrictEqual(engine.generateLoadoutRelaxed({ faction: "any", locks }).unmet, []);
 });
 
-// shield:3 can never be met without locks: only one backpack-slot item is allowed and only backpacks carry "shield".
+// handheld:3 can never be met without locks: only one backpack-slot item is allowed and only backpacks carry "handheld".
 test("unmeetable requirement: completes the build, flags only that requirement (almost always)", () => {
   let onlyRequire = 0;
   for (let i = 0; i < 60; i++) {
-    const l = engine.generateLoadoutRelaxed({ faction: "any", requirements: { shield: 3 } });
+    const l = engine.generateLoadoutRelaxed({ faction: "any", requirements: { handheld: 3 } });
     const u = l.unmet.find((x) => x.id === "require");
     assert(u, "requirement should be flagged");
-    assert(u.tag === "shield" && u.min === 3 && u.actual < 3);
+    assert(u.tag === "handheld" && u.min === 3 && u.actual < 3);
     if (ids(l).every((x) => x === "require")) onlyRequire++;
   }
   assert(onlyRequire >= 54, "other rules should still be met; only " + onlyRequire + "/60 were");
@@ -83,7 +83,7 @@ test("a build with no eligible items at all throws a GenerationError", () => {
 });
 
 test("strict generateLoadout() still refuses to return a build that breaks a rule", () => {
-  assert.throws(() => engine.generateLoadout({ faction: "any", requirements: { shield: 3 } }), HD2Engine.GenerationError);
+  assert.throws(() => engine.generateLoadout({ faction: "any", requirements: { handheld: 3 } }), HD2Engine.GenerationError);
 });
 
 test("locked backpack-type stratagems still waive the one-backpack rule without a flag", () => {
@@ -248,7 +248,7 @@ test("Exactly 0 backpacks replaces the 'exactly one backpack' rule instead of fi
     assert.deepStrictEqual(ids(l), [], "unexpected flags " + JSON.stringify(l.unmet));
   });
 });
-test("At most N never loosens the default 'at least one' check for that tag (at most 2 anti-armor still has >= 1)", () => {
+test("At most N never loosens the default 'at least one' check for that tag (at most 2 anti-tank still has >= 1)", () => {
   let ok = 0;
   builds(300, { requirements: { armor: { max: 2 } } }).forEach((l) => {
     const n = countTag(l, "armor");
@@ -283,7 +283,7 @@ test("Rules list: every default rule has an id, a label and a kind", () => {
   assert(HD2Engine.RULES.length === 15 && HD2Engine.RULES.every((r) => r.id && r.label && /^(guarantee|limit)$/.test(r.kind)));
   assert.deepStrictEqual(HD2Engine.RULES.filter((r) => r.kind === "guarantee").map((r) => r.id).sort(), ["armor", "backpack", "balance", "chaff", "demo", "demoEscalation", "med", "panic", "shield", "supply", "support"]);
 });
-test("A rule switched off is never flagged (locks that miss anti-armor, with the armor rule off)", () => {
+test("A rule switched off is never flagged (locks that miss anti-tank, with the armor rule off)", () => {
   const first = (list) => list.find((i) => !HD2Engine.has(i, "armor") && i.factions.indexOf("none") === -1);
   const P = engine.pools;
   const locks = { primary: first(P.primaries), secondary: first(P.secondaries), throwable: first(P.throwables) };
@@ -338,6 +338,17 @@ test("armor_pen: every weapon has valid armor-penetration data, and so does ever
   const by = (n) => globalThis.HD2_DATA.items.find((i) => i.name === n).armorPen;
   assert.deepStrictEqual([by("AR-23 Liberator"), by("AR-23P Liberator Penetrator"), by("RS-422 Railgun"), by("G-3 Smoke"), by("LAS-17 Double-Edge Sickle"), by("GR-8 Recoilless Rifle"), by("PLAS-45 Epoch"), by("CQC-9 Defoliation Tool")], [[2], [3], [5], [-1], [2, 4], [5, 6], [4, 5], [3, 5]]);
   assert.deepStrictEqual([by("Eagle Airstrike"), by("Eagle Strafing Run"), by("Orbital Railcannon Strike"), by("A/MG-43 Machine Gun Sentry"), by("EXO-45 Patriot Exosuit"), by("B-100 Portable Hellbomb")], [[5], [5], [7], [3], [3, 6], [10]]);
+});
+
+test("hand-held shields need a one-handed weapon, bubble shields do not", () => {
+  const noOneHand = (l) => !HD2Engine.has(l.primary, "onehand") && !HD2Engine.has(l.secondary, "onehand");
+  // lock a two-handed primary and secondary so the shield rule is what is being tested (unlocked, the generator picks a one-hander)
+  const run = (name, n) => Array.from({ length: n }, () => engine.generateLoadoutRelaxed({ faction: "any", locks: { primary: pick("AR-23 Liberator"), secondary: pick("P-19 Redeemer"), strat1: pick(name) } }));
+  const hand = run("SH-20 Ballistic Shield Backpack", 50);
+  assert(hand.every(noOneHand), "the locked weapons should not be one-handed (pick other weapons for this test)");
+  hand.forEach((l) => assert(l.unmet.some((u) => u.id === "shield"), "handheld shield without one-hander should be flagged"));
+  // the bubble generator pack and the shield relay never trigger it
+  ["SH-32 Shield Generator Pack", "FX-12 Shield Generator Relay"].forEach((n) => run(n, 50).forEach((l) => assert(!l.unmet.some((u) => u.id === "shield"), n + " should not need a one-hander")));
 });
 
 console.log("\n" + passed + " engine rule tests passed" + (process.exitCode ? " (with failures)" : ""));

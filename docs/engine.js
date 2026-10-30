@@ -5,7 +5,7 @@
  * (which is how tests/ checks it against the original Python).
  *
  * Guarantees per loadout (same rules as the Python version):
- *   - at least one of: anti-armor, medium killer, chaff killer (primary/secondary only),
+ *   - at least one of: anti-tank, medium killer, chaff killer (primary/secondary only),
  *     panic weapon (primary/secondary/throwable only), base breaker (2 if no weapon has it)
  *   - chaff / med / armor counts may differ by at most 3
  *   - support: max 1 non-expendable, max 2 expendable, never mixed, at least 1 total
@@ -53,12 +53,12 @@
   var RULES = [
     { id: "backpack", kind: "guarantee", label: "Exactly one backpack-slot item", note: "Also stops a second backpack being picked." },
     { id: "support", kind: "guarantee", label: "At least one support weapon" },
-    { id: "armor", kind: "guarantee", label: "At least one anti-armor item" },
+    { id: "armor", kind: "guarantee", label: "At least one anti-tank item" },
     { id: "med", kind: "guarantee", label: "At least one medium-enemy killer" },
     { id: "chaff", kind: "guarantee", label: "A chaff killer in primary or secondary" },
     { id: "demo", kind: "guarantee", label: "At least one base breaker" },
     { id: "panic", kind: "guarantee", label: "A panic weapon in primary, secondary or throwable" },
-    { id: "balance", kind: "guarantee", label: "Chaff / medium / anti-armor counts within 3 of each other" },
+    { id: "balance", kind: "guarantee", label: "Chaff / medium / anti-tank counts within 3 of each other" },
     { id: "demoEscalation", kind: "guarantee", label: "Two base breakers when no weapon is one" },
     { id: "shield", kind: "guarantee", label: "A shield backpack needs a one-handed weapon" },
     { id: "supply", kind: "guarantee", label: "No supply pack alongside 2+ no-ammo items" },
@@ -374,7 +374,7 @@
       // "exactly" replaces the single-item check, and "at most 0" means they want none at all. A plain
       // "at most 1+" leaves the default check in place.
       var hasReq = function (t) { return reqMin(t) !== undefined || reqMax(t) === 0; };
-      if (!hasReq("armor") && !coversArmor) fail("armor", "At least one anti-armor item");
+      if (!hasReq("armor") && !coversArmor) fail("armor", "At least one anti-tank item");
       if (!hasReq("med") && !coversMed) fail("med", "At least one medium-enemy killer");
       if (!hasReq("chaff") && !coversChaff) fail("chaff", "A chaff killer in primary or secondary");
       if (!hasReq("demo") && !coversDemo) fail("demo", "At least one base breaker");
@@ -400,7 +400,7 @@
       var spread = Math.max(chaffN, medN, armorN) - Math.min(chaffN, medN, armorN);
       if (ruleOn("balance") && (Math.abs(chaffN - medN) > 3 || Math.abs(chaffN - armorN) > 3 || Math.abs(medN - armorN) > 3)) {
         shortfall += spread - 3;
-        fail("balance", "Chaff / medium / anti-armor counts within 3 of each other");
+        fail("balance", "Chaff / medium / anti-tank counts within 3 of each other");
       }
 
       // Demo escalation: if only stratagems provide demo, require at least 2 of them.
@@ -410,8 +410,9 @@
         fail("demoEscalation", "Two base breakers when no weapon is one");
       }
 
-      // Shield backpack needs a one-handed primary or secondary.
-      if (chosen.some(function (s) { return has(s, "shield"); })) {
+      // A hand-held shield backpack (tag "handheld": the ballistic and directional shields, not the bubble generators)
+      // needs a one-handed primary or secondary.
+      if (chosen.some(function (s) { return has(s, "handheld"); })) {
         if (!(has(primary, "onehand") || has(secondary, "onehand"))) {
           fail("shield", "Shield backpack needs a one-handed weapon");
         }

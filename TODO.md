@@ -5,7 +5,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
 ## UI / design
 - [x] ~~Show armor penetration on weapon cards~~ done 2026-10-30: `armor_pen` column in `hd2gear.csv` for all 141 weapons
       (main attack, `2/4` for two-mode weapons), validated by the build, exported as `armorPen`, and shown on the loadout
-      cards as the wiki's icons (both, side by side, for two-mode weapons). Possible follow-ups: use it for the "anti-armor" tag/rules and sub-faction advice; check
+      cards as the wiki's icons (both, side by side, for two-mode weapons). Possible follow-ups: use it for the "anti-tank" tag/rules and sub-faction advice; check
       whether any other support weapon shows two icons on the wiki's Weapons page (Boss set Recoilless Rifle 5/6, Epoch
       4/5 and Defoliation Tool 3/5 on 2026-10-30; the page's support section didn't load for me, so the rest use one
       main value).
@@ -17,14 +17,18 @@ Items we agreed to come back to. Nothing below is started unless marked.
       single-file build embeds them (2.3 MB, works offline). Re-run the fetch (Actions -> Fetch images, or the script)
       when a new item / warbond / wiki image is added. The warbond covers are saved too, but not shown anywhere (header art is parked, 2026-10-30).
 - [x] ~~Host the tool at a URL~~ done 2026-10-30: live at https://gurudingo.github.io/Helldivers2-Slopinator/ (GitHub Pages, `main` / `/docs`). Open choices still: custom domain, analytics/feedback, shareable-loadout links.
-- [~] **Give every tag a display title.** 17 of 40 tags have titles now (the 9 old ones, "assist" is shown as
-      "Team Assist", plus Fire, Stealth, Orbital, Eagle, Sentry, Gas, Vehicle, Arc). Only titled tags appear in the
-      "Require tags" dropdown; the other 23 are hidden until they get a title. `hd2-tags.xlsx` (sent earlier) is now
+- [~] **Give every tag a display title.** 21 of 42 tags have titles now (the 9 old ones, "assist" is shown as
+      "Team Assist", plus Fire, Stealth, Orbital, Eagle, Sentry, Gas, Vehicle, Arc, and since 2026-10-30 Explosive, Laser,
+      Plasma and Hand-Held Shield). Only titled tags appear in the "Require tags" dropdown; the other 21 are hidden until
+      they get a title. `hd2-tags.xlsx` (sent earlier) is now
       out of date. Possible next step: move tag titles/pill colours into a `hd2tags.csv` instead of `TAG_NAMES` in
       `docs/app.js`.
 - [ ] **Check the "meme" elemental builds are tagged properly** (fire, arc, gas, explosive, stealth, laser/beam, ...),
       and explore which other meme tags are worth having. Then expand the pill options and colours to include the
-      meme tags (today only 9 tags get pills).
+      meme tags. (Done 2026-10-30 for the seven known meme tags, see Done; any new meme tag gets a pill from now on.)
+      - [ ] `explosive` (Boss, 2026-10-30): go through ALL the throwables and stratagems and tag everything that is
+            explosive (today it sits on a few weapons, plus the rule "secondary + demo -> explosive").
+      - [x] `laser` and `plasma` tags added 2026-10-30 (see Done). Open: should Nova / Quasar Cannon keep `laser`?
 - [x] ~~Tag consistency checks~~ done 2026-10-29 as a manual Claude procedure (`TAG_CHECK.md`), deliberately NOT in the build. (The beam -> fire rule, and the Orbital Laser exception to it, were dropped 2026-10-30.)
 - [x] ~~Reroll one slot~~ done 2026-10-29: every card has a lock toggle and a reroll button, and each loadout has a "Reroll all unlocked" button (see README). Possible follow-ups: lock/unlock-all buttons; one "reroll all loadouts" button when generating several; card locks are per-loadout and are NOT copied back into the Locks panel.
 - [ ] **Shareable loadouts**: encode a build in the URL (`#...`) so it can be sent to a friend; maybe a
@@ -50,7 +54,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - [ ] **Challenge mode**: presets such as "no support weapon" or "all Eagles", built from rule switches + rules.
       - [ ] Per-rule priority editing (drag to re-rank the tiers) - today the tiers are fixed in `RULE_TIER`.
       - [ ] Rules for item categories (e.g. "no Orbitals") rather than only tags.
-      - [ ] Optional: let a tag with no title be chosen in Additional rules (the dropdown still lists only the 17 titled tags).
+      - [ ] Optional: let a tag with no title be chosen in Additional rules (the dropdown still lists only the 21 titled tags).
 - [ ] **Faction rules: sub-factions.** Extend the faction rules (`works_for` / the `factions` column) to
       specify sub-factions (e.g. unit types within Terminids / Automatons / Illuminate).
 - [x] ~~Editable faction recommendations~~ done 2026-10-29 (My Gear > "Edit factions"; see README). Possible follow-ups:
@@ -58,11 +62,17 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - export / import your edits (a small file or a copy-paste code) so friends can share faction lists, plus a
         "reset to the game-wide defaults" confirmation that lists what will change;
       - a "show edited only" filter and a way to see which edits the CSV has since made redundant;
-      - faction presets such as "anti-armor first for Automatons";
+      - faction presets such as "anti-tank first for Automatons";
       - when sub-factions arrive, the same grid could gain columns, or an item could carry per-sub-faction ticks;
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
+- **Meme-tag pills and three new titles** (Boss): pills for all the meme tags, Fire, Gas, Arc, Stealth, Explosive, Laser and Plasma, and laser / plasma count as meme tags from now on (any new meme tag gets a title and a pill). New titles: Laser, Plasma, Hand-Held Shield (`handheld`) and Explosive (needed for its pill). Pill colours are first guesses in `TAG_COLORS` (`docs/app.js`): fire #c8541a, gas #7d8a1d, arc #0c8a96, stealth #37474f, explosive #a0700a, laser #d6336c, plasma #8f3fe0. The `explosive` pass over all throwables and stratagems is saved for later (still open under the meme-tag item).
+- **"Anti-Armor" is now "Anti-Tank"** (Boss): the pill title and the rule text in the Rules panel / unmet-rule messages now say Anti-Tank (README and test names too). The tag id stays `armor`, so saved settings and the CSV are unaffected. Boss also confirmed Quasar Cannon and Nova keep `laser`.
+- **Talon and Dagger get `charge`** (Boss): every laser weapon now has `charge` (it feeds the "no supply with 2+ no-ammo" rule). Odds baseline re-saved.
+- **Blitzer is `arc`** (Boss) and a new tag rule `laser` -> `charge` (laser weapons are assumed to be charge weapons; the tags otherwise stay separate). It applies to primaries, secondaries, support weapons and the Rover only: the Orbital Laser and Laser Sentry are not carried weapons, so they stay laser-only (`charge` on a stratagem would also count toward the no-supply rule). Note the Arc Thrower and Blitzer are `charge` but not `laser`, so charge does not imply laser.
+- **Laser and plasma tags** (Boss): `laser` on LAS-5 Scythe, LAS-16 Sickle, LAS-17 Double-Edge Sickle, LAS-13 Trident, LAS-12 Sai, LAS-58 Talon, LAS-7 Dagger, LAS-98 Laser Cannon, LAS-99 Quasar Cannon, LAS-44 Nova, AX/LAS-5 Rover, Orbital Laser and A/LAS-98 Laser Sentry; `plasma` on SG-8P Punisher Plasma, PLAS-39 Accelerator Rifle, PLAS-1 Scorcher, PLAS-101 Purifier, PLAS-15 Loyalist and PLAS-45 Epoch. New tag rule: `beam` -> `laser`. Judgement calls to confirm: the wiki calls Quasar and Nova "energy-based" (Nova is "a laser weapon" in its tactics text, Quasar is never called a laser), so both got `laser` because of their LAS designation; the R-36 Eruptor and other non-LAS/PLAS energy weapons were left alone. Neither tag has a display title yet, so neither appears in the Rules dropdown.
+- **Bubble + shield merged** (Boss): the old `bubble` tag is gone; every shield item has `shield`, and the two hand-held shield backpacks (SH-20 Ballistic, SH-51 Directional) also carry `handheld`. The "shield backpack needs a one-handed weapon" rule now keys on `handheld`, so the bubble packs and the relay no longer trigger it (rule id `shield` unchanged, so saved switches still work). Tag rule `handheld` -> `shield`; `handheld` is on the acknowledged-rare list.
 - **Crayon colours instead of a Crayon mode** (Boss: the crayon system is already built into his tags, so no mode): the Chaff Killer pill is green (#27ae32), Medium Killer is now blue (#2f80ed, was orange) and Anti-Armor red (#c62828), each a little different from the green / blue / red of the stratagem icons (#699655 / #55b9d2 / #dc6455). Panic Weapon is still indigo (#2943b9), the closest neighbour of the new blue.
 - **Panic is a weapon-only tag** (Boss): `panic` removed from the only two stratagems that had it (Orbital Smoke Strike, Orbital Laser), and a new `weapon_only_tags` check in `tools/tag_checks.py` / `tag_rules.json` flags it on any non-weapon item. Standing order in `TAG_CHECK.md`: Claude removes `panic` from stratagems whenever it finds it and reports which. The engine already only counted panic on weapons, so builds are unaffected.
 - **beam no longer implies fire** (Boss changed his mind): `fire` removed from every item that has `beam` (LAS-5 Scythe, LAS-7 Dagger, LAS-98 Laser Cannon, AX/LAS-5 Rover, A/LAS-98 Laser Sentry), the beam -> fire rule removed from `tools/tag_rules.json` and `TAG_CHECK.md`. Heads-up for the meme-build tagging item: a "Fire" requirement no longer matches beam items.
