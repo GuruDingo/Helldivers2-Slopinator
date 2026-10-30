@@ -5,7 +5,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
 ## UI / design
 - [x] ~~Show armor penetration on weapon cards~~ done 2026-10-30: `armor_pen` column in `hd2gear.csv` for all 141 weapons
       (main attack, `2/4` for two-mode weapons), validated by the build, exported as `armorPen`, and shown on the loadout
-      cards as the wiki's icons (both, side by side, for two-mode weapons). Possible follow-ups: use it for the "anti-armor" tag/rules and sub-faction advice; check
+      cards as the wiki's icons (both, side by side, for two-mode weapons). Possible follow-ups: use it for the "anti-tank" tag/rules and sub-faction advice; check
       whether any other support weapon shows two icons on the wiki's Weapons page (Boss set Recoilless Rifle 5/6, Epoch
       4/5 and Defoliation Tool 3/5 on 2026-10-30; the page's support section didn't load for me, so the rest use one
       main value).
@@ -61,11 +61,12 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - export / import your edits (a small file or a copy-paste code) so friends can share faction lists, plus a
         "reset to the game-wide defaults" confirmation that lists what will change;
       - a "show edited only" filter and a way to see which edits the CSV has since made redundant;
-      - faction presets such as "anti-armor first for Automatons";
+      - faction presets such as "anti-tank first for Automatons";
       - when sub-factions arrive, the same grid could gain columns, or an item could carry per-sub-faction ticks;
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
+- **"Anti-Armor" is now "Anti-Tank"** (Boss): the pill title and the rule text in the Rules panel / unmet-rule messages now say Anti-Tank (README and test names too). The tag id stays `armor`, so saved settings and the CSV are unaffected. Boss also confirmed Quasar Cannon and Nova keep `laser`.
 - **Laser and plasma tags** (Boss): `laser` on LAS-5 Scythe, LAS-16 Sickle, LAS-17 Double-Edge Sickle, LAS-13 Trident, LAS-12 Sai, LAS-58 Talon, LAS-7 Dagger, LAS-98 Laser Cannon, LAS-99 Quasar Cannon, LAS-44 Nova, AX/LAS-5 Rover, Orbital Laser and A/LAS-98 Laser Sentry; `plasma` on SG-8P Punisher Plasma, PLAS-39 Accelerator Rifle, PLAS-1 Scorcher, PLAS-101 Purifier, PLAS-15 Loyalist and PLAS-45 Epoch. New tag rule: `beam` -> `laser`. Judgement calls to confirm: the wiki calls Quasar and Nova "energy-based" (Nova is "a laser weapon" in its tactics text, Quasar is never called a laser), so both got `laser` because of their LAS designation; the R-36 Eruptor and other non-LAS/PLAS energy weapons were left alone. Neither tag has a display title yet, so neither appears in the Rules dropdown.
 - **Bubble + shield merged** (Boss): the old `bubble` tag is gone; every shield item has `shield`, and the two hand-held shield backpacks (SH-20 Ballistic, SH-51 Directional) also carry `handheld`. The "shield backpack needs a one-handed weapon" rule now keys on `handheld`, so the bubble packs and the relay no longer trigger it (rule id `shield` unchanged, so saved switches still work). Tag rule `handheld` -> `shield`; `handheld` is on the acknowledged-rare list.
 - **Crayon colours instead of a Crayon mode** (Boss: the crayon system is already built into his tags, so no mode): the Chaff Killer pill is green (#27ae32), Medium Killer is now blue (#2f80ed, was orange) and Anti-Armor red (#c62828), each a little different from the green / blue / red of the stratagem icons (#699655 / #55b9d2 / #dc6455). Panic Weapon is still indigo (#2943b9), the closest neighbour of the new blue.

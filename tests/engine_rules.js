@@ -29,7 +29,7 @@ test("locking all 4 stratagem slots with no backpack builds and does NOT flag th
   }
 });
 
-test("all 7 slots locked with nothing anti-armor: build completes and the armor rule is flagged", () => {
+test("all 7 slots locked with nothing anti-tank: build completes and the armor rule is flagged", () => {
   const first = (list) => list.find((i) => !HD2Engine.has(i, "armor") && i.factions.indexOf("none") === -1);
   const P = engine.pools;
   const locks = { primary: first(P.primaries), secondary: first(P.secondaries), throwable: first(P.throwables) };
@@ -248,7 +248,7 @@ test("Exactly 0 backpacks replaces the 'exactly one backpack' rule instead of fi
     assert.deepStrictEqual(ids(l), [], "unexpected flags " + JSON.stringify(l.unmet));
   });
 });
-test("At most N never loosens the default 'at least one' check for that tag (at most 2 anti-armor still has >= 1)", () => {
+test("At most N never loosens the default 'at least one' check for that tag (at most 2 anti-tank still has >= 1)", () => {
   let ok = 0;
   builds(300, { requirements: { armor: { max: 2 } } }).forEach((l) => {
     const n = countTag(l, "armor");
@@ -283,7 +283,7 @@ test("Rules list: every default rule has an id, a label and a kind", () => {
   assert(HD2Engine.RULES.length === 15 && HD2Engine.RULES.every((r) => r.id && r.label && /^(guarantee|limit)$/.test(r.kind)));
   assert.deepStrictEqual(HD2Engine.RULES.filter((r) => r.kind === "guarantee").map((r) => r.id).sort(), ["armor", "backpack", "balance", "chaff", "demo", "demoEscalation", "med", "panic", "shield", "supply", "support"]);
 });
-test("A rule switched off is never flagged (locks that miss anti-armor, with the armor rule off)", () => {
+test("A rule switched off is never flagged (locks that miss anti-tank, with the armor rule off)", () => {
   const first = (list) => list.find((i) => !HD2Engine.has(i, "armor") && i.factions.indexOf("none") === -1);
   const P = engine.pools;
   const locks = { primary: first(P.primaries), secondary: first(P.secondaries), throwable: first(P.throwables) };

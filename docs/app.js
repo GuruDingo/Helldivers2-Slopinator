@@ -23,14 +23,14 @@
   // Display titles. Only tags listed here appear in the "Additional rules" dropdown; a tag with no title here
   // still works in the data and the rules, it just isn't offered (and gets no pill).
   var TAG_NAMES = {
-    melee: "Melee", expendable: "Expendable", chaff: "Chaff Killer", med: "Medium Killer", armor: "Anti-Armor",
+    melee: "Melee", expendable: "Expendable", chaff: "Chaff Killer", med: "Medium Killer", armor: "Anti-Tank",
     demo: "Base Breaker", panic: "Panic Weapon", assist: "Team Assist", backpack: "Backpack",
     fire: "Fire", stealth: "Stealth", orbital: "Orbital", eagle: "Eagle", sentry: "Sentry",
     gas: "Gas", vehicle: "Vehicle", arc: "Arc",
   };
   // Order here = order of the pills on a card. Tags not listed here still work in the rules,
   // they just don't get a pill.
-  // The three "crayon" pills follow the enemy-level colours: Chaff green, Medium blue, Anti-Armor red. They are deliberately
+  // The three "crayon" pills follow the enemy-level colours: Chaff green, Medium blue, Anti-Tank red. They are deliberately
   // a little different from the green / blue / red of the stratagem icons (#699655 / #55b9d2 / #dc6455) so the two don't blur.
   var TAG_COLORS = {
     melee: "#382E02", expendable: "#0F0D02", chaff: "#27ae32", med: "#2f80ed", armor: "#c62828",

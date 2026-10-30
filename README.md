@@ -120,7 +120,7 @@ Each card in a generated loadout has a lock toggle (🔒/🔓) and a reroll butt
 
 The **Rules** section of the randomizer page has two parts.
 
-**Default rules** - one switch for every rule the engine checks, grouped by priority (the same ranking used when a build can't meet everything): backpack / shield / supply, then anti-armor / chaff / base breaker, then support / medium killer / panic weapon, then balance and base-breaker escalation. The fill-time **limits** (one regular support weapon or up to two expendable ones, one vehicle, two Eagles, one mine) have switches too. Switched-off rules are never enforced and never flagged. They are saved in this browser, and "Turn all default rules back on" (or Reset) restores them. The list comes from `Engine.RULES`, so the panel can't drift from the engine; the engine option is `disabledRules: ["armor", "capEagle", ...]`.
+**Default rules** - one switch for every rule the engine checks, grouped by priority (the same ranking used when a build can't meet everything): backpack / shield / supply, then anti-tank / chaff / base breaker, then support / medium killer / panic weapon, then balance and base-breaker escalation. The fill-time **limits** (one regular support weapon or up to two expendable ones, one vehicle, two Eagles, one mine) have switches too. Switched-off rules are never enforced and never flagged. They are saved in this browser, and "Turn all default rules back on" (or Reset) restores them. The list comes from `Engine.RULES`, so the panel can't drift from the engine; the engine option is `disabledRules: ["armor", "capEagle", ...]`.
 
 The **in-game limits** (one FRV, one tank, one exosuit) are shown with a lock and cannot be switched off.
 
@@ -164,7 +164,7 @@ Not part of the build. It is a manual procedure Claude runs when `hd2gear.csv` i
 
 Locks, warbond choices, exclusions or requirements can make some guarantees impossible. The engine then
 tries, in order: (1) a build that follows every rule, (2) the same with the faction relaxed to "any"
-(off-faction picks are flagged), (3) the build that misses the least important rules (priority tiers: your own requirements > one backpack / shield needs a one-hander / no supply with 2+ no-ammo > anti-armor, chaff, base breaker > support weapon, medium killer, panic weapon > two base breakers, balance), fewer misses breaking ties. Case 3 is completed anyway and
+(off-faction picks are flagged), (3) the build that misses the least important rules (priority tiers: your own requirements > one backpack / shield needs a one-hander / no supply with 2+ no-ammo > anti-tank, chaff, base breaker > support weapon, medium killer, panic weapon > two base breakers, balance), fewer misses breaking ties. Case 3 is completed anyway and
 the missed rules are listed above the loadout. Locking all four stratagem slots waives the "exactly one
 backpack" and "at least one support weapon" rules. Only a build with *no* eligible items for a slot is an error.
 
