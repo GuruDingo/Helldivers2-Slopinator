@@ -9,17 +9,15 @@ Items we agreed to come back to. Nothing below is started unless marked.
       whether any other support weapon shows two icons on the wiki's Weapons page (Boss set Recoilless Rifle 5/6, Epoch
       4/5 and Defoliation Tool 3/5 on 2026-10-30; the page's support section didn't load for me, so the rest use one
       main value).
-- [ ] **Colour the rest of the UI**: weapon tags (the pills only cover ~9 of the ~40 tags) and the faction buttons
-      themselves (the selected one already takes the faction colour).
 - [x] ~~Migrate images from wiki hotlinks to saved files~~ done 2026-10-30: `tools/fetch_images.py` + the "Fetch images" GitHub Action
       saved all 276 images (2.2 MB: 201 item pictures, 28 warbond covers, 47 icons) into `docs/img/`, `build_gear.py`
       exports them as `HD2_DATA.images`, the page prefers the saved copy (wiki link only as a fallback), and the
       single-file build embeds them (2.3 MB, works offline). Re-run the fetch (Actions -> Fetch images, or the script)
       when a new item / warbond / wiki image is added. The warbond covers are saved too, but not shown anywhere (header art is parked, 2026-10-30).
 - [x] ~~Host the tool at a URL~~ done 2026-10-30: live at https://gurudingo.github.io/Helldivers2-Slopinator/ (GitHub Pages, `main` / `/docs`). Open choices still: custom domain, analytics/feedback, shareable-loadout links.
-- [~] **Give every tag a display title.** 21 of 42 tags have titles now (the 9 old ones, "assist" is shown as
+- [~] **Give every tag a display title.** 24 of 42 tags have titles now (the 9 old ones, "assist" is shown as
       "Team Assist", plus Fire, Stealth, Orbital, Eagle, Sentry, Gas, Vehicle, Arc, and since 2026-10-30 Explosive, Laser,
-      Plasma and Hand-Held Shield). Only titled tags appear in the "Require tags" dropdown; the other 21 are hidden until
+      Plasma and Hand-Held Shield, then Mines, then One-Handed and Supply). Only titled tags appear in the Rules dropdown; the other 18 are hidden until
       they get a title. `hd2-tags.xlsx` (sent earlier) is now
       out of date. Possible next step: move tag titles/pill colours into a `hd2tags.csv` instead of `TAG_NAMES` in
       `docs/app.js`.
@@ -31,12 +29,20 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - [x] `laser` and `plasma` tags added 2026-10-30 (see Done). Open: should Nova / Quasar Cannon keep `laser`?
 - [x] ~~Tag consistency checks~~ done 2026-10-29 as a manual Claude procedure (`TAG_CHECK.md`), deliberately NOT in the build. (The beam -> fire rule, and the Orbital Laser exception to it, were dropped 2026-10-30.)
 - [x] ~~Reroll one slot~~ done 2026-10-29: every card has a lock toggle and a reroll button, and each loadout has a "Reroll all unlocked" button (see README). Possible follow-ups: lock/unlock-all buttons; one "reroll all loadouts" button when generating several; card locks are per-loadout and are NOT copied back into the Locks panel.
-- [ ] **Shareable loadouts**: encode a build in the URL (`#...`) so it can be sent to a friend; maybe a
-      copy-as-text button for Discord.
+- [ ] **Shareable loadouts** (parked, Boss 2026-10-30: "not super important long term", do later): encode a build in the URL
+      (`#...`) so it can be sent to a friend; maybe a copy-as-text button for Discord. Design notes from the discussion:
+      link = faction + item ids per slot (ids are stable across renames), several loadouts joined with `~`, a version marker,
+      placeholder for unknown ids; build and faction only (not the recipient's rules or My Gear); "Copy link" and "Copy as text"
+      buttons per card. Open: include locks? one link for a whole batch? text format for Discord?
+- [ ] **Weapon lock UI** (Boss, 2026-10-30): format the lock options (the Locks panel) the same way as the Randomizer output
+      cards (same card layout, thumbnails, pills, AP icons), instead of the plain lock grid.
+- [ ] **My Gear list order** (Boss, 2026-10-30): show the My Gear lists in the order the game does (menu / warbond /
+      chronological order) instead of `hd2gear.csv` order. Needs an order for the items inside each category (a column in the
+      CSV or a rank from the wiki) and for the warbonds.
 - [ ] **Odds transparency**: explain why a build was flagged or why the faction was relaxed (tooltips / details).
 
 ## Rules
-- [ ] **Redo the rule priority list later, with MORE rules in it** (Boss, 2026-10-29). Today's tiers only cover the
+- [ ] **Redo the rule priority list later, with MORE rules in it** (Boss, 2026-10-29). Boss, 2026-10-30: assume a FULL RESET of rule priority when this is tackled, which also settles what tier an edited default row has (today it becomes one of the player's own requirements and ranks at the top). Today's tiers only cover the
       12 rules a finished build is checked against. To add to the ranking:
       - the fill-time caps, which are currently hard limits that only locks can break (and a lock breaks them silently):
         max 1 non-expendable support weapon; max 2 expendable support weapons; never mix regular + expendable
@@ -48,13 +54,13 @@ Items we agreed to come back to. Nothing below is started unless marked.
       Partly done 2026-10-29: a required tag now overrides the cap for its own tag (Eagle 3, mines 2...), and FRV / tank /
       exosuit (max 1 each) are in-game limits that sit ABOVE the ranking. Still open: should the backpack join the in-game
       limits? Where do the other caps and faction fit rank?
-- [~] **"Rules" menu** - first version done 2026-10-29: one Rules panel with a switch for every default rule (grouped by
-      priority, caps included, in-game limits locked) and the "Additional rules" (at least / at most / exactly, ranges,
-      bans). Possible follow-ups:
+- [x] ~~**More default rules as editable rows**~~ done 2026-10-30 (Boss: "all seven", if/then rules for players, locks win): all 17 default rules are rows; the engine has category / group selectors, slot scopes, if/then and balance rules (see README, Rules panel). Nine of them can be removed but not edited in place; edited rows rank as the player's own requirements until the full priority reset below. Two deliberate behaviour changes: a chaff requirement no longer replaces the chaff-in-primary/secondary default, and an expendable-support minimum no longer allows mixed supports. `capSupport` is now `capRegular` / `capExpend` / `capMixed` (old saved name still works).
+- [~] **"Rules" menu** - first version done 2026-10-29, rebuilt 2026-10-30 as one list of rows (every default rule a row, no
+      switches), a simple add form and a rule builder (categories, scopes, if/then, balance). Possible follow-ups:
       - [ ] **Challenge mode**: presets such as "no support weapon" or "all Eagles", built from rule switches + rules.
       - [ ] Per-rule priority editing (drag to re-rank the tiers) - today the tiers are fixed in `RULE_TIER`.
-      - [ ] Rules for item categories (e.g. "no Orbitals") rather than only tags.
-      - [ ] Optional: let a tag with no title be chosen in Additional rules (the dropdown still lists only the 21 titled tags).
+      - [x] Rules for item categories (e.g. "no Orbitals"): done 2026-10-30 via the rule builder.
+      - [ ] Optional: let a tag with no title be chosen in Additional rules (the dropdown still lists only the 24 titled tags).
 - [ ] **Faction rules: sub-factions.** Extend the faction rules (`works_for` / the `factions` column) to
       specify sub-factions (e.g. unit types within Terminids / Automatons / Illuminate).
 - [x] ~~Editable faction recommendations~~ done 2026-10-29 (My Gear > "Edit factions"; see README). Possible follow-ups:
@@ -67,6 +73,9 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
+- **Clear custom rules** button next to Reset to system defaults (Boss): removes the rules the player added for tags that have no default row; the default rows (edited or not) stay. Hidden while there are none.
+- **Eight default rules are now editable rows** (Boss): Backpack = 1, Anti-Tank >= 1, Medium Killer >= 1, Base Breaker >= 1, Panic Weapon >= 1, Vehicle <= 1, Eagle <= 2 and Mines <= 1 moved from the Default rules switches to dim rows at the top of Additional rules. Adding a rule for the same tag edits the row (a clash with a default number lets the default give way); the x removes it; the new **Reset to system defaults** button restores all eight (rules added for other tags stay). An edited row is the player's own requirement, so it ranks as top priority; an untouched row is still the engine's default rule with its tier. Engine: `Engine.RULES` entries carry a `preset` ({tag, min, max}); no change to how builds are made (tests prove a preset handed over as a requirement behaves the same). Rules, edits and removals are now saved in `hd2_settings` (Additional rules used to be lost on reload). New title: Mines.
+- **Pill colours swapped** (Boss): Team Assist is now laser pink (#d6336c) and Laser is a brighter version of the old Team Assist yellow (#8a8210, was #534e05). **Colour the rest of the UI** removed from the to-do list: the pill colours are good for now (the faction buttons keep the faction accent).
 - **Meme-tag pills and three new titles** (Boss): pills for all the meme tags, Fire, Gas, Arc, Stealth, Explosive, Laser and Plasma, and laser / plasma count as meme tags from now on (any new meme tag gets a title and a pill). New titles: Laser, Plasma, Hand-Held Shield (`handheld`) and Explosive (needed for its pill). Pill colours are first guesses in `TAG_COLORS` (`docs/app.js`): fire #c8541a, gas #7d8a1d, arc #0c8a96, stealth #37474f, explosive #a0700a, laser #d6336c, plasma #8f3fe0. The `explosive` pass over all throwables and stratagems is saved for later (still open under the meme-tag item).
 - **"Anti-Armor" is now "Anti-Tank"** (Boss): the pill title and the rule text in the Rules panel / unmet-rule messages now say Anti-Tank (README and test names too). The tag id stays `armor`, so saved settings and the CSV are unaffected. Boss also confirmed Quasar Cannon and Nova keep `laser`.
 - **Talon and Dagger get `charge`** (Boss): every laser weapon now has `charge` (it feeds the "no supply with 2+ no-ammo" rule). Odds baseline re-saved.
