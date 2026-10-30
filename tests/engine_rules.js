@@ -340,8 +340,8 @@ test("armor_pen: every weapon has valid armor-penetration data, and so does ever
   assert.deepStrictEqual([by("Eagle Airstrike"), by("Eagle Strafing Run"), by("Orbital Railcannon Strike"), by("A/MG-43 Machine Gun Sentry"), by("EXO-45 Patriot Exosuit"), by("B-100 Portable Hellbomb")], [[5], [5], [7], [3], [3, 6], [10]]);
 });
 
-test("hand-held shields need a one-handed weapon, bubble shields do not", () => {
-  const noOneHand = (l) => !HD2Engine.has(l.primary, "onehand") && !HD2Engine.has(l.secondary, "onehand");
+test("hand-held shields need a one-handed primary or a melee weapon (a pistol does not count), bubble shields do not", () => {
+  const noOneHand = (l) => !HD2Engine.has(l.primary, "onehand") && !HD2Engine.has(l.primary, "melee") && !HD2Engine.has(l.secondary, "melee");
   // lock a two-handed primary and secondary so the shield rule is what is being tested (unlocked, the generator picks a one-hander)
   const run = (name, n) => Array.from({ length: n }, () => engine.generateLoadoutRelaxed({ faction: "any", locks: { primary: pick("AR-23 Liberator"), secondary: pick("P-19 Redeemer"), strat1: pick(name) } }));
   const hand = run("SH-20 Ballistic Shield Backpack", 50);
@@ -498,6 +498,20 @@ test("Every support weapon carries the 'support' tag, so it works as a tag in ru
   const byName = (n) => globalThis.HD2_DATA.items.find((i) => i.name === n);
   bs.forEach((l) => assert(!l.strategems.some((n) => (byName(n.name || n) || {}).cat === "support"), "a support weapon was picked despite 'support = 0'"));
   assert(strict(300, { requirements: { support: { min: 1, max: 1 } } }).every((l) => l.strategems.filter((n) => (byName(n.name || n) || {}).cat === "support").length === 1));
+});
+
+test("Shield rule: a one-handed primary or a melee weapon satisfies it, a pistol does not", () => {
+  const has = HD2Engine.has;
+  const items = globalThis.HD2_DATA.items;
+  assert(items.filter((i) => i.cat === "secondary").every((i) => has(i, "onehand")), "every secondary (pistols and melee) is tagged one-handed");
+  const run = (locks) => Array.from({ length: 40 }, () => engine.generateLoadoutRelaxed({ faction: "any", locks: Object.assign({ strat1: pick("SH-20 Ballistic Shield Backpack") }, locks) }));
+  const flagged = (l) => l.unmet.some((u) => u.id === "shield");
+  run({ primary: pick("AR-23 Liberator"), secondary: pick("P-4 Senator") }).forEach((l) => assert(flagged(l), "a pistol alone must not satisfy the shield"));
+  run({ primary: pick("AR-23 Liberator"), secondary: pick("CQC-2 Saber") }).forEach((l) => assert(!flagged(l), "a melee secondary satisfies it"));
+  run({ primary: pick("SMG-37 Defender"), secondary: pick("P-4 Senator") }).forEach((l) => assert(!flagged(l), "a one-handed primary satisfies it"));
+  run({ primary: pick("CB-9 Exploding Crossbow"), secondary: pick("P-4 Senator") }).forEach((l) => assert(!flagged(l), "a one-handed non-SMG primary satisfies it"));
+  // the other half of the condition: no hand-held shield, nothing to check
+  Array.from({ length: 40 }, () => engine.generateLoadoutRelaxed({ faction: "any", locks: { primary: pick("AR-23 Liberator"), secondary: pick("P-4 Senator"), strat1: pick("SH-32 Shield Generator Pack") } })).forEach((l) => assert(!flagged(l)));
 });
 
 console.log("\n" + passed + " engine rule tests passed" + (process.exitCode ? " (with failures)" : ""));

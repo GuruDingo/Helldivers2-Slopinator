@@ -29,6 +29,7 @@
     gas: "Gas", vehicle: "Vehicle", arc: "Arc",
     explosive: "Explosive", laser: "Laser", plasma: "Plasma", handheld: "Hand-Held Shield", mines: "Mines",
     onehand: "One-Handed", supply: "Supply", support: "Support Weapon",
+    charge: "Charge", shield: "Shield", shotgun: "Shotgun", "assault rifle": "Assault Rifle", smg: "SMG", "marksman rifle": "Marksman Rifle", special: "Special",
   };
   // Order here = order of the pills on a card. Tags not listed here still work in the rules,
   // they just don't get a pill. (Pills need a title in TAG_NAMES above too.)

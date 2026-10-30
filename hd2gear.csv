@@ -39,49 +39,49 @@ id,category,name,nicknames,tags,factions,warbond,img_url,armor_pen
 38,primary,SG-225SP Breaker Spray&Pray,"sg-225sp breaker spray&pray,sg-225sp,breaker spray&pray,spray&pray,spray and pray,breaker spray and pray,breaker s&p,breaker sp","shotgun,chaff,panic","bug,squid",helldivers_mobilize,https://helldivers.wiki.gg/images/SG-225SP_Breaker_Spray&Pray_Primary_Render.png,2
 39,primary,SG-225IE Breaker Incendiary,"sg-225ie breaker incendiary,sg-225ie ,breaker incendiary,incendiary breaker,breaker fire,fire breaker","shotgun,chaff,panic","bug,squid",steeled_veterans,https://helldivers.wiki.gg/images/SG-225IE_Breaker_Incendiary_Primary_Render.png,2
 40,primary,SG-97 Sweeper,"sg-97 sweeper,sg-97,sweeper","shotgun,chaff,med,panic",any,superstore,https://helldivers.wiki.gg/images/SG-97_Shotgun_Primary_Render.png,3
-41,primary,R-36 Eruptor,"r-36 eruptor,r-36,eruptor","explosive,chaff,med,demo",any,democratic_detonation,https://helldivers.wiki.gg/images/R-36_Eruptor_Primary_Render.png,4
-42,primary,CB-9 Exploding Crossbow,"cb-9 exploding crossbow,cb-9,exploding crossbow,crossbow","explosive,chaff,med,demo,onehand",any,democratic_detonation,https://helldivers.wiki.gg/images/CB-9_Exploding_Crossbow_Primary_Render.png,3
-43,primary,GL-15 Evictor,"gl-15 evictor,gl-15,evictor","explosive,chaff,med,demo",any,ironclad_democracy,https://helldivers.wiki.gg/images/GL-15_Evictor_Primary_Render.png,3
+41,primary,R-36 Eruptor,"r-36 eruptor,r-36,eruptor","explosive,chaff,med,demo,special",any,democratic_detonation,https://helldivers.wiki.gg/images/R-36_Eruptor_Primary_Render.png,4
+42,primary,CB-9 Exploding Crossbow,"cb-9 exploding crossbow,cb-9,exploding crossbow,crossbow","explosive,chaff,med,demo,onehand,special",any,democratic_detonation,https://helldivers.wiki.gg/images/CB-9_Exploding_Crossbow_Primary_Render.png,3
+43,primary,GL-15 Evictor,"gl-15 evictor,gl-15,evictor","explosive,chaff,med,demo,special",any,ironclad_democracy,https://helldivers.wiki.gg/images/GL-15_Evictor_Primary_Render.png,3
 44,primary,SG-8P Punisher Plasma,"sg-8p punisher plasma,sg-8p,punisher plasma,pp","shotgun,chaff,med,panic,plasma",any,cutting_edge,https://helldivers.wiki.gg/images/SG-8P_Punisher_Plasma_Primary_Render.png,3
 45,primary,PLAS-39 Accelerator Rifle,"plas-39 accelerator rifle,plas-39,accelerator rifle,accelerator,killzone sniper,killzone plasma","marksman rifle,med,plasma",any,killzone,https://helldivers.wiki.gg/images/PLAS-39_Accelerator_Rifle_Primary_Render.png,3
 46,primary,ARC-12 Blitzer,"arc-12 blitzer,arc-12,blitzer","shotgun,chaff,med,charge,panic,arc",bug,cutting_edge,https://helldivers.wiki.gg/images/ARC-12_Blitzer_Primary_Render.png,3
-47,primary,LAS-5 Scythe,"las-5 scythe,las-5,scythe","beam,chaff,charge,panic,laser","bug,squid",helldivers_mobilize,https://helldivers.wiki.gg/images/LAS-5_Scythe_Primary_Render.png,2
+47,primary,LAS-5 Scythe,"las-5 scythe,las-5,scythe","beam,chaff,charge,panic,laser,special","bug,squid",helldivers_mobilize,https://helldivers.wiki.gg/images/LAS-5_Scythe_Primary_Render.png,2
 48,primary,LAS-16 Sickle,"las-16 sickle,las-16,sickle","assault rifle,chaff,charge,panic,laser",any,cutting_edge,https://helldivers.wiki.gg/images/LAS-16_Sickle_Primary_Render.png,2
 49,primary,LAS-17 Double-Edge Sickle,"las-17 double-edge sickle,las-17,double-edge sickle,double-edge,de sickle","assault rifle,charge,chaff,med,panic,laser",any,servants_of_freedom,https://helldivers.wiki.gg/images/LAS-17_Double-Edge_Sickle_Primary_Render.png,2/4
 50,primary,PLAS-1 Scorcher,"plas-1 scorcher,plas-1,scorcher","assault rifle,chaff,med,panic,plasma",any,helldivers_mobilize,https://helldivers.wiki.gg/images/PLAS-1_Scorcher_Primary_Render.png,3
-51,primary,PLAS-101 Purifier,"plas-101 purifier,plas-101,purifier","explosive,chaff,med,panic,plasma",any,polar_patriots,https://helldivers.wiki.gg/images/PLAS-101_Purifier_Primary_Render.png,3
+51,primary,PLAS-101 Purifier,"plas-101 purifier,plas-101,purifier","explosive,chaff,med,panic,plasma,assault rifle",any,polar_patriots,https://helldivers.wiki.gg/images/PLAS-101_Purifier_Primary_Render.png,3
 52,primary,LAS-13 Trident,"las-13 trident,las-13,trident,laser shotgun","shotgun,chaff,med,charge,panic,laser",any,siege_breakers,https://helldivers.wiki.gg/images/LAS-13_Trident_Primary_Render.png,2
 53,primary,R/40-K Hot-Shot Marksman Rifle,"r/40-k hot-shot marksman rifle,r/40-k hot-shot rifle,r/40-k hot-shot,r/40-k,lasgun,hotshot,hot-shot,hotshot rifle,hot-shot rifle,lasrifle,las gun,las rifle,hell gun,hellgun,hotshot las,hot shot las,hot-shot las","marksman rifle,chaff","bot,squid",40k,https://helldivers.wiki.gg/images/R-40-K_Hot-Shot_Primary_Render.png,3
 54,primary,VG-70 Variable,"vg-70 variable,vg-70,variable","assault rifle,chaff,med,panic",any,control_group,https://helldivers.wiki.gg/images/VG-70_Variable_Primary_Render.png,2
-55,primary,FLAM-66 Torcher,"flam-66 torcher,flam-66,torcher","fire,chaff",any,freedoms_flame,https://helldivers.wiki.gg/images/FLAM-66_Torcher_Primary_Render.png,4
+55,primary,FLAM-66 Torcher,"flam-66 torcher,flam-66,torcher","fire,chaff,special",any,freedoms_flame,https://helldivers.wiki.gg/images/FLAM-66_Torcher_Primary_Render.png,4
 56,primary,JAR-5 Dominator,"jar-5 dominator,jar-5,dominator,dom","assault rifle,med",any,steeled_veterans,https://helldivers.wiki.gg/images/JAR-5_Dominator_Primary_Render.png,3
 202,primary,LAS-12 Sai,"las-12 sai,las-12,sai","smg,chaff,onehand,med,panic,charge,laser","bug,squid",superstore,https://helldivers.wiki.gg/images/LAS-12_Sai_Primary_Render.png,3
-57,secondary,P-92 Warrant,"p-92 warrant,p-92,warrant","chaff,panic","bug,squid",superstore,https://helldivers.wiki.gg/images/P-92_Warrant_Secondary_Render.png,3
-58,secondary,P-2 Peacemaker,"p-2 peacemaker,p-2,peacemaker",chaff,"bot,squid",base,https://helldivers.wiki.gg/images/P-2_Peacemaker_Secondary_Render.png,2
-59,secondary,P-19 Redeemer,"p-19 redeemer,p-19,redeemer","chaff,panic","bug,squid",helldivers_mobilize,https://helldivers.wiki.gg/images/P-19_Redeemer_Secondary_Render.png,2
-60,secondary,P-113 Verdict,"p-113 verdict,p-113,verdict","med,panic","bug,bot",polar_patriots,https://helldivers.wiki.gg/images/P-113_Verdict_Secondary_Render.png,3
-61,secondary,M6C/SOCOM Pistol,"m6c/socom pistol,m6c/socom,mrc,socom,halo pistol","chaff,panic,stealth",any,odst,https://helldivers.wiki.gg/images/M6C-SOCOM_Pistol_Secondary_Render.png,2
-62,secondary,P-4 Senator,"p-4 senator,p-4,senator","med,panic","bot,squid",steeled_veterans,https://helldivers.wiki.gg/images/P-4_Senator_Secondary_Render.png,4
-63,secondary,P-69 Veto,"p-69 veto,p-69,veto","chaff,med,panic","bug,bot",entrenched_division,https://helldivers.wiki.gg/images/P-69_Veto_Secondary_Render.png,3
-64,secondary,P-44 Mist,"p-44 mist,p-44,mist","chaff,panic",any,scope_of_authority,https://helldivers.wiki.gg/images/P-44_Mist_Secondary_Render.png,2
+57,secondary,P-92 Warrant,"p-92 warrant,p-92,warrant","chaff,panic,onehand","bug,squid",superstore,https://helldivers.wiki.gg/images/P-92_Warrant_Secondary_Render.png,3
+58,secondary,P-2 Peacemaker,"p-2 peacemaker,p-2,peacemaker","chaff,onehand","bot,squid",base,https://helldivers.wiki.gg/images/P-2_Peacemaker_Secondary_Render.png,2
+59,secondary,P-19 Redeemer,"p-19 redeemer,p-19,redeemer","chaff,panic,onehand","bug,squid",helldivers_mobilize,https://helldivers.wiki.gg/images/P-19_Redeemer_Secondary_Render.png,2
+60,secondary,P-113 Verdict,"p-113 verdict,p-113,verdict","med,panic,onehand","bug,bot",polar_patriots,https://helldivers.wiki.gg/images/P-113_Verdict_Secondary_Render.png,3
+61,secondary,M6C/SOCOM Pistol,"m6c/socom pistol,m6c/socom,mrc,socom,halo pistol","chaff,panic,stealth,onehand",any,odst,https://helldivers.wiki.gg/images/M6C-SOCOM_Pistol_Secondary_Render.png,2
+62,secondary,P-4 Senator,"p-4 senator,p-4,senator","med,panic,onehand","bot,squid",steeled_veterans,https://helldivers.wiki.gg/images/P-4_Senator_Secondary_Render.png,4
+63,secondary,P-69 Veto,"p-69 veto,p-69,veto","chaff,med,panic,onehand","bug,bot",entrenched_division,https://helldivers.wiki.gg/images/P-69_Veto_Secondary_Render.png,3
+64,secondary,P-44 Mist,"p-44 mist,p-44,mist","chaff,panic,onehand",any,scope_of_authority,https://helldivers.wiki.gg/images/P-44_Mist_Secondary_Render.png,2
 65,secondary,CQC-19 Stun Lance,"cqc-19 stun lance,cqc-19,lance,stun lance","chaff,melee,onehand,panic,stun,assist",squid,urban_legends,https://helldivers.wiki.gg/images/CQC-19_Stun_Lance_Secondary_Render.png,3
 66,secondary,CQC-2 Saber,"cqc-2 saber,cqc-2,saber","chaff,melee,onehand,panic",squid,masters_of_ceremony,https://helldivers.wiki.gg/images/CQC-2_Saber_Secondary_Render.png,3
 67,secondary,CQC-30 Stun Baton,"cqc-30 stun baton,cqc-30,baton,stun baton","chaff,melee,onehand,panic,stun,assist",bug,superstore,https://helldivers.wiki.gg/images/CQC-30_Stun_Baton_Secondary_Render.png,3
 68,secondary,CQC-5 Combat Hatchet,"cqc-5 combat hatchet,cqc-5,hatchet,combat hatchet","chaff,melee,onehand,panic",bot,superstore,https://helldivers.wiki.gg/images/CQC-5_Combat_Hatchet_Secondary_Render.png,3
 69,secondary,CQC-73 Entrenchment Tool,"cqc-73 entrenchment tool,cqc-73,entrenchment tool,shovel","chaff,melee,onehand,panic",bot,entrenched_division,https://helldivers.wiki.gg/images/CQC-73_Entrenchment_Tool_Secondary_Render.png,3
 70,secondary,CQC-42 Machete,"cqc-42 machete,cqc-42,machete","chaff,melee,onehand,panic","bug,bot",superstore,https://helldivers.wiki.gg/images/CQC-42_Machete_Secondary_Render.png,3
-71,secondary,P-11 Stim Pistol,"p-11 stim pistol,p-11,stim pistol,stim","assist,heal",any,chemical_agents,https://helldivers.wiki.gg/images/P-11_Stim_Pistol_Secondary_Render.png,-1
-72,secondary,SG-22 Bushwhacker,"sg-22 bushwhacker,sg-22,bushwhacker","shotgun,chaff,med,panic",bug,viper_commandos,https://helldivers.wiki.gg/images/SG-22_Bushwhacker_Secondary_Render.png,2
-73,secondary,LAS-58 Talon,"las-58 talon,las-58,talon","chaff,med,panic,laser,charge",any,borderline_justice,https://helldivers.wiki.gg/images/LAS-58_Talon_Secondary_Render.png,3
-74,secondary,P-72 Crisper,"p-72 crisper,p-72,crisper","chaff,fire",any,freedoms_flame,https://helldivers.wiki.gg/images/P-72_Crisper_Secondary_Render.png,4
-75,secondary,GP-31 Grenade Pistol,"gp-31 grenade pistol,gp-31,pistol","chaff,med,demo,explosive",any,democratic_detonation,https://helldivers.wiki.gg/images/GP-31_Grenade_Pistol_Secondary_Render.png,3
-76,secondary,LAS-7 Dagger,"las-7 dagger,las-7,dagger","chaff,panic,beam,laser,charge","bug,squid",cutting_edge,https://helldivers.wiki.gg/images/LAS-7_Dagger_Secondary_Render.png,2
-77,secondary,GP-20 Ultimatum,"gp-20 ultimatum,gp-20,ultimatum","armor,demo,explosive","bug,bot",servants_of_freedom,https://helldivers.wiki.gg/images/GP-20_Ultimatum_Secondary_Render.png,6
-78,secondary,PLAS-15 Loyalist,"plas-15 loyalist,plas-15,loyalist","chaff,med,panic,plasma",any,truth_enforcers,https://helldivers.wiki.gg/images/PLAS-15_Loyalist_Secondary_Render.png,3
-79,secondary,P-35 Re-Educator,"p-35 re-educator,p-35,re-educator,reeducator","gas,med,assist,stealth",bot,redacted_regiment,https://helldivers.wiki.gg/images/P-35_Re-Educator_Secondary_Render.png,4
-80,secondary,P-33 Missile Pistol,"p-33 missile pistol,p-33,missle pistol,pissle","med,demo,explosive","bot,squid",exo_experts,https://helldivers.wiki.gg/images/P-33_Missile_Pistol_Secondary_Render.png,5
-81,secondary,P/40-K Bolt Pistol,"p/40-k bolt pistol,p/40-k,bolt pistol,bolter","chaff,med,armor",any,40k,https://helldivers.wiki.gg/images/P-40-K_Bolt_Pistol_Secondary_Render.png,4
-82,secondary,P-34 Breacher,"p-34 breacher,p-34,breacher,thermite gun,thermite pistol","med,armor,demo,explosive",any,ironclad_democracy,https://helldivers.wiki.gg/images/P-34_Breacher_Secondary_Render.png,7
+71,secondary,P-11 Stim Pistol,"p-11 stim pistol,p-11,stim pistol,stim","assist,heal,onehand",any,chemical_agents,https://helldivers.wiki.gg/images/P-11_Stim_Pistol_Secondary_Render.png,-1
+72,secondary,SG-22 Bushwhacker,"sg-22 bushwhacker,sg-22,bushwhacker","shotgun,chaff,med,panic,onehand",bug,viper_commandos,https://helldivers.wiki.gg/images/SG-22_Bushwhacker_Secondary_Render.png,2
+73,secondary,LAS-58 Talon,"las-58 talon,las-58,talon","chaff,med,panic,laser,charge,onehand",any,borderline_justice,https://helldivers.wiki.gg/images/LAS-58_Talon_Secondary_Render.png,3
+74,secondary,P-72 Crisper,"p-72 crisper,p-72,crisper","chaff,fire,onehand",any,freedoms_flame,https://helldivers.wiki.gg/images/P-72_Crisper_Secondary_Render.png,4
+75,secondary,GP-31 Grenade Pistol,"gp-31 grenade pistol,gp-31,pistol","chaff,med,demo,explosive,onehand",any,democratic_detonation,https://helldivers.wiki.gg/images/GP-31_Grenade_Pistol_Secondary_Render.png,3
+76,secondary,LAS-7 Dagger,"las-7 dagger,las-7,dagger","chaff,panic,beam,laser,charge,onehand","bug,squid",cutting_edge,https://helldivers.wiki.gg/images/LAS-7_Dagger_Secondary_Render.png,2
+77,secondary,GP-20 Ultimatum,"gp-20 ultimatum,gp-20,ultimatum","armor,demo,explosive,onehand","bug,bot",servants_of_freedom,https://helldivers.wiki.gg/images/GP-20_Ultimatum_Secondary_Render.png,6
+78,secondary,PLAS-15 Loyalist,"plas-15 loyalist,plas-15,loyalist","chaff,med,panic,plasma,onehand",any,truth_enforcers,https://helldivers.wiki.gg/images/PLAS-15_Loyalist_Secondary_Render.png,3
+79,secondary,P-35 Re-Educator,"p-35 re-educator,p-35,re-educator,reeducator","gas,med,assist,stealth,onehand",bot,redacted_regiment,https://helldivers.wiki.gg/images/P-35_Re-Educator_Secondary_Render.png,4
+80,secondary,P-33 Missile Pistol,"p-33 missile pistol,p-33,missle pistol,pissle","med,demo,explosive,onehand","bot,squid",exo_experts,https://helldivers.wiki.gg/images/P-33_Missile_Pistol_Secondary_Render.png,5
+81,secondary,P/40-K Bolt Pistol,"p/40-k bolt pistol,p/40-k,bolt pistol,bolter","chaff,med,armor,onehand",any,40k,https://helldivers.wiki.gg/images/P-40-K_Bolt_Pistol_Secondary_Render.png,4
+82,secondary,P-34 Breacher,"p-34 breacher,p-34,breacher,thermite gun,thermite pistol","med,armor,demo,explosive,onehand",any,ironclad_democracy,https://helldivers.wiki.gg/images/P-34_Breacher_Secondary_Render.png,7
 83,throwable,TED-63 Dynamite,"ted-63 dynamite,ted-63,dynamite","demo,med,armor","bug,bot",borderline_justice,https://helldivers.wiki.gg/images/TED-63_Dynamite_Throwable_Render.png,4
 84,throwable,G-6 Frag,"g-6 frag,g-6,frag","demo,chaff,med,panic",any,helldivers_mobilize,https://helldivers.wiki.gg/images/G-6_Frag_Throwable_Render.png,3
 85,throwable,G-12 High Explosive,"g-12 high explosive,g-12,explosive,high explosive,he grenade,high explosive grenade","demo,med",bot,base,https://helldivers.wiki.gg/images/G-12_High_Explosive_Throwable_Render.png,4
