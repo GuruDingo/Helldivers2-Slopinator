@@ -17,12 +17,6 @@ Items we agreed to come back to. Nothing below is started unless marked.
       single-file build embeds them (2.3 MB, works offline). Re-run the fetch (Actions -> Fetch images, or the script)
       when a new item / warbond / wiki image is added. The warbond covers are saved too, but not shown anywhere (header art is parked, 2026-10-30).
 - [x] ~~Host the tool at a URL~~ done 2026-10-30: live at https://gurudingo.github.io/Helldivers2-Slopinator/ (GitHub Pages, `main` / `/docs`). Open choices still: custom domain, analytics/feedback, shareable-loadout links.
-- [ ] **Proof the new stratagem AP values** (Boss, 2026-10-30; PR #3 is already merged and live, so this is now a correction pass). Wiki pages were summarised, not
-      read in full, so check these against the wiki: K-9 (7), Orbital EMS Strike (7), EMS Mortar Sentry (6), Eagle
-      Strafing Run (5) vs the other Eagles (7), Maelstrom (4, missiles 5), Rover (2, fire is 4), Incendiary Mines (4,
-      explosion 3), Gas Mortar Sentry (6) and Mortar Sentry (3, headline is AV only), the three two-value ones (Patriot
-      3/6, Lumberer 4/6, Bastion 4/8; Dog Breath is set to 5 by Boss), and whether the two smoke strikes should really be blank.
-      ALSO (Boss, 2026-10-30): review EVERY multi-AP item, not just the three above - all 12 items that show two icons: AR/GL-21 One-Two (2/3), AR-11 Arbitrator (2/3), SMG/FLAM-34 Stoker (2/4), SG-20 Halt (2/3), LAS-17 Double-Edge Sickle (2/4), PLAS-15 Loyalist (2/3), GR-8 Recoilless Rifle (5/6), PLAS-45 Epoch (4/5), CQC-9 Defoliation Tool (3/5), EXO-45 Patriot Exosuit (3/6), EXO-51 Lumberer Exosuit (4/6), TD-220 Bastion MK XVI (4/8). Check that each really has two attacks worth showing and that the order and values match the wiki.
 - [~] **Give every tag a display title.** 17 of 40 tags have titles now (the 9 old ones, "assist" is shown as
       "Team Assist", plus Fire, Stealth, Orbital, Eagle, Sentry, Gas, Vehicle, Arc). Only titled tags appear in the
       "Require tags" dropdown; the other 23 are hidden until they get a title. `hd2-tags.xlsx` (sent earlier) is now
@@ -71,6 +65,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
+- **AP proofing** (Boss checked every multi-icon and flagged item): PLAS-15 Loyalist 3, Orbital EMS Strike 6, A/M-23 EMS Mortar Sentry 3/6, Eagle Airstrike 5, TD-110 Maelstrom 4/5, MD-I4 Incendiary Mines 3; everything else confirmed as it was. Open question: the other 7-rated strikes (Gas, Cluster Bomb, Rocket Pods, 500kg, Napalm, and the Orbital strikes) still use the page's lead projectile value, unlike the Airstrike.
 - **Wiki scan decisions** (Boss): the two temporary Liberty Day 2026 stratagems (Orbital Confetti, Eagle Fly By) are skipped on purpose, because the game doesn't let you pick temporary stratagems in a loadout. The Halo: ODST warbond and the wiki's "Obedient Democracy Support Troopers" are the same warbond; no change needed. "G/40-K Meltamine" renamed "G/40-K Melta Mine" to match the wiki; "melta mine" and "meltamine" are both nicknames (saved ticks / faction edits under the old name are orphaned).
 - **My Gear thumbnails confirmed working on the live site** (Boss). **Mobile layout** checked on Boss's phone: fine, closed for now. **Warbond header art** and **AP icons in My Gear rows** dropped from the list for now (Boss); the covers stay saved in `docs/img/warbonds/` in case we want them later.
 - **LAS-12 Sai** added (primary, Superstore, `smg,chaff,onehand,med,panic,charge`, bug+squid, AP 3). Wiki scan the same day: no other permanent weapon or stratagem is missing from the CSV (primaries 57/57, secondaries 26/26, throwables 24/24, backpacks, vehicles, sentries, emplacements, Eagles, orbitals and support weapons all match), and the wiki's "Obedient Democracy Support Troopers" warbond is the same four items as our `odst` (Halo: ODST) warbond. The UI tests no longer hard-code the item count.
