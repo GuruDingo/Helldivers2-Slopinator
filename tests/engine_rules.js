@@ -473,7 +473,10 @@ test("Support limits: a regular support is never mixed with an expendable one, a
   strict(600, {}).forEach((l) => { assert(regularSupports(l) <= 1); assert(!(regularSupports(l) && expendables(l)), "mixed"); assert(expendables(l) <= 2); });
   assert(strict(1500, { disabledRules: ["capMixed"] }).some((l) => regularSupports(l) && expendables(l)), "never saw a mixed build with the rule off");
   assert(strict(1500, { disabledRules: ["capRegular"] }).some((l) => regularSupports(l) >= 2), "never saw two regulars with the rule off");
-  assert(strict(2500, { disabledRules: ["capExpend"] }).some((l) => expendables(l) >= 3), "never saw three expendables with the rule off");
+  // two expendables locked, so a third is a plain draw (not a rare one) once the limit is off
+  const twoExp = { strat1: pick("EAT-17 Expendable Anti-Tank"), strat2: pick("MLS-4X Commando") };
+  assert(strict(1000, { locks: twoExp, disabledRules: ["capExpend"] }).some((l) => expendables(l) >= 3), "never saw three expendables with the rule off");
+  strict(300, { locks: twoExp }).forEach((l) => assert(expendables(l) === 2, "the limit let a third expendable in"));
 });
 test("Support limits: the old single 'capSupport' switch still turns all three off", () => {
   const bs = strict(1500, { disabledRules: ["capSupport"] });
