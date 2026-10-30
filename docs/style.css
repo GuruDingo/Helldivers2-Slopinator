@@ -100,6 +100,7 @@ input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-v
 }
 .chip button { background: none; border: none; color: #aaa; cursor: pointer; font-size: 1rem; line-height: 1; padding: 0 4px; }
 .chip button:hover { color: #f44336; }
+.chip.preset { background: #1f1f1f; border-style: dashed; border-color: #444; color: #aaa; }   /* a system-default row, not edited */
 
 /* ---------- messages ---------- */
 #messages { margin-top: 1rem; }
@@ -275,3 +276,4 @@ hr.divider { border: none; border-top: 1px solid var(--accent); margin: 1.5rem 0
 .rule-row.locked .lock-mark { flex-shrink: 0; width: 34px; text-align: center; color: #666; }
 .add-row select { max-width: 100%; }
 .add-row input[type=number] { width: 4.2rem; }
+.chips + .btn-row { margin-top: .6rem; }

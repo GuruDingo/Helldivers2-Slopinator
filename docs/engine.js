@@ -50,22 +50,27 @@
   // kind "guarantee" = checked on the finished build; "limit" = enforced while the stratagems are being picked.
   // `disabledRules: ["armor", "capEagle", ...]` switches any of them off. The in-game limits are not listed
   // here on purpose: nothing can turn those off.
+  // A rule with `preset: { tag, min?, max? }` is a plain count of one tag over the whole build ("Anti-Tank >= 1",
+  // "Vehicle <= 1"). The website shows those as editable rows next to the player's own rules rather than as a switch;
+  // an edited row is handed to the engine as a requirement for that tag with the preset's rule id in disabledRules,
+  // which behaves exactly like the preset did (tests/engine_rules.js checks that). The numbers in `preset` are the
+  // system defaults and must match what the engine enforces below.
   var RULES = [
-    { id: "backpack", kind: "guarantee", label: "Exactly one backpack-slot item", note: "Also stops a second backpack being picked." },
+    { id: "backpack", kind: "guarantee", label: "Exactly one backpack-slot item", note: "Also stops a second backpack being picked.", preset: { tag: "backpack", min: 1, max: 1 } },
     { id: "support", kind: "guarantee", label: "At least one support weapon" },
-    { id: "armor", kind: "guarantee", label: "At least one anti-tank item" },
-    { id: "med", kind: "guarantee", label: "At least one medium-enemy killer" },
+    { id: "armor", kind: "guarantee", label: "At least one anti-tank item", preset: { tag: "armor", min: 1 } },
+    { id: "med", kind: "guarantee", label: "At least one medium-enemy killer", preset: { tag: "med", min: 1 } },
     { id: "chaff", kind: "guarantee", label: "A chaff killer in primary or secondary" },
-    { id: "demo", kind: "guarantee", label: "At least one base breaker" },
-    { id: "panic", kind: "guarantee", label: "A panic weapon in primary, secondary or throwable" },
+    { id: "demo", kind: "guarantee", label: "At least one base breaker", preset: { tag: "demo", min: 1 } },
+    { id: "panic", kind: "guarantee", label: "A panic weapon in primary, secondary or throwable", preset: { tag: "panic", min: 1 } },
     { id: "balance", kind: "guarantee", label: "Chaff / medium / anti-tank counts within 3 of each other" },
     { id: "demoEscalation", kind: "guarantee", label: "Two base breakers when no weapon is one" },
     { id: "shield", kind: "guarantee", label: "A shield backpack needs a one-handed weapon" },
     { id: "supply", kind: "guarantee", label: "No supply pack alongside 2+ no-ammo items" },
     { id: "capSupport", kind: "limit", label: "One regular support weapon, or up to two expendable ones (never mixed)" },
-    { id: "capVehicle", kind: "limit", label: "At most 1 vehicle" },
-    { id: "capEagle", kind: "limit", label: "At most 2 Eagles" },
-    { id: "capMine", kind: "limit", label: "At most 1 mine" },
+    { id: "capVehicle", kind: "limit", label: "At most 1 vehicle", preset: { tag: "vehicle", max: 1 } },
+    { id: "capEagle", kind: "limit", label: "At most 2 Eagles", preset: { tag: "eagle", max: 2 } },
+    { id: "capMine", kind: "limit", label: "At most 1 mine", preset: { tag: "mines", max: 1 } },
   ];
 
   // -- Rule priority --------------------------------------------------------

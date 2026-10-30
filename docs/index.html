@@ -55,12 +55,12 @@
         <summary>Rules <span class="summary-note" id="rules-summary"></span></summary>
         <div class="section-body">
           <h3 class="rules-title">Default rules</h3>
-          <p class="hint">What every loadout is checked against. Switch one off and the randomizer stops enforcing it. When a build can't meet everything, higher-priority rules are protected first.</p>
+          <p class="hint">What every loadout is checked against. Switch one off and the randomizer stops enforcing it. When a build can't meet everything, higher-priority rules are protected first. The plain "how many" defaults (Anti-Tank, Vehicle, Eagle and so on) are the first rows under Additional rules, where you can change the numbers.</p>
           <div id="rules-default"></div>
           <div class="btn-row"><button type="button" class="ctrl-btn" id="rules-reset" hidden>Turn all default rules back on</button></div>
 
           <h3 class="rules-title">Additional rules</h3>
-          <p class="hint">Your own rule for how many items with a tag the whole loadout must have. Adding a rule for a tag replaces the default check for it. <em>At least</em> and <em>at most</em> on the same tag make a range. <em>At most 0</em> / <em>exactly 0</em> bans the tag.</p>
+          <p class="hint">How many items with a tag the whole loadout must have. The dimmer rows are the system defaults. To change one, add a rule for the same tag (it replaces that number); remove one with the ×. <em>At least</em> and <em>at most</em> on the same tag make a range. <em>At most 0</em> / <em>exactly 0</em> bans the tag.</p>
           <div class="add-row">
             <select id="require-tag" aria-label="Tag"></select>
             <select id="require-op" aria-label="Rule type">
@@ -72,6 +72,7 @@
             <button type="button" class="ctrl-btn" id="require-add">Add</button>
           </div>
           <div class="chips" id="require-chips"></div>
+          <div class="btn-row"><button type="button" class="ctrl-btn" id="presets-reset" hidden title="Brings back the default rows you removed or changed. Rules you added for other tags stay.">Reset to system defaults</button></div>
         </div>
       </details>
 

@@ -72,7 +72,7 @@ function check(label, cond, extra) {
   check("first visit wrote the owned list to localStorage", Object.keys(JSON.parse(win.localStorage.getItem("hd2_tracker"))).length === ACTIVE - win.HD2_DATA.items.filter((i) => i.warbond === "base" && i.factions.indexOf("none") === -1).length); // everything except the always-owned Base Game items
   check("7 lock inputs", doc.querySelectorAll("#lock-grid input").length === 7);
   check("datalists filled", $("dl-primary").children.length > 40 && $("dl-strat").children.length > 60);
-  check("require tag dropdown lists only titled tags (21), by title", (() => { const o = Array.from($("require-tag").children); const t = o.map((x) => x.textContent); return o.length === 21 && t.includes("Team Assist") && t.includes("Fire") && t.includes("Laser") && t.includes("Plasma") && t.includes("Hand-Held Shield") && t.includes("Explosive") && t.every((x, i) => i === 0 || t[i - 1].localeCompare(x) <= 0) && !o.some((x) => ["onehand", "stun", "smg", "mortar"].includes(x.value)) && o.some((x) => x.value === "assist"); })(), Array.from($("require-tag").children).map((x) => x.textContent).join(", "));
+  check("require tag dropdown lists only titled tags (22), by title", (() => { const o = Array.from($("require-tag").children); const t = o.map((x) => x.textContent); return o.length === 22 && t.includes("Team Assist") && t.includes("Fire") && t.includes("Laser") && t.includes("Plasma") && t.includes("Hand-Held Shield") && t.includes("Explosive") && t.every((x, i) => i === 0 || t[i - 1].localeCompare(x) <= 0) && !o.some((x) => ["onehand", "stun", "smg", "mortar"].includes(x.value)) && o.some((x) => x.value === "assist"); })(), Array.from($("require-tag").children).map((x) => x.textContent).join(", "));
   check("autocomplete options carry names only (no category labels)",
     Array.from(doc.querySelectorAll("#dl-strat option")).every((o) => !o.hasAttribute("label")) &&
     $("dl-strat").querySelector("option[value='AC-8 Autocannon']") !== null);
@@ -258,9 +258,16 @@ function check(label, cond, extra) {
   setOwnedItem("AC-8 Autocannon", true);
 
   const addRule = (tag, op, n) => { $("require-tag").value = tag; $("require-op").value = op; $("require-op").dispatchEvent(new win.Event("change")); $("require-n").value = String(n); click($("require-add")); };
-  const chipTexts = () => Array.from(doc.querySelectorAll("#require-chips .chip")).map((c) => c.firstChild.textContent);
+  const chips = () => Array.from(doc.querySelectorAll("#require-chips .chip"));
+  const chipTexts = () => chips().map((c) => c.firstChild.textContent);
+  const chipFor = (tag) => doc.querySelector('#require-chips .chip[data-tag="' + tag + '"]');
+  const removeChip = (tag) => click(chipFor(tag).querySelector("button"));
+  const DEFAULT_ROWS = ["Backpack = 1", "Anti-Tank ≥ 1", "Medium Killer ≥ 1", "Base Breaker ≥ 1", "Panic Weapon ≥ 1", "Vehicle ≤ 1", "Eagle ≤ 2", "Mines ≤ 1"];
+  check("the eight plain-count default rules start as dim rows in Additional rules", chipTexts().join("|") === DEFAULT_ROWS.join("|") && chips().every((c) => c.classList.contains("preset")), chipTexts().join("|"));
+  check("...with no 'reset to system defaults' button yet, and nothing counted in the summary", $("presets-reset").hidden && $("rules-summary").textContent === "");
   addRule("demo", "min", 3);
-  check("require chip added", doc.querySelectorAll("#require-chips .chip").length === 1);
+  check("adding a rule for a default row's tag edits that row (not a second chip)", chips().length === 8 && chipTexts()[3] === "Base Breaker ≥ 3" && !chipFor("demo").classList.contains("preset"), chipTexts().join("|"));
+  check("...shows the reset button and counts one edited rule", !$("presets-reset").hidden && /1 edited/.test($("rules-summary").textContent), $("rules-summary").textContent);
   $("count").value = "4"; generate();
   check("require demo>=3 still generates", cards() === 28, cards() + " " + errors());
   $("count").value = "1";
@@ -270,21 +277,24 @@ function check(label, cond, extra) {
   check("...and lists the unmet requirement in a banner", /Rule: at least 4 Vehicle/.test((doc.querySelector("#results .rules-warning") || {}).textContent || ""),
     (doc.querySelector("#results .rules-warning") || {}).textContent);
   check("...with no red error message", errors().length === 0, errors());
-  doc.querySelectorAll("#require-chips .chip button").forEach((b) => click(b));
-  check("requirement chips removable", doc.querySelectorAll("#require-chips .chip").length === 0);
+  check("'at least 4 vehicles' replaced the default 'at most 1' (the default's side of the clash is dropped)", chipTexts()[5] === "Vehicle ≥ 4", chipTexts().join("|"));
+  chips().forEach((c) => click(c.querySelector("button")));
+  check("every row is removable, defaults included", chips().length === 0 && /8 off/.test($("rules-summary").textContent), $("rules-summary").textContent);
+  click($("presets-reset"));
+  check("'Reset to system defaults' brings the eight default rows back", chipTexts().join("|") === DEFAULT_ROWS.join("|") && chips().every((c) => c.classList.contains("preset")) && $("presets-reset").hidden && $("rules-summary").textContent === "", chipTexts().join("|"));
 
   console.log("Rules panel");
   check("rules panel replaces 'Require tags'", !/Require tags/.test(doc.body.textContent) && /Default rules/.test(doc.body.textContent) && /Additional rules/.test(doc.body.textContent));
   check("operator offers at least / at most / exactly", Array.from($("require-op").children).map((o) => o.textContent).join("|") === "at least|at most|exactly");
-  const engRules = win.HD2Engine.RULES;
+  const engRules = win.HD2Engine.RULES.filter((r) => !r.preset);   // the eight plain-count rules are rows, not switches
   const sw = (id) => doc.querySelector('#rules-default input[data-rule="' + id + '"]');
-  check("one switch per engine rule, all on", doc.querySelectorAll("#rules-default input[data-rule]").length === engRules.length && engRules.every((r) => sw(r.id) && sw(r.id).checked));
+  check("one switch per engine rule that is not a plain count, all on", doc.querySelectorAll("#rules-default input[data-rule]").length === engRules.length && engRules.every((r) => sw(r.id) && sw(r.id).checked));
   check("in-game limits row is shown and has no switch", /1 FRV, 1 tank and 1 exosuit/.test($("rules-default").textContent) && doc.querySelectorAll("#rules-default .rule-row.locked input").length === 0);
   check("priority headings shown", /High priority/.test($("rules-default").textContent) && /Lowest priority/.test($("rules-default").textContent));
   check("'turn all back on' hidden while nothing is off", $("rules-reset").hidden);
   addRule("eagle", "max", 1); addRule("sentry", "eq", 0); addRule("chaff", "min", 2); addRule("chaff", "max", 3);
-  check("chips: at most / exactly / range", chipTexts().join("|") === "Eagle ≤ 1|Sentry = 0|Chaff Killer 2–3", chipTexts().join("|"));
-  check("summary counts added rules", /3 added/.test($("rules-summary").textContent), $("rules-summary").textContent);
+  check("chips: at most / exactly / range (Eagle edits its default row; the others are added after the defaults)", chipTexts().join("|") === DEFAULT_ROWS.join("|").replace("Eagle ≤ 2", "Eagle ≤ 1") + "|Sentry = 0|Chaff Killer 2–3", chipTexts().join("|"));
+  check("summary counts added and edited rules", /2 added, 1 edited/.test($("rules-summary").textContent), $("rules-summary").textContent);
   addRule("chaff", "min", 5);
   check("a contradictory range is refused with a message", errors().some((e) => /can't both hold/.test(e)) && chipTexts().includes("Chaff Killer 2–3"), errors());
   addRule("chaff", "min", 0);
@@ -294,19 +304,32 @@ function check(label, cond, extra) {
   $("count").value = "3"; generate();
   check("builds with added rules; no unmet rule banner for the ones that can be met", cards() === 21 && !/Rule: at most 1 Eagle|Rule: exactly 0 Sentry/.test((doc.querySelector("#results") || {}).textContent), cards() + " " + errors());
   $("count").value = "1";
-  doc.querySelectorAll("#require-chips .chip button").forEach((b) => click(b));
-  check("rule chips removable", doc.querySelectorAll("#require-chips .chip").length === 0 && $("rules-summary").textContent === "");
+  addRule("eagle", "min", 3);
+  check("'at least 3' against the player's own 'at most 1' is refused (only a DEFAULT number gives way)", errors().some((e) => /can't both hold/.test(e)) && chipTexts().includes("Eagle ≤ 1"), errors().concat(chipTexts()).join("|"));
+  addRule("eagle", "eq", 2); addRule("eagle", "max", 1);
+  check("a clash with the player's own earlier rule is refused", errors().some((e) => /can't both hold/.test(e)) && chipTexts().includes("Eagle = 2"), errors().concat(chipTexts()).join("|"));
+  addRule("armor", "max", 2);
+  check("'at most 2' on a default 'at least 1' row makes the range 1–2", chipTexts().includes("Anti-Tank 1–2"), chipTexts().join("|"));
+  addRule("vehicle", "max", 2); addRule("vehicle", "max", 1);
+  check("editing a row back to its default makes it a dim default row again", chipFor("vehicle").classList.contains("preset") && chipTexts().includes("Vehicle ≤ 1"), chipTexts().join("|"));
+  chips().forEach((c) => click(c.querySelector("button")));
+  check("rule chips removable", chips().length === 0);
+  addRule("armor", "min", 2); addRule("sentry", "min", 1);
+  click($("presets-reset"));
+  check("'Reset to system defaults' restores the defaults but keeps rules added for other tags", chipTexts().join("|") === DEFAULT_ROWS.join("|") + "|Sentry ≥ 1", chipTexts().join("|"));
+  removeChip("sentry");
+  check("...and removing the last extra rule leaves just the defaults, nothing counted", chipTexts().join("|") === DEFAULT_ROWS.join("|") && $("rules-summary").textContent === "");
 
-  const sw2 = sw("capEagle"); sw2.checked = false; sw2.dispatchEvent(new win.Event("change", { bubbles: true }));
+  const sw2 = sw("capSupport"); sw2.checked = false; sw2.dispatchEvent(new win.Event("change", { bubbles: true }));
   check("switching a rule off greys the row, shows 'turn back on' and counts it", sw2.closest(".rule-row").classList.contains("off") && !$("rules-reset").hidden && /1 off/.test($("rules-summary").textContent), $("rules-summary").textContent);
-  check("...and saves it", JSON.stringify(JSON.parse(win.localStorage.getItem("hd2_settings")).disabledRules) === '["capEagle"]', win.localStorage.getItem("hd2_settings"));
-  const armorOff = sw("armor"); armorOff.checked = false; armorOff.dispatchEvent(new win.Event("change", { bubbles: true }));
+  check("...and saves it", JSON.stringify(JSON.parse(win.localStorage.getItem("hd2_settings")).disabledRules) === '["capSupport"]', win.localStorage.getItem("hd2_settings"));
+  const armorOff = sw("balance"); armorOff.checked = false; armorOff.dispatchEvent(new win.Event("change", { bubbles: true }));
   generate();
   check("builds still generate with rules off", cards() === 7 && errors().length === 0, cards() + " " + errors());
   click($("rules-reset"));
   check("'turn all back on' re-enables everything", engRules.every((r) => sw(r.id).checked) && $("rules-reset").hidden && $("rules-summary").textContent === "");
   check("...and saves that", JSON.parse(win.localStorage.getItem("hd2_settings")).disabledRules.length === 0);
-  sw("panic").checked = false; sw("panic").dispatchEvent(new win.Event("change", { bubbles: true }));
+  removeChip("panic");   // the Panic Weapon default row is removed; it must be saved as a switched-off rule
 
   console.log("Locks that break rules");
   $("lock-strat1").value = "Eagle Airstrike"; $("lock-strat2").value = "Orbital Gas Strike";
@@ -604,6 +627,21 @@ function check(label, cond, extra) {
   check("...ignores unknown items and invalid values", f2("Eagle Airstrike") === defaultOf("Eagle Airstrike"));
   check("...and notes the 2 edits on the Randomizer tab", /edited faction lists \(2 items\)/.test(d2.getElementById("pool-text").textContent), d2.getElementById("pool-text").textContent);
   dom2.window.close();
+  // edited rules survive a reload too; damaged saved rules are skipped
+  const dom4 = new JSDOM(bundleHtml, {
+    runScripts: "dangerously", pretendToBeVisual: true, url: "http://localhost/",
+    beforeParse(w) {
+      w.localStorage.setItem("hd2_settings", JSON.stringify({ faction: "any", disabledRules: ["capMine", "balance", "nonsense"],
+        requirements: { eagle: { min: 3 }, sentry: { min: 0, max: 0 }, "no such tag": { min: 1 }, chaff: { min: 5, max: 2 }, med: { min: "x" }, armor: { min: 99 } } }));
+    },
+  });
+  await new Promise((resolve) => dom4.window.addEventListener("load", resolve));
+  const d4 = dom4.window.document;
+  const texts4 = Array.from(d4.querySelectorAll("#require-chips .chip")).map((c) => c.firstChild.textContent);
+  check("a reloaded page restores edited rows, the removed default and the added rules", texts4.join("|") === "Backpack = 1|Anti-Tank ≥ 1|Medium Killer ≥ 1|Base Breaker ≥ 1|Panic Weapon ≥ 1|Vehicle ≤ 1|Eagle ≥ 3|Sentry = 0", texts4.join("|"));
+  check("...and skips damaged saved rules (unknown tag, min above max, not a number, too big)", !texts4.some((t) => /no such|Chaff|99/.test(t)) && texts4.filter((t) => /Medium/.test(t)).length === 1);
+  check("...with the reset buttons and the summary showing what differs", !d4.getElementById("presets-reset").hidden && !d4.getElementById("rules-reset").hidden && /1 added, 1 edited, 2 off/.test(d4.getElementById("rules-summary").textContent), d4.getElementById("rules-summary").textContent);
+  dom4.window.close();
   click(doc.querySelector('.tab[data-view="randomizer"]'));
 
   console.log("Saved images");
@@ -641,7 +679,7 @@ function check(label, cond, extra) {
   console.log("Reset");
   click($("reset-all"));
   check("reset restores faction any + 1 loadout", doc.querySelector('input[name="faction"]:checked').value === "any" && $("count").value === "1");
-  check("reset switches default rules back on and clears added rules", win.HD2Engine.RULES.every((r) => sw(r.id).checked) && doc.querySelectorAll("#require-chips .chip").length === 0 && JSON.parse(win.localStorage.getItem("hd2_settings")).disabledRules.length === 0);
+  check("reset switches default rules back on, restores the default rows and clears added rules", engRules.every((r) => sw(r.id).checked) && chipTexts().join("|") === DEFAULT_ROWS.join("|") && JSON.parse(win.localStorage.getItem("hd2_settings")).disabledRules.length === 0);
   check("...but leaves My Gear alone", blockBtn("AC-8 Autocannon").getAttribute("aria-pressed") === "true" && $("grand-total").textContent === ACTIVE + " / " + ACTIVE + " items owned");
 
   console.log(failed ? "\n" + failed + " check(s) FAILED" : "\nAll UI checks passed");

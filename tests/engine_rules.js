@@ -351,4 +351,56 @@ test("hand-held shields need a one-handed weapon, bubble shields do not", () => 
   ["SH-32 Shield Generator Pack", "FX-12 Shield Generator Relay"].forEach((n) => run(n, 50).forEach((l) => assert(!l.unmet.some((u) => u.id === "shield"), n + " should not need a one-hander")));
 });
 
+// ---- Preset rules: the eight default rules that are plain tag counts --------------------------------------------
+const PRESETS = HD2Engine.RULES.filter((r) => r.preset);
+// What the website does with a preset row: switch the preset off and pass the row as the player's own requirement.
+const asRequirements = (over) => {
+  const req = {};
+  PRESETS.forEach((p) => { req[p.preset.tag] = Object.assign({}, p.preset); delete req[p.preset.tag].tag; });
+  return { disabledRules: PRESETS.map((p) => p.id), requirements: Object.assign(req, over || {}) };
+};
+
+test("Presets: eight rules carry their system-default tag counts", () => {
+  const got = PRESETS.map((p) => p.id + ":" + p.preset.tag + ":" + (p.preset.min ?? "") + ":" + (p.preset.max ?? "")).sort();
+  assert.deepStrictEqual(got, ["armor:armor:1:", "backpack:backpack:1:1", "capEagle:eagle::2", "capMine:mines::1", "capVehicle:vehicle::1", "demo:demo:1:", "med:med:1:", "panic:panic:1:"]);
+  PRESETS.forEach((p) => assert(HD2Engine.RULES.some((r) => r === p)));
+});
+test("Presets: the default counts, handed over as the player's own requirements, give builds that follow them", () => {
+  const o = asRequirements();
+  for (let i = 0; i < 300; i++) {
+    const l = engine.generateLoadoutRelaxed(Object.assign({ faction: "any" }, o));
+    assert.deepStrictEqual(l.unmet, [], "unmet: " + JSON.stringify(l.unmet));
+    PRESETS.forEach((p) => {
+      const n = countTag(l, p.preset.tag);
+      if (p.preset.min !== undefined) assert(n >= p.preset.min, p.id + " too few: " + n);
+      if (p.preset.max !== undefined) assert(n <= p.preset.max, p.id + " too many: " + n);
+    });
+  }
+});
+test("Presets: an edited cap works (Vehicle <= 2 allows two vehicles, which the default never does)", () => {
+  assert(!builds(400, {}).some((l) => countTag(l, "vehicle") > 1), "default allowed two vehicles");
+  const o = asRequirements({ vehicle: { max: 2 } });
+  const two = Array.from({ length: 1500 }, () => engine.generateLoadoutRelaxed(Object.assign({ faction: "any" }, o)));
+  assert(two.some((l) => countTag(l, "vehicle") === 2), "never saw two vehicles");
+  two.forEach((l) => assert(countTag(l, "vehicle") <= 2));
+});
+test("Presets: an edited minimum works (Eagle >= 3 replaces 'at most 2 Eagles'; Anti-Tank >= 2 replaces 'at least 1')", () => {
+  const o = asRequirements({ eagle: { min: 3 }, armor: { min: 2 } });
+  for (let i = 0; i < 100; i++) {
+    const l = engine.generateLoadoutRelaxed(Object.assign({ faction: "any" }, o));
+    assert(countTag(l, "eagle") >= 3 && countTag(l, "armor") >= 2, "eagle " + countTag(l, "eagle") + ", armor " + countTag(l, "armor"));
+  }
+});
+test("Presets: a removed preset is not enforced (no Anti-Tank row -> builds without any appear)", () => {
+  // the balance rule (chaff / medium / anti-tank within 3) rejects most builds with no anti-tank, so it is switched off to test this one rule
+  const o = asRequirements();
+  delete o.requirements.armor;
+  o.disabledRules.push("balance");
+  assert(Array.from({ length: 1500 }, () => engine.generateLoadoutRelaxed(Object.assign({ faction: "any" }, o))).some((l) => countTag(l, "armor") === 0), "never saw a build without anti-tank");
+});
+test("Presets: Backpack at most 0 (the Backpack row edited to ban backpacks) builds with none", () => {
+  const o = asRequirements({ backpack: { max: 0 } });
+  for (let i = 0; i < 100; i++) assert.strictEqual(countTag(engine.generateLoadoutRelaxed(Object.assign({ faction: "any" }, o)), "backpack"), 0);
+});
+
 console.log("\n" + passed + " engine rule tests passed" + (process.exitCode ? " (with failures)" : ""));
