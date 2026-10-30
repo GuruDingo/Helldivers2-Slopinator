@@ -5,37 +5,24 @@ Items we agreed to come back to. Nothing below is started unless marked.
 ## UI / design
 - [x] ~~Show armor penetration on weapon cards~~ done 2026-10-30: `armor_pen` column in `hd2gear.csv` for all 141 weapons
       (main attack, `2/4` for two-mode weapons), validated by the build, exported as `armorPen`, and shown on the loadout
-      cards as the wiki's icons (both, side by side, for two-mode weapons). Possible follow-ups: show it in My Gear rows
-      too; use it for the "anti-armor" tag/rules and sub-faction advice; check
+      cards as the wiki's icons (both, side by side, for two-mode weapons). Possible follow-ups: use it for the "anti-armor" tag/rules and sub-faction advice; check
       whether any other support weapon shows two icons on the wiki's Weapons page (Boss set Recoilless Rifle 5/6, Epoch
       4/5 and Defoliation Tool 3/5 on 2026-10-30; the page's support section didn't load for me, so the rest use one
       main value).
 - [ ] **Colour the rest of the UI**: weapon tags (the pills only cover ~9 of the ~40 tags) and the faction buttons
       themselves (the selected one already takes the faction colour).
-- [ ] **Find out why the My Gear thumbnails don't show on the live site** (Boss, 2026-10-30; the image migration is done, so check now). PR #4 was merged into the `stratagem-armor-pen` branch, NOT `main` (its base), so it never
-      reached the live site: fixed by PR #5, which carries it to `main`. After that, if images are still missing, check the
-      browser cache (hard refresh) and whether the wiki blocks the hotlinks (the loadout cards use the same links, so
-      compare). Bundle/test builds show the thumbnails in my screenshots.
 - [x] ~~Migrate images from wiki hotlinks to saved files~~ done 2026-10-30: `tools/fetch_images.py` + the "Fetch images" GitHub Action
       saved all 276 images (2.2 MB: 201 item pictures, 28 warbond covers, 47 icons) into `docs/img/`, `build_gear.py`
       exports them as `HD2_DATA.images`, the page prefers the saved copy (wiki link only as a fallback), and the
       single-file build embeds them (2.3 MB, works offline). Re-run the fetch (Actions -> Fetch images, or the script)
-      when a new item / warbond / wiki image is added. Follow-ups: warbond header art (covers are saved but not shown);
-      check the live site shows the My Gear thumbnails (item below).
+      when a new item / warbond / wiki image is added. The warbond covers are saved too, but not shown anywhere (header art is parked, 2026-10-30).
 - [x] ~~Host the tool at a URL~~ done 2026-10-30: live at https://gurudingo.github.io/Helldivers2-Slopinator/ (GitHub Pages, `main` / `/docs`). Open choices still: custom domain, analytics/feedback, shareable-loadout links.
-- [ ] **Decide on the two temporary Liberty Day 2026 stratagems** (found by the wiki scan, 2026-10-30): **Orbital Confetti** (non-lethal orbital) and **Eagle Fly By** (does nothing), both added mid-patch 1.007.201 on 2026-10-25 as event items (not in any warbond). Not added to the CSV. If wanted: category `orbital` / `eagle`, warbond `fomo` (Campaign/Event Rewards), no `armor_pen`.
-- [ ] **Maybe rename G/40-K Meltamine**: the wiki page is titled "G/40-K Melta Mine" (the CSV says Meltamine; "melta mine" is already a nickname). Renaming would orphan saved ticks / faction edits for it.
 - [ ] **Proof the new stratagem AP values** (Boss, 2026-10-30; PR #3 is already merged and live, so this is now a correction pass). Wiki pages were summarised, not
       read in full, so check these against the wiki: K-9 (7), Orbital EMS Strike (7), EMS Mortar Sentry (6), Eagle
       Strafing Run (5) vs the other Eagles (7), Maelstrom (4, missiles 5), Rover (2, fire is 4), Incendiary Mines (4,
       explosion 3), Gas Mortar Sentry (6) and Mortar Sentry (3, headline is AV only), the three two-value ones (Patriot
       3/6, Lumberer 4/6, Bastion 4/8; Dog Breath is set to 5 by Boss), and whether the two smoke strikes should really be blank.
       ALSO (Boss, 2026-10-30): review EVERY multi-AP item, not just the three above - all 12 items that show two icons: AR/GL-21 One-Two (2/3), AR-11 Arbitrator (2/3), SMG/FLAM-34 Stoker (2/4), SG-20 Halt (2/3), LAS-17 Double-Edge Sickle (2/4), PLAS-15 Loyalist (2/3), GR-8 Recoilless Rifle (5/6), PLAS-45 Epoch (4/5), CQC-9 Defoliation Tool (3/5), EXO-45 Patriot Exosuit (3/6), EXO-51 Lumberer Exosuit (4/6), TD-220 Bastion MK XVI (4/8). Check that each really has two attacks worth showing and that the order and values match the wiki.
-- [~] **Artwork in My Gear** (Boss, 2026-10-30). DONE: a lazy-loaded thumbnail (44x32) at the left of every item row, from the
-      item's `img_url` (blank square if it can't load; the loadout cards are unchanged, no compact mode on the Randomizer
-      tab, per Boss). STILL TO DO: warbond cover art in the warbond headers (28 of 36 warbonds have an `img_url`; the
-      Requisition shops, Superstore and Campaign/Event Rewards are blank). Hotlinking is OK for now (friends-only);
-      the image migration replaces the links later.
 - [~] **Give every tag a display title.** 17 of 40 tags have titles now (the 9 old ones, "assist" is shown as
       "Team Assist", plus Fire, Stealth, Orbital, Eagle, Sentry, Gas, Vehicle, Arc). Only titled tags appear in the
       "Require tags" dropdown; the other 23 are hidden until they get a title. `hd2-tags.xlsx` (sent earlier) is now
@@ -48,8 +35,6 @@ Items we agreed to come back to. Nothing below is started unless marked.
       enemy levels. Needs the exact crayon-to-tag mapping from Boss (or the reference video) before building.
 - [x] ~~Tag consistency checks~~ done 2026-10-29 as a manual Claude procedure (`TAG_CHECK.md`), deliberately NOT in the build. Orbital Laser is a deliberate exception to beam -> fire.
 - [x] ~~Reroll one slot~~ done 2026-10-29: every card has a lock toggle and a reroll button, and each loadout has a "Reroll all unlocked" button (see README). Possible follow-ups: lock/unlock-all buttons; one "reroll all loadouts" button when generating several; card locks are per-loadout and are NOT copied back into the Locks panel.
-- [ ] **Mobile layout**: check and tidy on a real phone (there's a small-screen block in `style.css`, but it has
-      only been tested in jsdom).
 - [ ] **Shareable loadouts**: encode a build in the URL (`#...`) so it can be sent to a friend; maybe a
       copy-as-text button for Discord.
 - [ ] **Odds transparency**: explain why a build was flagged or why the faction was relaxed (tooltips / details).
@@ -86,6 +71,8 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
+- **Wiki scan decisions** (Boss): the two temporary Liberty Day 2026 stratagems (Orbital Confetti, Eagle Fly By) are skipped on purpose, because the game doesn't let you pick temporary stratagems in a loadout. The Halo: ODST warbond and the wiki's "Obedient Democracy Support Troopers" are the same warbond; no change needed. "G/40-K Meltamine" renamed "G/40-K Melta Mine" to match the wiki; "melta mine" and "meltamine" are both nicknames (saved ticks / faction edits under the old name are orphaned).
+- **My Gear thumbnails confirmed working on the live site** (Boss). **Mobile layout** checked on Boss's phone: fine, closed for now. **Warbond header art** and **AP icons in My Gear rows** dropped from the list for now (Boss); the covers stay saved in `docs/img/warbonds/` in case we want them later.
 - **LAS-12 Sai** added (primary, Superstore, `smg,chaff,onehand,med,panic,charge`, bug+squid, AP 3). Wiki scan the same day: no other permanent weapon or stratagem is missing from the CSV (primaries 57/57, secondaries 26/26, throwables 24/24, backpacks, vehicles, sentries, emplacements, Eagles, orbitals and support weapons all match), and the wiki's "Obedient Democracy Support Troopers" warbond is the same four items as our `odst` (Halo: ODST) warbond. The UI tests no longer hard-code the item count.
 - **Armor penetration on stratagems** (icons moved to the right of the item name): 50 attacking stratagems now have `armor_pen` (page's lead AP icon; two values for Patriot, Lumberer, Bastion; Dog Breath counted as just 5 per Boss). Worth a second look on the wiki: K-9 (7), EMS Strike (7) and EMS Mortar Sentry (6) look high for what they do, Eagle Strafing Run (5) vs the other Eagles (7), and Maelstrom (4, missiles are 5).
 - **Armor penetration data**: new `armor_pen` column in `hd2gear.csv` (141 weapons), build validation, `armorPen` in the exported data, and the wiki icon links in the README. The cards now show it (both icons for two-mode weapons).
