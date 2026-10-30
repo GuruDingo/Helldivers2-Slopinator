@@ -6,8 +6,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
 - [x] ~~Show armor penetration on weapon cards~~ done 2026-10-30: `armor_pen` column in `hd2gear.csv` for all 141 weapons
       (main attack, `2/4` for two-mode weapons), validated by the build, exported as `armorPen`, and shown on the loadout
       cards as the wiki's icons (both, side by side, for two-mode weapons). Possible follow-ups: show it in My Gear rows
-      too; use it for the "anti-armor" tag/rules and sub-faction advice; stratagem attacks (sentries, Eagles, orbitals)
-      have ratings but are not in the column; `LAS-12 Sai` is on the wiki's primary list but not in the CSV; check
+      too; use it for the "anti-armor" tag/rules and sub-faction advice; `LAS-12 Sai` is on the wiki's primary list but not in the CSV; check
       whether any other support weapon shows two icons on the wiki's Weapons page (Boss set Recoilless Rifle 5/6, Epoch
       4/5 and Defoliation Tool 3/5 on 2026-10-30; the page's support section didn't load for me, so the rest use one
       main value).
@@ -77,6 +76,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
+- **Armor penetration on stratagems** (icons moved to the right of the item name): 50 attacking stratagems now have `armor_pen` (page's lead AP icon; two values for Patriot, Lumberer, Bastion, Dog Breath). Worth a second look on the wiki: K-9 (7), EMS Strike (7) and EMS Mortar Sentry (6) look high for what they do, Eagle Strafing Run (5) vs the other Eagles (7), and Maelstrom (4, missiles are 5).
 - **Armor penetration data**: new `armor_pen` column in `hd2gear.csv` (141 weapons), build validation, `armorPen` in the exported data, and the wiki icon links in the README. The cards now show it (both icons for two-mode weapons).
 - **Enable for all factions** button in Edit factions mode, next to Reset to defaults: ticks all three factions for the items shown (second click to confirm; respects the search filter). Reset to defaults undoes it.
 
