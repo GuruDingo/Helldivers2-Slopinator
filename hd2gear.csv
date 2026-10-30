@@ -45,7 +45,7 @@ id,category,name,nicknames,tags,factions,warbond,img_url,armor_pen
 44,primary,SG-8P Punisher Plasma,"sg-8p punisher plasma,sg-8p,punisher plasma,pp","shotgun,chaff,med,panic",any,cutting_edge,https://helldivers.wiki.gg/images/SG-8P_Punisher_Plasma_Primary_Render.png,3
 45,primary,PLAS-39 Accelerator Rifle,"plas-39 accelerator rifle,plas-39,accelerator rifle,accelerator,killzone sniper,killzone plasma","marksman rifle,med",any,killzone,https://helldivers.wiki.gg/images/PLAS-39_Accelerator_Rifle_Primary_Render.png,3
 46,primary,ARC-12 Blitzer,"arc-12 blitzer,arc-12,blitzer","shotgun,chaff,med,charge,panic",bug,cutting_edge,https://helldivers.wiki.gg/images/ARC-12_Blitzer_Primary_Render.png,3
-47,primary,LAS-5 Scythe,"las-5 scythe,las-5,scythe","beam,chaff,charge,panic,fire","bug,squid",helldivers_mobilize,https://helldivers.wiki.gg/images/LAS-5_Scythe_Primary_Render.png,2
+47,primary,LAS-5 Scythe,"las-5 scythe,las-5,scythe","beam,chaff,charge,panic","bug,squid",helldivers_mobilize,https://helldivers.wiki.gg/images/LAS-5_Scythe_Primary_Render.png,2
 48,primary,LAS-16 Sickle,"las-16 sickle,las-16,sickle","assault rifle,chaff,charge,panic",any,cutting_edge,https://helldivers.wiki.gg/images/LAS-16_Sickle_Primary_Render.png,2
 49,primary,LAS-17 Double-Edge Sickle,"las-17 double-edge sickle,las-17,double-edge sickle,double-edge,de sickle","assault rifle,charge,chaff,med,panic",any,servants_of_freedom,https://helldivers.wiki.gg/images/LAS-17_Double-Edge_Sickle_Primary_Render.png,2/4
 50,primary,PLAS-1 Scorcher,"plas-1 scorcher,plas-1,scorcher","assault rifle,chaff,med,panic",any,helldivers_mobilize,https://helldivers.wiki.gg/images/PLAS-1_Scorcher_Primary_Render.png,3
@@ -75,7 +75,7 @@ id,category,name,nicknames,tags,factions,warbond,img_url,armor_pen
 73,secondary,LAS-58 Talon,"las-58 talon,las-58,talon","chaff,med,panic",any,borderline_justice,https://helldivers.wiki.gg/images/LAS-58_Talon_Secondary_Render.png,3
 74,secondary,P-72 Crisper,"p-72 crisper,p-72,crisper","chaff,fire",any,freedoms_flame,https://helldivers.wiki.gg/images/P-72_Crisper_Secondary_Render.png,4
 75,secondary,GP-31 Grenade Pistol,"gp-31 grenade pistol,gp-31,pistol","chaff,med,demo,explosive",any,democratic_detonation,https://helldivers.wiki.gg/images/GP-31_Grenade_Pistol_Secondary_Render.png,3
-76,secondary,LAS-7 Dagger,"las-7 dagger,las-7,dagger","chaff,panic,beam,fire","bug,squid",cutting_edge,https://helldivers.wiki.gg/images/LAS-7_Dagger_Secondary_Render.png,2
+76,secondary,LAS-7 Dagger,"las-7 dagger,las-7,dagger","chaff,panic,beam","bug,squid",cutting_edge,https://helldivers.wiki.gg/images/LAS-7_Dagger_Secondary_Render.png,2
 77,secondary,GP-20 Ultimatum,"gp-20 ultimatum,gp-20,ultimatum","armor,demo,explosive","bug,bot",servants_of_freedom,https://helldivers.wiki.gg/images/GP-20_Ultimatum_Secondary_Render.png,6
 78,secondary,PLAS-15 Loyalist,"plas-15 loyalist,plas-15,loyalist","chaff,med,panic",any,truth_enforcers,https://helldivers.wiki.gg/images/PLAS-15_Loyalist_Secondary_Render.png,3
 79,secondary,P-35 Re-Educator,"p-35 re-educator,p-35,re-educator,reeducator","gas,med,assist,stealth",bot,redacted_regiment,https://helldivers.wiki.gg/images/P-35_Re-Educator_Secondary_Render.png,4
@@ -124,7 +124,7 @@ id,category,name,nicknames,tags,factions,warbond,img_url,armor_pen
 122,support,FAF-14 Spear,"faf-14 spear,faf-14,spear","armor,backpack","bug,bot",req_p,https://helldivers.wiki.gg/images/Spear_Stratagem_Icon_Background.svg,7
 123,support,StA-X3 W.A.S.P. Launcher,"sta-x3 w.a.s.p. launcher,sta-x3 wasp launcher,sta-x3,w.a.s.p. launcher,wasp launcher,wasp,w.a.s.p.","med,armor,backpack",squid,req_p,https://helldivers.wiki.gg/images/W.A.S.P._Launcher_Stratagem_Icon_Background.svg,6
 124,support,GL-21 Grenade Launcher,"gl-21 grenade launcher,gl-21,grenade launcher","chaff,med,demo",any,req_e,https://helldivers.wiki.gg/images/Grenade_Launcher_Stratagem_Icon_Background.svg,3
-125,support,LAS-98 Laser Cannon,"las-98 laser cannon,las-98,laser cannon","chaff,med,armor,charge,beam,fire","bug,squid",req_e,https://helldivers.wiki.gg/images/Laser_Cannon_Stratagem_Icon_Background.svg,4
+125,support,LAS-98 Laser Cannon,"las-98 laser cannon,las-98,laser cannon","chaff,med,armor,charge,beam","bug,squid",req_e,https://helldivers.wiki.gg/images/Laser_Cannon_Stratagem_Icon_Background.svg,4
 126,support,ARC-3 Arc Thrower,"arc-3 arc thrower,arc-3,arc thrower","arc,chaff,med,charge,stun,assist",any,req_e,https://helldivers.wiki.gg/images/Arc_Thrower_Stratagem_Icon_Background.svg,7
 127,support,LAS-99 Quasar Cannon,"las-99 quasar cannon,las-99,quasar cannon,quasar","armor,demo,charge","bug,bot",req_e,https://helldivers.wiki.gg/images/Quasar_Cannon_Stratagem_Icon_Background.svg,6
 128,support,TX-41 Sterilizer,"tx-41 sterilizer,tx-41,sterilizer","gas,chaff","bug,squid",chemical_agents,https://helldivers.wiki.gg/images/Sterilizer_Stratagem_Icon_Background.svg,5
@@ -145,7 +145,7 @@ id,category,name,nicknames,tags,factions,warbond,img_url,armor_pen
 143,backpack,LIFT-850 Jump Pack,"lift-850 jump pack,lift-850,jump pack","jump,stealth,backpack",any,req_h,https://helldivers.wiki.gg/images/Jump_Pack_Stratagem_Icon_Background.svg,
 144,backpack,SH-20 Ballistic Shield Backpack,"sh-20 ballistic shield backpack,sh-20,ballistic shield,sh-20 ballistic shield","shield,backpack",bot,req_e,https://helldivers.wiki.gg/images/Ballistic_Shield_Backpack_Stratagem_Icon_Background.svg,
 145,backpack,AX/AR-23 Guard Dog,"ax/ar-23 guard dog,ax/ar-23,guard dog,gun rover,gun guard dog","rover,chaff,backpack",any,req_r,https://helldivers.wiki.gg/images/Guard_Dog_Stratagem_Icon_Background.svg,3
-146,backpack,AX/LAS-5 Rover,"ax/las-5 rover,ax/las-5,rover,laser rover,laser guard dog","rover,chaff,backpack,beam,charge,fire",any,req_e,https://helldivers.wiki.gg/images/Rover_Stratagem_Icon_Background.svg,2
+146,backpack,AX/LAS-5 Rover,"ax/las-5 rover,ax/las-5,rover,laser rover,laser guard dog","rover,chaff,backpack,beam,charge",any,req_e,https://helldivers.wiki.gg/images/Rover_Stratagem_Icon_Background.svg,2
 147,backpack,SH-32 Shield Generator Pack,"sh-32 shield generator pack,sh-32,shield generator pack,shield pack","assist,bubble,backpack","bot,squid",req_e,https://helldivers.wiki.gg/images/Shield_Generator_Pack_Stratagem_Icon_Background.svg,
 148,backpack,SH-51 Directional Shield,"sh-51 directional shield,sh-51,directional shield","shield,backpack",bot,urban_legends,https://helldivers.wiki.gg/images/Directional_Shield_Stratagem_Icon_Background.svg,
 149,backpack,AX/FLAM-75 Hot Dog,"ax/flam-75 hot dog,ax/flam-75,hot dog,fire rover,fire guard dog","rover,chaff,fire,backpack",any,python_commandos,https://helldivers.wiki.gg/images/Hot_Dog_Stratagem_Icon_Background.svg,4
@@ -176,11 +176,11 @@ id,category,name,nicknames,tags,factions,warbond,img_url,armor_pen
 174,orbital,Orbital Gas Strike,"orbital gas strike,orbital gas,gas strike","orbital,gas,chaff,med,demo","bug,squid",req_b,https://helldivers.wiki.gg/images/Orbital_Gas_Strike_Stratagem_Icon_Background.svg,6
 175,orbital,Orbital 120mm HE Barrage,"orbital 120mm he barrage,orbital 120mm,120mm he barrage,120mm,120mm barrage","orbital,chaff,armor,demo",any,req_o,https://helldivers.wiki.gg/images/Orbital_120mm_HE_Barrage_Stratagem_Icon_Background.svg,5
 176,orbital,Orbital Airburst Strike,"orbital airburst strike,orbital airburst,airburst strike","orbital,chaff",any,req_o,https://helldivers.wiki.gg/images/Orbital_Airburst_Strike_Stratagem_Icon_Background.svg,3
-177,orbital,Orbital Smoke Strike,"orbital smoke strike,orbital smoke","orbital,assist,smoke,stealth,panic",any,req_b,https://helldivers.wiki.gg/images/Orbital_Smoke_Strike_Stratagem_Icon_Background.svg,
+177,orbital,Orbital Smoke Strike,"orbital smoke strike,orbital smoke","orbital,assist,smoke,stealth",any,req_b,https://helldivers.wiki.gg/images/Orbital_Smoke_Strike_Stratagem_Icon_Background.svg,
 178,orbital,Orbital EMS Strike,"orbital ems strike,orbital ems,ems strike","orbital,assist,stun",any,req_b,https://helldivers.wiki.gg/images/Orbital_EMS_Strike_Stratagem_Icon_Background.svg,6
 179,orbital,Orbital 380mm HE Barrage,"orbital 380mm he barrage,orbital 380mm,380mm he barrage,380mm,380mm barrage","orbital,chaff,demo",any,req_o,https://helldivers.wiki.gg/images/Orbital_380mm_HE_Barrage_Stratagem_Icon_Background.svg,6
 180,orbital,Orbital Walking Barrage,"orbital walking barrage,orbital walking,walking barrage","orbital,chaff,armor,demo",bot,req_o,https://helldivers.wiki.gg/images/Orbital_Walking_Barrage_Stratagem_Icon_Background.svg,6
-181,orbital,Orbital Laser,"orbital laser,miku beam","orbital,chaff,med,armor,demo,panic,beam","bot,squid",req_o,https://helldivers.wiki.gg/images/Orbital_Laser_Stratagem_Icon_Background.svg,6
+181,orbital,Orbital Laser,"orbital laser,miku beam","orbital,chaff,med,armor,demo,beam","bot,squid",req_o,https://helldivers.wiki.gg/images/Orbital_Laser_Stratagem_Icon_Background.svg,6
 182,orbital,Orbital Napalm Barrage,"orbital napalm barrage,orbital napalm,napalm barrage","orbital,fire,chaff,med","bug,squid",req_o,https://helldivers.wiki.gg/images/Orbital_Napalm_Barrage_Stratagem_Icon_Background.svg,3
 183,orbital,Orbital Railcannon Strike,"orbital railcannon strike,orbital railcannon,railcannon strike,railcannon","orbital,armor","bug,bot",req_o,https://helldivers.wiki.gg/images/Orbital_Railcannon_Strike_Stratagem_Icon_Background.svg,7
 184,sentry,A/MG-43 Machine Gun Sentry,"a/mg-43 machine gun sentry,a/mg-43,machine gun sentry,mg sentry","sentry,chaff",any,req_r,https://helldivers.wiki.gg/images/Machine_Gun_Sentry_Stratagem_Icon_Background.svg,3
@@ -190,7 +190,7 @@ id,category,name,nicknames,tags,factions,warbond,img_url,armor_pen
 188,sentry,A/MLS-4X Rocket Sentry,"a/mls-4x rocket sentry,a/mls-4x,rocket sentry","sentry,armor",bot,req_r,https://helldivers.wiki.gg/images/Rocket_Sentry_Stratagem_Icon_Background.svg,5
 189,sentry,A/ARC-3 Tesla Tower,"a/arc-3 tesla tower,a/arc-3,tesla tower,tesla","sentry,arc,chaff",any,req_b,https://helldivers.wiki.gg/images/Tesla_Tower_Stratagem_Icon_Background.svg,4
 190,sentry,A/M-23 EMS Mortar Sentry,"a/m-23 ems mortar sentry,a/m-23,ems mortar sentry,ems mortar","sentry,mortar,assist,stun",any,req_r,https://helldivers.wiki.gg/images/EMS_Mortar_Sentry_Stratagem_Icon_Background.svg,3/6
-191,sentry,A/LAS-98 Laser Sentry,"a/las-98 laser sentry,a/las-98,laser sentry","sentry,chaff,beam,fire",any,control_group,https://helldivers.wiki.gg/images/Laser_Sentry_Stratagem_Icon_Background.svg,4
+191,sentry,A/LAS-98 Laser Sentry,"a/las-98 laser sentry,a/las-98,laser sentry","sentry,chaff,beam",any,control_group,https://helldivers.wiki.gg/images/Laser_Sentry_Stratagem_Icon_Background.svg,4
 192,sentry,A/FLAM-40 Flame Sentry,"a/flam-40 flame sentry,a/flam-40,flame sentry","sentry,fire,chaff",any,urban_legends,https://helldivers.wiki.gg/images/Flame_Sentry_Stratagem_Icon_Background.svg,4
 193,sentry,A/GM-17 Gas Mortar Sentry,"a/gm-17 gas mortar sentry,a/gm-17,gas mortar sentry,gas mortar","sentry,mortar,gas,chaff",any,entrenched_division,https://helldivers.wiki.gg/images/Gas_Mortar_Sentry_Stratagem_Icon_Background.svg,6
 194,defensive,MD-6 Anti-Personnel Minefield,"md-6 anti-personnel minefield,md-6,anti-personnel minefield,minefield,anti-personnel mines,mines","mines,chaff",bug,req_e,https://helldivers.wiki.gg/images/Anti-Personnel_Minefield_Stratagem_Icon_Background.svg,3

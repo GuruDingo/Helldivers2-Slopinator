@@ -10,6 +10,7 @@ RULES = {
         {"if": "beam", "then": "fire", "except": ["Deliberate"]},
         {"if": "demo", "then": "explosive", "category": "secondary"},
     ],
+    "weapon_only_tags": [{"tag": "panic", "categories": ["primary", "secondary", "throwable"]}],
     "min_items_per_tag": 3,
     "acknowledged_rare_tags": ["known"],
 }
@@ -43,6 +44,10 @@ check("a tag listed twice is flagged", any("'Twice' lists the same tag twice: de
 
 flags = check_tags(filler + [it("New", "primary", "brandnew")], RULES)
 check("new tag used by fewer than 3 items is flagged", any("NEW RARE TAG 'brandnew'" in f for f in flags), flags)
+
+flags = check_tags(filler + [it("Strat", "orbital", "common,panic"), it("Gun", "primary", "common,panic"), it("Nade", "throwable", "common,panic")], RULES)
+check("a weapon-only tag on a stratagem is flagged", any("'Strat' (orbital) has 'panic'" in f for f in flags), flags)
+check("...but not on a primary or a throwable", not any("'Gun'" in f or "'Nade'" in f for f in flags), flags)
 
 flags = check_tags(filler[:1], RULES)
 check("acknowledged rare tag is not flagged", not any("'known'" in f for f in flags), flags)
