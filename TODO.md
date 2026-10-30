@@ -17,14 +17,16 @@ Items we agreed to come back to. Nothing below is started unless marked.
       reached the live site: fixed by PR #5, which carries it to `main`. After that, if images are still missing, check the
       browser cache (hard refresh) and whether the wiki blocks the hotlinks (the loadout cards use the same links, so
       compare). Bundle/test builds show the thumbnails in my screenshots.
-- [ ] **Migrate images from wiki hotlinks to saved files** (Boss, 2026-10-30). Plan: (1) `tools/fetch_images.py` reads the
-      CSVs plus `WARBOND_ICONS` / `FAC_ICON_URL` and saves everything into `docs/img/{items,warbonds,titles,factions}/`
-      (skips existing files, polite rate limit; must run on Boss's machine because the sandbox can't reach wiki.gg
-      images, or Boss sends a zip); (2) resize item art to ~128-256px and save as WebP/PNG, leave SVGs alone;
-      (3) keep the wiki URLs in the CSVs as the source, map them to local paths in `build_gear.py` (or add an
-      `img_file` column) and fail the build on a missing file; (4) keep the text fallback; (5) decide the bundle:
-      option A = html + `img/` folder zipped (recommended), option B = base64-embedded single file (several MB);
-      (6) add a credit line / wiki link, since the images are Arrowhead's. Depends on the web-hosting decision below.
+- [~] **Migrate images from wiki hotlinks to saved files** (Boss, 2026-10-30). BUILT (PR "Image migration tool"): `tools/fetch_images.py`
+      collects every wiki image the site uses (items, warbond covers, faction/warbond/requisition icons, the 13 AP icons;
+      ~276 files) into `docs/img/{items,warbonds,icons}/` (rasters shrunk to WebP, SVGs kept), writes
+      `docs/img/manifest.json`; `build_gear.py` copies it into `HD2_DATA.images` and the page uses the saved copy of any
+      picture that has one (wiki link otherwise); the single-file bundle embeds the pictures. Also a "Fetch images" GitHub
+      Action (Run workflow -> branch `images-fetched` + a download), because my sandbox can't reach wiki.gg images.
+      NOT DONE YET: actually running it (Boss clicks Run workflow, or runs the script locally), then merging the images
+      branch; if GitHub's servers are blocked by the wiki, use `--from-dir` with a zip Boss downloads some other way.
+      Afterwards: warbond header art (covers are fetched but not shown), a README credit (done), decide whether to
+      keep the wiki URLs as fallback forever (they are).
 - [ ] **Host the tool at a URL** (Boss, 2026-10-30): see the hosting notes in the reply of 2026-10-30; first step is
       turning on GitHub Pages for `/docs`. Open choices: custom domain, analytics/feedback, shareable-loadout links.
 - [ ] **Proof the new stratagem AP values** (Boss, 2026-10-30; PR #3 is already merged and live, so this is now a correction pass). Wiki pages were summarised, not
@@ -32,6 +34,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       Strafing Run (5) vs the other Eagles (7), Maelstrom (4, missiles 5), Rover (2, fire is 4), Incendiary Mines (4,
       explosion 3), Gas Mortar Sentry (6) and Mortar Sentry (3, headline is AV only), the three two-value ones (Patriot
       3/6, Lumberer 4/6, Bastion 4/8; Dog Breath is set to 5 by Boss), and whether the two smoke strikes should really be blank.
+      ALSO (Boss, 2026-10-30): review EVERY multi-AP item, not just the three above - all 12 items that show two icons: AR/GL-21 One-Two (2/3), AR-11 Arbitrator (2/3), SMG/FLAM-34 Stoker (2/4), SG-20 Halt (2/3), LAS-17 Double-Edge Sickle (2/4), PLAS-15 Loyalist (2/3), GR-8 Recoilless Rifle (5/6), PLAS-45 Epoch (4/5), CQC-9 Defoliation Tool (3/5), EXO-45 Patriot Exosuit (3/6), EXO-51 Lumberer Exosuit (4/6), TD-220 Bastion MK XVI (4/8). Check that each really has two attacks worth showing and that the order and values match the wiki.
 - [~] **Artwork in My Gear** (Boss, 2026-10-30). DONE: a lazy-loaded thumbnail (44x32) at the left of every item row, from the
       item's `img_url` (blank square if it can't load; the loadout cards are unchanged, no compact mode on the Randomizer
       tab, per Boss). STILL TO DO: warbond cover art in the warbond headers (28 of 36 warbonds have an `img_url`; the

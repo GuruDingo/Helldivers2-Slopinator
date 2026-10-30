@@ -240,5 +240,6 @@ globalThis.HD2_DATA = {
   {"id":"199","cat":"defensive","name":"E/MG-101 HMG Emplacement","nicknames":["e/mg-101 hmg emplacement","e/mg-101","hmg emplacement"],"tags":["emplacement","chaff","med","armor"],"factions":["any"],"warbond":"req_b","imgUrl":"https://helldivers.wiki.gg/images/HMG_Emplacement_Stratagem_Icon_Background.svg","armorPen":[4]},
   {"id":"200","cat":"defensive","name":"E/GL-21 Grenadier Battlement","nicknames":["e/gl-21 grenadier battlement","e/gl-21","grenadier battlement","grenade emplacement"],"tags":["emplacement","chaff"],"factions":["bot"],"warbond":"req_b","imgUrl":"https://helldivers.wiki.gg/images/Grenadier_Battlement_Stratagem_Icon_Background.svg","armorPen":[3]},
   {"id":"201","cat":"defensive","name":"E/AT-12 Anti-Tank Emplacement","nicknames":["e/at-12 anti-tank emplacement","e/at-12","anti-tank emplacement","at emplacement","gamer chair"],"tags":["emplacement","armor","demo"],"factions":["any"],"warbond":"urban_legends","imgUrl":"https://helldivers.wiki.gg/images/Anti-Tank_Emplacement_Stratagem_Icon_Background.svg","armorPen":[6]}
- ]
+ ],
+ "images": {}
 };

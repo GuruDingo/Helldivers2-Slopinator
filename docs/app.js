@@ -108,10 +108,17 @@
   // ---------------------------------------------------------------------------
   // Loadout cards
   // ---------------------------------------------------------------------------
+  // Every picture goes through here: the saved copy in docs/img/ (listed in HD2_DATA.images by
+  // tools/fetch_images.py + build_gear.py) when there is one, otherwise the wiki address it was given.
+  function imgSrc(url) {
+    var saved = globalThis.HD2_DATA && HD2_DATA.images;
+    return (saved && saved[url]) || url;
+  }
+
   function imageNode(item) {
     if (!item.imgUrl) return h("div", { class: "img-placeholder" }, "No image");
     var img = h("img", {
-      src: item.imgUrl, alt: item.name, class: "item-img", loading: "lazy", referrerpolicy: "no-referrer",
+      src: imgSrc(item.imgUrl), alt: item.name, class: "item-img", loading: "lazy", referrerpolicy: "no-referrer",
     });
     img.addEventListener("error", function () { img.replaceWith(h("div", { class: "img-placeholder" }, "No image")); });
     return img;
@@ -121,7 +128,7 @@
   // square of the same size if there is no image or it can't load, so the names stay lined up.
   function gearThumb(item) {
     if (!item.imgUrl) return h("span", { class: "gear-thumb gear-thumb-blank", "aria-hidden": "true" });
-    var img = h("img", { src: item.imgUrl, alt: "", class: "gear-thumb", loading: "lazy", referrerpolicy: "no-referrer" });
+    var img = h("img", { src: imgSrc(item.imgUrl), alt: "", class: "gear-thumb", loading: "lazy", referrerpolicy: "no-referrer" });
     img.addEventListener("error", function () { img.replaceWith(h("span", { class: "gear-thumb gear-thumb-blank", "aria-hidden": "true" })); });
     return img;
   }
@@ -149,7 +156,7 @@
     levels.forEach(function (n, i) {
       var name = AP_NAMES[n] || ("AP" + n);
       if (i) row.appendChild(h("span", { class: "ap-sep", "aria-hidden": "true" }, "/"));
-      var img = h("img", { src: apIconUrl(n), alt: "Armor penetration: " + name, class: "ap-icon", loading: "lazy", referrerpolicy: "no-referrer" });
+      var img = h("img", { src: imgSrc(apIconUrl(n)), alt: "Armor penetration: " + name, class: "ap-icon", loading: "lazy", referrerpolicy: "no-referrer" });
       img.addEventListener("error", function () { img.replaceWith(h("span", { class: "ap-text" }, name)); });
       row.appendChild(img);
     });
@@ -410,12 +417,12 @@
   function warbondIcon(key) {
     var def = WARBOND_ICONS[key];
     if (!def) return null;
-    var img = h("img", { src: def.url, alt: "", class: "wb-icon" + (def.white ? " wb-icon-white" : ""), referrerpolicy: "no-referrer", "aria-hidden": "true" });
+    var img = h("img", { src: imgSrc(def.url), alt: "", class: "wb-icon" + (def.white ? " wb-icon-white" : ""), referrerpolicy: "no-referrer", "aria-hidden": "true" });
     img.addEventListener("error", function () { img.remove(); }); // can't load: the title is just its name
     return img;
   }
   function facIcon(f, fallbackText) {
-    var img = h("img", { src: FAC_ICON_URL[f], alt: "", class: "fac-icon", referrerpolicy: "no-referrer", "aria-hidden": "true" });
+    var img = h("img", { src: imgSrc(FAC_ICON_URL[f]), alt: "", class: "fac-icon", referrerpolicy: "no-referrer", "aria-hidden": "true" });
     img.addEventListener("error", function () {
       img.replaceWith(fallbackText ? h("span", { class: "fac-icon-fallback" }, fallbackText) : document.createTextNode(""));
     });
