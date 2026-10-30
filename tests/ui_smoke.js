@@ -93,6 +93,22 @@ function check(label, cond, extra) {
   check("switching faction later leaves existing results in their own colour", $("results").style.getPropertyValue("--accent").toLowerCase() === "#ff6161" && doc.documentElement.getAttribute("data-faction") === "squid");
   setFaction("any");
 
+  console.log("Armor penetration icons");
+  $("lock-primary").value = "SMG/FLAM-34 Stoker"; $("lock-strat1").value = "Eagle Airstrike"; $("lock-strat2").value = "AC-8 Autocannon";
+  generate();
+  const cardOf = (name) => Array.from(doc.querySelectorAll("#results .item-card, #results .item-card2")).find((c) => c.querySelector(".item-name").textContent === name);
+  const apSrc = (name) => Array.from(cardOf(name).querySelectorAll(".ap-icon")).map((i) => i.getAttribute("src").replace(/^.*\//, ""));
+  check("a two-mode weapon shows both icons, in order, with a separator", apSrc("SMG/FLAM-34 Stoker").join() === "Armor_AP2_Icon.png,Armor_AP4_Icon.png" && cardOf("SMG/FLAM-34 Stoker").querySelectorAll(".ap-sep").length === 1, apSrc("SMG/FLAM-34 Stoker").join());
+  check("a single-mode weapon shows one icon (Autocannon = Heavy)", apSrc("AC-8 Autocannon").join() === "Armor_AP4_Icon.png" && cardOf("AC-8 Autocannon").querySelectorAll(".ap-sep").length === 0, apSrc("AC-8 Autocannon").join());
+  check("icons come from the wiki and have a readable name", /^https:\/\/helldivers\.wiki\.gg\/images\/Armor_AP4_Icon\.png$/.test(cardOf("AC-8 Autocannon").querySelector(".ap-icon").getAttribute("src")) && /Heavy/.test(cardOf("AC-8 Autocannon").querySelector(".ap-icon").getAttribute("alt")));
+  check("a stratagem that isn't a weapon has no armor-penetration row", cardOf("Eagle Airstrike").querySelector(".ap-row") === null);
+  const ic = cardOf("SMG/FLAM-34 Stoker").querySelector(".ap-icon");
+  ic.dispatchEvent(new win.Event("error"));
+  check("an icon that fails to load is replaced by its name", cardOf("SMG/FLAM-34 Stoker").querySelector(".ap-text") && cardOf("SMG/FLAM-34 Stoker").querySelector(".ap-text").textContent === "Light", (cardOf("SMG/FLAM-34 Stoker").querySelector(".ap-row") || {}).textContent);
+  // every weapon in the data produces an icon row on its card
+  check("every weapon category has armor data to show", win.HD2_DATA.items.filter((i) => ["primary", "secondary", "throwable", "support"].includes(i.cat)).every((i) => i.armorPen.length >= 1));
+  $("lock-primary").value = ""; $("lock-strat1").value = ""; $("lock-strat2").value = "";
+
   console.log("Pool line follows the faction");
   const validFor = (f) => win.HD2_DATA.items.filter((i) => win.HD2Engine.worksFor(i, f)).length;
   check("any -> 'of N items' with N = every active item", new RegExp("of " + validFor("any") + " items").test(poolText()) && validFor("any") === 200, poolText());
@@ -499,6 +515,34 @@ function check(label, cond, extra) {
   check("with no search the button resets everything", /Click again to reset 1/.test($("fac-reset").textContent), $("fac-reset").textContent);
   click($("fac-reset"));
   check("...and everything is back on the defaults", customCount() === 0 && /No edits/.test($("fac-count").textContent) && itemFactions(LIB) === "any", $("fac-count").textContent);
+  // "Enable for all factions": all three ticked for the items on screen, with the same two-click guard
+  const narrow = Object.keys(DEFAULTS).filter((n) => DEFAULTS[n] !== "any" && DEFAULTS[n] !== "none" && DEFAULTS[n] !== "");
+  const NARROW = narrow[0], NARROW2 = narrow[1];
+  check("test items exist that aren't already for every faction", !!NARROW && !!NARROW2 && rowOf(NARROW) && rowOf(NARROW2));
+  const allCount = () => Object.keys(DEFAULTS).filter((n) => DEFAULTS[n] !== "none" && itemFactions(n) !== "any").length;
+  check("'Enable for all factions' is shown next to reset, counts the items that aren't already all-factions", /^Enable for all factions \(\d+\)$/.test($("fac-all").textContent) && !$("fac-all").disabled && $("fac-all").textContent === "Enable for all factions (" + allCount() + ")", $("fac-all").textContent);
+  search(NARROW.toLowerCase());
+  check("with a search active it says 'shown'", /^Enable shown for all factions \(\d+\)$/.test($("fac-all").textContent), $("fac-all").textContent);
+  click($("fac-all"));
+  check("first click only asks for confirmation", /^Click again to enable \d+$/.test($("fac-all").textContent) && itemFactions(NARROW) === DEFAULTS[NARROW] && itemFactions(NARROW2) === DEFAULTS[NARROW2], $("fac-all").textContent);
+  click($("fac-all"));
+  check("second click ticks all three for the item shown only", itemFactions(NARROW) === "any" && facTicks(NARROW) === "bug,bot,squid" && rowOf(NARROW).classList.contains("fac-custom") && rowOf(NARROW2).hidden && itemFactions(NARROW2) === DEFAULTS[NARROW2], itemFactions(NARROW) + " / " + itemFactions(NARROW2) + " hidden=" + rowOf(NARROW2).hidden);
+  check("...saved as an edit, and the edit survives a reload of the saved data", JSON.parse(win.localStorage.getItem("hd2_factions"))[NARROW].join() === "any");
+  check("...and the per-item revert puts it back", (click(rowOf(NARROW).querySelector(".fac-revert")), itemFactions(NARROW) === DEFAULTS[NARROW]));
+  search("");
+  click($("fac-all")); click($("fac-all"));
+  check("with no search it enables every item", allCount() === 0 && $("fac-all").disabled && /^Enable for all factions$/.test($("fac-all").textContent), $("fac-all").textContent);
+  check("...and every enabled item now counts as edited", customCount() > 0 && /items edited/.test($("fac-count").textContent), $("fac-count").textContent);
+  click($("fac-reset"));
+  check("reset to defaults still undoes it (after its own confirmation)", /Click again to reset/.test($("fac-reset").textContent));
+  click($("fac-reset"));
+  check("...everything back on the CSV defaults", customCount() === 0 && itemFactions(NARROW) === DEFAULTS[NARROW] && allCount() > 0, $("fac-count").textContent);
+  tick(facBox(LIB, "bug"), false);   // gives Reset something to do
+  click($("fac-all"));
+  click($("fac-reset"));
+  check("arming one button cancels the other's confirmation", /^Enable for all factions \(\d+\)$/.test($("fac-all").textContent) && /^Click again to reset 1$/.test($("fac-reset").textContent), $("fac-all").textContent + " | " + $("fac-reset").textContent);
+  click($("fac-reset"));
+  check("(cleanup) back on the defaults", customCount() === 0);
   check("faction emblems are tinted per faction (unselected buttons + ticks + legend), dark when selected", (() => {
     const c = css; return ["bug", "bot", "squid"].every((f) => new RegExp('input\\[value="' + f + '"\\]:not\\(:checked\\) \\+ span \\.fac-icon[^{]*\\.fac-' + f + ' \\.fac-icon\\s*\\{[^}]*hue-rotate').test(c)) && /input:checked \+ span \.fac-icon\s*\{\s*filter: brightness\(0\)/.test(c);
   })());

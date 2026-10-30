@@ -2,6 +2,8 @@
 
 A loadout randomizer fan project for Helldivers 2.
 
+**Use it online: https://gurudingo.github.io/Helldivers2-Slopinator/**
+
 A static website: the loadout randomizer and warbond tracker run entirely in the visitor's browser.
 No server, no accounts, nothing to host except the files in `docs/`.
 
@@ -42,6 +44,10 @@ Everything stays in the visitor's browser (localStorage): `hd2_tracker` (items o
 blocked), `hd2_factions` (your edits to which factions each item is recommended against; only items that differ from the CSV) and `hd2_settings` (faction and any default rules you switched off). The randomizer rolls from owned items that are not blocked.
 Base Game gear is always owned. A browser with no saved data starts with everything owned.
 
+## Trying a pull request before it goes live
+
+The live site only ever shows what is merged into `main`. To try a pull request first: open it on GitHub, click the **Checks** tab (or the "Details" link next to the Tests check), open the finished **Tests** run and scroll to **Artifacts** at the bottom. Download `hd2-randomizer`, unzip it and open `hd2-randomizer.html` in a browser. It is the complete tool in one file (your own settings are stored per file location, so a downloaded copy starts with a fresh My Gear). Artifacts are kept for 30 days.
+
 ## Publishing on GitHub Pages
 
 Repo -> Settings -> Pages -> Source: "Deploy from a branch" -> Branch `main`, folder `/docs` -> Save.
@@ -71,6 +77,7 @@ tiny tilts of a couple of percent. **After an intentional rule change, or after 
 On the My Gear tab, the **Edit factions** switch (top right) shows three ticks on every item: **T**erminid, **A**utomaton, **I**lluminate. They show the faction emblems (the same emblems are on the faction buttons on the Randomizer tab; Any uses the Super Earth emblem, white) and start from the CSV's `factions` column (`any` = all three ticked). The emblems are linked from the Helldivers wiki like the item images and are flattened and tinted with CSS filters in the faction colours (dark on the selected faction button) - if you ever change a faction colour, regenerate its filter in `style.css`; if one can't load, the tick shows T / A / I and the button just shows its name. Change them and the randomizer, the pool counts and the Randomizer-tab pool line use your version. Details:
 - All three ticked is the same as `any`. With none ticked an item only rolls when the faction is Any.
 - Edited items get a coloured edge and a ↺ button that puts that one item back; **Reset to defaults** (only shown in this mode) resets everything, needs a second click to confirm, and while the search box is filtering it only resets the items shown.
+- **Enable for all factions** (next to Reset) ticks all three for every item that isn't already for all factions, with the same second-click confirmation and the same "shown only" behaviour while searching. It counts as an edit for any item whose CSV default was narrower, and Reset to defaults undoes it.
 - Only differences from the CSV are saved (`hd2_factions`), so when the CSV changes its defaults, items you haven't edited follow the new CSV. Edits are keyed by item name, so renaming an item in the CSV orphans its edit.
 - Results already on screen are not changed; the next Generate or reroll uses the new lists.
 
@@ -91,6 +98,30 @@ The **Rules** section of the randomizer page has two parts.
 The **in-game limits** (one FRV, one tank, one exosuit) are shown with a lock and cannot be switched off.
 
 **Additional rules** - your own count rule for a tag across the whole loadout: **at least**, **at most** or **exactly** N. Adding a rule for a tag replaces the default check for that tag, and a required count also lifts that tag's cap (see below). "At least" and "at most" on the same tag make a range (chip `Chaff Killer 2-3`); "exactly" sets both. An "at most 0" or "exactly 0" rule bans the tag - for the backpack tag it also replaces the "exactly one backpack" rule. A plain "at most N" (N of 1 or more) keeps the default "at least one" check for that tag. Rules that can't all hold (for example locks that break an "at most") are built as well as possible and listed above the loadout, like any other unmet rule. In code a rule is `{ min?, max? }`; a plain number still means "at least".
+
+## Armor penetration (`armor_pen` column)
+
+`hd2gear.csv` has an `armor_pen` column for every weapon (primaries, secondaries, throwables and support weapons; stratagems that aren't weapons are blank). It holds the main attack's armor-penetration level as the wiki's icons number it, and a weapon with two modes lists both, e.g. `2/4`. `tools/build_gear.py` checks the format (whole numbers from -1 to 11 joined by `/`), warns about a weapon with no value, and writes it to `docs/gear-data.js` as `armorPen: [n, ...]`. Each weapon card on the Randomizer tab shows the icon for each level, side by side with a `/` between them for a two-mode weapon (hover for the name). If an icon can't load, the level's name is shown as text instead.
+
+Values came from the wiki's Weapons page (primaries, secondaries, throwables) and each support weapon's own page, with a few single-attack support weapons taken from the wiki's Damage Comparison table (MGX-42, MG-206, LAS-98, CQC-1, TX-41, B/MD C4, CQC-9, B/FLAM-80, AMW-20). Where a weapon has several attacks (a rocket plus its explosion, a rifle plus an underbarrel launcher) the value is the weapon's main/highest attack as the wiki lists it, so a few explosive weapons are rated by the explosion. The three support weapons the wiki's Weapons page shows with two icons were set by hand from it: Recoilless Rifle `5/6`, Epoch `4/5` and Defoliation Tool `3/5`. Re-check a number against the wiki whenever it looks wrong; the game changes these in patches.
+
+Icons are linked from the wiki like the other images:
+
+| n | Name | Icon |
+|---|---|---|
+| -1 | No Hitbox | `https://helldivers.wiki.gg/images/Armor_AP-1_Icon.png` |
+| 0 | Unarmored | `https://helldivers.wiki.gg/images/Armor_AP0_Icon.png` |
+| 1 | Very Light | `https://helldivers.wiki.gg/images/Armor_AP1_Icon.png` |
+| 2 | Light | `https://helldivers.wiki.gg/images/Armor_AP2_Icon.png` |
+| 3 | Medium | `https://helldivers.wiki.gg/images/Armor_AP3_Icon.png` |
+| 4 | Heavy | `https://helldivers.wiki.gg/images/Armor_AP4_Icon.png` |
+| 5 | Anti-Tank I | `https://helldivers.wiki.gg/images/Armor_AP5_Icon.png` |
+| 6 | Anti-Tank II | `https://helldivers.wiki.gg/images/Armor_AP6_Icon.png` |
+| 7 | Anti-Tank III | `https://helldivers.wiki.gg/images/Armor_AP7_Icon.png` |
+| 8 | Anti-Tank IV | `https://helldivers.wiki.gg/images/Armor_AP8_Icon.png` |
+| 9 | Anti-Tank V | `https://helldivers.wiki.gg/images/Armor_AP9_Icon.png` |
+| 10 | Anti-Tank VI | `https://helldivers.wiki.gg/images/Armor_AP10_Icon.png` |
+| 11 | Indestructible | `https://helldivers.wiki.gg/images/Armor_AP11_Icon.png` |
 
 ## Item caps and in-game limits
 

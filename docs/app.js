@@ -125,6 +125,28 @@
       });
   }
 
+  // Armor penetration: the wiki's own icon for each level a weapon has, side by side when it has two (e.g. a
+  // rifle and its underbarrel launcher). Linked from the wiki like the other images; if one can't load, the level's
+  // name is shown as text instead.
+  var AP_NAMES = {
+    "-1": "No hitbox", 0: "Unarmored", 1: "Very light", 2: "Light", 3: "Medium", 4: "Heavy", 5: "Anti-tank I",
+    6: "Anti-tank II", 7: "Anti-tank III", 8: "Anti-tank IV", 9: "Anti-tank V", 10: "Anti-tank VI", 11: "Indestructible",
+  };
+  function apIconUrl(n) { return "https://helldivers.wiki.gg/images/Armor_AP" + n + "_Icon.png"; }
+  function apRow(item) {
+    var levels = item.armorPen || [];
+    if (!levels.length) return null;
+    var row = h("div", { class: "ap-row", title: "Armor penetration: " + levels.map(function (n) { return AP_NAMES[n] || ("AP" + n); }).join(" / ") });
+    levels.forEach(function (n, i) {
+      var name = AP_NAMES[n] || ("AP" + n);
+      if (i) row.appendChild(h("span", { class: "ap-sep", "aria-hidden": "true" }, "/"));
+      var img = h("img", { src: apIconUrl(n), alt: "Armor penetration: " + name, class: "ap-icon", loading: "lazy", referrerpolicy: "no-referrer" });
+      img.addEventListener("error", function () { img.replaceWith(h("span", { class: "ap-text" }, name)); });
+      row.appendChild(img);
+    });
+    return row;
+  }
+
   function itemCard(item, slotLabel, opts) {
     var locked = opts.locked, suboptimal = opts.suboptimal;
     var cls = (opts.wide ? "item-card2" : "item-card") + (suboptimal ? " suboptimal" : "") + (locked ? " is-locked" : "");
@@ -157,6 +179,7 @@
       imageNode(item),
       h("div", { class: "card-body" },
         h("div", { class: "item-name" }, item.name),
+        apRow(item),
         warbondRow,
         h("div", { class: "tag-row" }, tagPills(item))));
   }
@@ -926,34 +949,43 @@
     updatePoolLine();
   }
 
-  // ---- Edit factions: switch, count and reset button ----
-  var resetArmed = null;
-  function disarmReset() { if (resetArmed) { clearTimeout(resetArmed); resetArmed = null; } }
+  // ---- Edit factions: switch, count and the two bulk buttons ----
+  // Both bulk buttons act on the items shown (the search filter applies, like the other bulk buttons) and need a
+  // second click within 4 seconds, so a stray click can't overwrite your edits.
+  var armed = null;   // { which: "reset" | "all", timer }
+  function disarm() { if (armed) { clearTimeout(armed.timer); armed = null; } }
+  function allTicked(item) { return facFlags(item.factions).every(Boolean); }
+  function resetScope() { return shownOnly(ALL_ITEMS).filter(isCustomised); }
+  function allScope() { return shownOnly(ALL_ITEMS).filter(function (i) { return !allTicked(i); }); }
   function updateFacTools() {
     var on = $("edit-factions").checked;
     $("view-gear").classList.toggle("edit-factions", on);
     $("fac-tools").hidden = !on;
-    if (!on) { disarmReset(); return; }
+    if (!on) { disarm(); return; }
     var total = customisedCount();
-    var scope = shownOnly(ALL_ITEMS).filter(isCustomised).length;
     var filtered = gearFiltered();
     $("fac-count").textContent = total ? total + " item" + (total === 1 ? "" : "s") + " edited" : "No edits: everything is on the default factions";
-    var btn = $("fac-reset");
-    btn.disabled = scope === 0;
-    if (resetArmed) { btn.textContent = "Click again to reset " + scope; return; }
-    btn.textContent = (filtered ? "Reset shown to defaults" : "Reset to defaults") + (scope ? " (" + scope + ")" : "");
+    function label(btn, which, scope, idle, idleShown) {
+      btn.disabled = scope === 0;
+      if (armed && armed.which === which) { btn.textContent = "Click again to " + (which === "reset" ? "reset " : "enable ") + scope; return; }
+      btn.textContent = (filtered ? idleShown : idle) + (scope ? " (" + scope + ")" : "");
+    }
+    label($("fac-reset"), "reset", resetScope().length, "Reset to defaults", "Reset shown to defaults");
+    label($("fac-all"), "all", allScope().length, "Enable for all factions", "Enable shown for all factions");
   }
-  function onResetFactionsClick() {
-    var scope = shownOnly(ALL_ITEMS).filter(isCustomised).length;
-    if (!scope) return;
-    if (!resetArmed) {
-      // Two clicks, so a stray click can't wipe your edits.
-      resetArmed = setTimeout(function () { resetArmed = null; updateFacTools(); }, 4000);
+  function onBulkFactionClick(which) {
+    var scope = which === "reset" ? resetScope() : allScope();
+    if (!scope.length) return;
+    if (!armed || armed.which !== which) {
+      disarm();
+      armed = { which: which, timer: setTimeout(function () { armed = null; updateFacTools(); }, 4000) };
       updateFacTools();
       return;
     }
-    disarmReset();
-    resetFactions(ALL_ITEMS);
+    disarm();
+    if (which === "reset") { resetFactions(ALL_ITEMS); return; }
+    scope.forEach(function (i) { setItemFactions(i, [true, true, true]); });
+    onFactionEdit();
   }
 
   // Search: every word must appear in the item's name, a nickname, or its warbond's name/key
@@ -1023,7 +1055,8 @@
 
     $("gear-search").addEventListener("input", function () { filterGear(); updateFacTools(); });
     $("edit-factions").addEventListener("change", updateFacTools);
-    $("fac-reset").addEventListener("click", onResetFactionsClick);
+    $("fac-reset").addEventListener("click", function () { onBulkFactionClick("reset"); });
+    $("fac-all").addEventListener("click", function () { onBulkFactionClick("all"); });
     $("gear-expand").addEventListener("click", function () {
       document.querySelectorAll("#gear-list .wb-items").forEach(function (el) { el.classList.add("open"); });
     });

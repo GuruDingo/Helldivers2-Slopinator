@@ -78,6 +78,25 @@ def load_items(warbond_keys):
             if not (row.get("img_url") or "").strip():
                 warnings.append(f"{where}: no img_url")
 
+            # armor_pen: the main attack's armor-penetration level(s) as the wiki icons number them (-1 = no hitbox,
+            # 0 = unarmored, 2 = light, 3 = medium, 4 = heavy, 5-10 = anti-tank I-VI, 11 = indestructible). Weapons with
+            # two modes list both, "2/4". Blank is fine for stratagems that aren't weapons.
+            armor_raw = (row.get("armor_pen") or "").strip()
+            armor_pen = []
+            if armor_raw:
+                for part in armor_raw.split("/"):
+                    try:
+                        level = int(part.strip())
+                    except ValueError:
+                        level = None
+                    if level is None or not -1 <= level <= 11:
+                        errors.append(f"{where}: armor_pen '{armor_raw}' must be whole numbers from -1 to 11, joined by '/' (e.g. 3 or 2/4)")
+                        armor_pen = []
+                        break
+                    armor_pen.append(level)
+            elif cat in WEAPON_CATEGORIES or cat == "support":
+                warnings.append(f"{where}: no armor_pen")
+
             items.append({
                 "id": (row.get("id") or "").strip(),
                 "cat": cat,
@@ -87,6 +106,7 @@ def load_items(warbond_keys):
                 "factions": factions,
                 "warbond": warbond,
                 "imgUrl": (row.get("img_url") or "").strip(),
+                "armorPen": armor_pen,
             })
 
     # duplicate names / nicknames (the lock + exclude boxes resolve by either one)
