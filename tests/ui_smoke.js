@@ -13,6 +13,11 @@ const { JSDOM } = require("jsdom");
 // The single-file bundle has every script inlined, so jsdom needs no file loading. Build it first:
 //   python tools/build_gear.py --bundle
 const indexFile = path.resolve(__dirname, "..", "dist", "hd2-randomizer.html");
+// Once images are saved (docs/img), the bundle embeds them and every src would be a data: address. Most checks are about
+// which picture goes where, so they run on the bundle with that list emptied (every src is then the wiki address);
+// the "Saved images" section below covers the saved-copy behaviour, and the real bundle is checked at the end of it.
+const rawBundle = fs.readFileSync(indexFile, "utf8");
+const bundleHtml = rawBundle.replace(/"images": \{[\s\S]*?\n \}\n\};/, '"images": {}\n};');
 let failed = 0;
 function check(label, cond, extra) {
   console.log((cond ? "  ok   " : "  FAIL ") + label + (cond || !extra ? "" : "  -> " + extra));
@@ -20,7 +25,7 @@ function check(label, cond, extra) {
 }
 
 (async function main() {
-  const dom = new JSDOM(fs.readFileSync(indexFile, "utf8"), {
+  const dom = new JSDOM(bundleHtml, {
     runScripts: "dangerously", pretendToBeVisual: true, url: "http://localhost/",
   });
   await new Promise((resolve) => dom.window.addEventListener("load", resolve));
@@ -587,7 +592,7 @@ function check(label, cond, extra) {
   $("edit-factions").checked = false; $("edit-factions").dispatchEvent(new win.Event("change", { bubbles: true }));
   check("switching it off hides the tools again", $("fac-tools").hidden === true && !$("view-gear").classList.contains("edit-factions"));
   // edits survive a reload and are applied when the page starts
-  const dom2 = new JSDOM(fs.readFileSync(indexFile, "utf8"), {
+  const dom2 = new JSDOM(bundleHtml, {
     runScripts: "dangerously", pretendToBeVisual: true, url: "http://localhost/",
     beforeParse(w) { w.localStorage.setItem("hd2_factions", JSON.stringify({ [CONC]: ["bot"], [LIB]: [], "No Such Item": ["bug"], "Eagle Airstrike": ["nonsense"] })); },
   });
@@ -606,7 +611,7 @@ function check(label, cond, extra) {
     const WIKI = "https://helldivers.wiki.gg/images/";
     const libUrl = win.HD2_DATA.items.find((i) => i.name === "AR-23 Liberator").imgUrl;
     const map = { [libUrl]: "img/items/lib.webp", [WIKI + "Armor_AP2_Icon.png"]: "img/icons/Armor_AP2_Icon.png", [WIKI + "Terminid_Icon.svg"]: "img/icons/Terminid_Icon.svg", [WIKI + "Super_Earth_Icon.svg"]: "img/icons/Super_Earth_Icon.svg" };
-    const html = fs.readFileSync(indexFile, "utf8");
+    const html = bundleHtml;
     check("(the bundle has an empty image list to swap)", html.includes('"images": {}'));
     const dom3 = new JSDOM(html.replace('"images": {}', '"images": ' + JSON.stringify(map)), { runScripts: "dangerously", pretendToBeVisual: true, url: "http://localhost/" });
     await new Promise((resolve) => dom3.window.addEventListener("load", resolve));
@@ -620,6 +625,16 @@ function check(label, cond, extra) {
     w3.document.getElementById("controls").dispatchEvent(new w3.Event("submit", { bubbles: true, cancelable: true }));
     check("loadout cards use the saved armor-penetration icon", srcs("#results .ap-icon").includes("img/icons/Armor_AP2_Icon.png") && srcs("#results .ap-icon").some((x) => x.startsWith(WIKI)), srcs("#results .ap-icon").join());
     dom3.window.close();
+    // the real bundle (nothing swapped): if images are saved, it carries them inside the file
+    if (/"images": \{\n/.test(rawBundle)) {
+      const domR = new JSDOM(rawBundle, { runScripts: "dangerously", pretendToBeVisual: true, url: "http://localhost/" });
+      await new Promise((resolve) => domR.window.addEventListener("load", resolve));
+      const dr = domR.window.document;
+      const thumbs = Array.from(dr.querySelectorAll("#gear-list img.gear-thumb")).map((i) => i.getAttribute("src"));
+      const saved = Object.keys(domR.window.HD2_DATA.images).length;
+      check("the single-file build shows every saved picture from inside the file (no network needed)", saved > 0 && thumbs.length === 200 && thumbs.filter((t) => t.startsWith("data:image/")).length >= 150, thumbs.filter((t) => t.startsWith("data:image/")).length + " of " + thumbs.length + " thumbnails are embedded");
+      domR.window.close();
+    }
   }
 
   console.log("Reset");
