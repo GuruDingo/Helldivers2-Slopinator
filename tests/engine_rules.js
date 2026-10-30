@@ -321,4 +321,16 @@ test("Switching nothing off changes nothing (default behaviour is unchanged)", (
   builds(200, { disabledRules: [] }).forEach((l) => assert.deepStrictEqual(l.unmet, []));
 });
 
+test("armor_pen: every weapon has valid armor-penetration data and non-weapon stratagems have none", () => {
+  const weapon = new Set(["primary", "secondary", "throwable", "support"]);
+  globalThis.HD2_DATA.items.forEach((i) => {
+    if (weapon.has(i.cat)) {
+      assert(Array.isArray(i.armorPen) && i.armorPen.length >= 1 && i.armorPen.length <= 2, i.name + " " + JSON.stringify(i.armorPen));
+      i.armorPen.forEach((n) => assert(Number.isInteger(n) && n >= -1 && n <= 11, i.name + " " + n));
+    } else assert.deepStrictEqual(i.armorPen, [], i.name);
+  });
+  const by = (n) => globalThis.HD2_DATA.items.find((i) => i.name === n).armorPen;
+  assert.deepStrictEqual([by("AR-23 Liberator"), by("AR-23P Liberator Penetrator"), by("RS-422 Railgun"), by("G-3 Smoke"), by("LAS-17 Double-Edge Sickle")], [[2], [3], [5], [-1], [2, 4]]);
+});
+
 console.log("\n" + passed + " engine rule tests passed" + (process.exitCode ? " (with failures)" : ""));

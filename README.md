@@ -95,6 +95,30 @@ The **in-game limits** (one FRV, one tank, one exosuit) are shown with a lock an
 
 **Additional rules** - your own count rule for a tag across the whole loadout: **at least**, **at most** or **exactly** N. Adding a rule for a tag replaces the default check for that tag, and a required count also lifts that tag's cap (see below). "At least" and "at most" on the same tag make a range (chip `Chaff Killer 2-3`); "exactly" sets both. An "at most 0" or "exactly 0" rule bans the tag - for the backpack tag it also replaces the "exactly one backpack" rule. A plain "at most N" (N of 1 or more) keeps the default "at least one" check for that tag. Rules that can't all hold (for example locks that break an "at most") are built as well as possible and listed above the loadout, like any other unmet rule. In code a rule is `{ min?, max? }`; a plain number still means "at least".
 
+## Armor penetration (`armor_pen` column)
+
+`hd2gear.csv` has an `armor_pen` column for every weapon (primaries, secondaries, throwables and support weapons; stratagems that aren't weapons are blank). It holds the main attack's armor-penetration level as the wiki's icons number it, and a weapon with two modes lists both, e.g. `2/4`. `tools/build_gear.py` checks the format (whole numbers from -1 to 11 joined by `/`), warns about a weapon with no value, and writes it to `docs/gear-data.js` as `armorPen: [n, ...]`. Nothing on the page shows it yet - that is the next step (see TODO.md).
+
+Values came from the wiki's Weapons page (primaries, secondaries, throwables) and each support weapon's own page, with a few single-attack support weapons taken from the wiki's Damage Comparison table (MGX-42, MG-206, LAS-98, CQC-1, TX-41, B/MD C4, CQC-9, B/FLAM-80, AMW-20). Where a weapon has several attacks (a rocket plus its explosion, a rifle plus an underbarrel launcher) the value is the weapon's main/highest attack as the wiki lists it, so a few explosive weapons are rated by the explosion. Re-check a number against the wiki whenever it looks wrong; the game changes these in patches.
+
+Icons are linked from the wiki like the other images:
+
+| n | Name | Icon |
+|---|---|---|
+| -1 | No Hitbox | `https://helldivers.wiki.gg/images/Armor_AP-1_Icon.png` |
+| 0 | Unarmored | `https://helldivers.wiki.gg/images/Armor_AP0_Icon.png` |
+| 1 | Very Light | `https://helldivers.wiki.gg/images/Armor_AP1_Icon.png` |
+| 2 | Light | `https://helldivers.wiki.gg/images/Armor_AP2_Icon.png` |
+| 3 | Medium | `https://helldivers.wiki.gg/images/Armor_AP3_Icon.png` |
+| 4 | Heavy | `https://helldivers.wiki.gg/images/Armor_AP4_Icon.png` |
+| 5 | Anti-Tank I | `https://helldivers.wiki.gg/images/Armor_AP5_Icon.png` |
+| 6 | Anti-Tank II | `https://helldivers.wiki.gg/images/Armor_AP6_Icon.png` |
+| 7 | Anti-Tank III | `https://helldivers.wiki.gg/images/Armor_AP7_Icon.png` |
+| 8 | Anti-Tank IV | `https://helldivers.wiki.gg/images/Armor_AP8_Icon.png` |
+| 9 | Anti-Tank V | `https://helldivers.wiki.gg/images/Armor_AP9_Icon.png` |
+| 10 | Anti-Tank VI | `https://helldivers.wiki.gg/images/Armor_AP10_Icon.png` |
+| 11 | Indestructible | `https://helldivers.wiki.gg/images/Armor_AP11_Icon.png` |
+
 ## Item caps and in-game limits
 
 While filling stratagem slots the engine keeps a few balance caps: one non-expendable support weapon, two expendable ones (never mixed with a regular one), one backpack-slot item, one vehicle, two Eagles, one mine. A **required tag overrides the cap for its own tag** - e.g. `Eagle 3` allows three Eagles, `mines 2` allows two mines, `vehicle 3` allows several vehicles. Requiring one tag never loosens a different cap, and locks still bypass the caps.

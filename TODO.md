@@ -3,9 +3,12 @@
 Items we agreed to come back to. Nothing below is started unless marked.
 
 ## UI / design
-- [ ] **Show armor penetration on weapon cards** (Boss, 2026-10-29): add each weapon's armor-pen rating to its loadout
-      card (needs a new `armor_pen` column in `hd2gear.csv`, filled in by Boss or sourced from the wiki, and a layout
-      for it next to the tag pills). Could later feed the "anti-armor" tag/rules and sub-faction advice.
+- [~] **Show armor penetration on weapon cards** (Boss, 2026-10-29): DATA DONE 2026-10-30 - `armor_pen` column in
+      `hd2gear.csv` for all 141 weapons (main attack, `2/4` for two-mode weapons), validated by the build and exported
+      as `armorPen` in `gear-data.js`; icon links are listed in the README. Still to do: show the icon (and label) on each
+      weapon card next to the tag pills, and decide how to show two-mode weapons (two icons?). Could later feed the
+      "anti-armor" tag/rules and sub-faction advice. Open: stratagem attacks (sentries, Eagles, orbitals) have ratings
+      too but are not in the column; `LAS-12 Sai` is on the wiki's primary list but not in the CSV.
 - [ ] **Colour the rest of the UI**: weapon tags (the pills only cover ~9 of the ~40 tags) and the faction buttons
       themselves (the selected one already takes the faction colour).
 - [ ] **Migrate images from wiki hotlinks to saved files** (Boss, 2026-10-30). Plan: (1) `tools/fetch_images.py` reads the
@@ -72,6 +75,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
+- **Armor penetration data**: new `armor_pen` column in `hd2gear.csv` (141 weapons), build validation, `armorPen` in the exported data, and the wiki icon links in the README. Display on the cards is still to do.
 - **Enable for all factions** button in Edit factions mode, next to Reset to defaults: ticks all three factions for the items shown (second click to confirm; respects the search filter). Reset to defaults undoes it.
 
 ## Done 2026-10-29
