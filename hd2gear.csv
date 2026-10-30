@@ -114,7 +114,7 @@ id,category,name,nicknames,tags,factions,warbond,img_url,armor_pen
 113,support,MG-43 Machine Gun,"mg-43 machine gun,mg-43,machine gun","chaff,med","bug,squid",base,https://helldivers.wiki.gg/images/Machine_Gun_Stratagem_Icon_Background.svg,3
 114,support,APW-1 Anti-Materiel Rifle,"apw-1 anti-materiel rifle,apw-1,anti-materiel rifle,amr","stealth,med,armor",any,req_p,https://helldivers.wiki.gg/images/Anti-Materiel_Rifle_Stratagem_Icon_Background.svg,4
 115,support,M-105 Stalwart,"m-105 stalwart,m-105,stalwart",chaff,"bug,squid",req_p,https://helldivers.wiki.gg/images/Stalwart_Stratagem_Icon_Background.svg,2
-116,support,GR-8 Recoilless Rifle,"gr-8 recoilless rifle,gr-8,recoilless rifle","armor,demo,backpack",any,req_p,https://helldivers.wiki.gg/images/Recoilless_Rifle_Stratagem_Icon_Background.svg,6
+116,support,GR-8 Recoilless Rifle,"gr-8 recoilless rifle,gr-8,recoilless rifle","armor,demo,backpack",any,req_p,https://helldivers.wiki.gg/images/Recoilless_Rifle_Stratagem_Icon_Background.svg,5/6
 117,support,FLAM-40 Flamethrower,"flam-40 flamethrower,flam-40,flamethrower","chaff,fire","bug,squid",req_p,https://helldivers.wiki.gg/images/Flamethrower_Stratagem_Icon_Background.svg,4
 118,support,AC-8 Autocannon,"ac-8 autocannon,ac-8,autocannon","chaff,med,armor,demo,backpack",any,req_p,https://helldivers.wiki.gg/images/Autocannon_Stratagem_Icon_Background.svg,4
 119,support,MG-206 Heavy Machine Gun,"mg-206 heavy machine gun,mg-206,heavy machine gun,hmr","chaff,med,armor","bug,squid",req_p,https://helldivers.wiki.gg/images/Heavy_Machine_Gun_Stratagem_Icon_Background.svg,4
@@ -129,10 +129,10 @@ id,category,name,nicknames,tags,factions,warbond,img_url,armor_pen
 128,support,TX-41 Sterilizer,"tx-41 sterilizer,tx-41,sterilizer","gas,chaff","bug,squid",chemical_agents,https://helldivers.wiki.gg/images/Sterilizer_Stratagem_Icon_Background.svg,5
 129,support,CQC-1 One True Flag,"cqc-1 one true flag,cqc-1,one true flag,flag","melee,onehand,assist,taunt",any,masters_of_ceremony,https://helldivers.wiki.gg/images/One_True_Flag_Stratagem_Icon_Background.svg,3
 130,support,GL-52 De-Escalator,"gl-52 de-escalator,gl-52,de-escalator","arc,chaff,med","bug,squid",force_of_law,https://helldivers.wiki.gg/images/De-Escalator_Stratagem_Icon_Background.svg,4
-131,support,PLAS-45 Epoch,"plas-45 epoch,plas-45,epoch,epog","chaff,med,armor",any,control_group,https://helldivers.wiki.gg/images/Epoch_Stratagem_Icon_Background.svg,5
+131,support,PLAS-45 Epoch,"plas-45 epoch,plas-45,epoch,epog","chaff,med,armor",any,control_group,https://helldivers.wiki.gg/images/Epoch_Stratagem_Icon_Background.svg,4/5
 132,support,S-11 Speargun,"s-11 speargun,s-11,speargun","gas,med,demo","bug,bot",dust_devils,https://helldivers.wiki.gg/images/Speargun_Stratagem_Icon_Background.svg,5
 133,support,M-1000 Maxigun,"m-1000 maxigun,m-1000,maxigun,minigun","chaff,med,backpack","bug,squid",python_commandos,https://helldivers.wiki.gg/images/Maxigun_Stratagem_Icon_Background.svg,3
-134,support,CQC-9 Defoliation Tool,"cqc-9 defoliation tool,cqc-9,defoliation tool,chainsaw","melee,med,stealth",bot,python_commandos,https://helldivers.wiki.gg/images/Defoliation_Tool_Stratagem_Icon_Background.svg,3
+134,support,CQC-9 Defoliation Tool,"cqc-9 defoliation tool,cqc-9,defoliation tool,chainsaw","melee,med,stealth",bot,python_commandos,https://helldivers.wiki.gg/images/Defoliation_Tool_Stratagem_Icon_Background.svg,3/5
 135,support,B/MD C4 Pack,"b/md c4 pack,b/md,b-md,c4 pack,c4","armor,demo,stealth,backpack","bot,squid",redacted_regiment,https://helldivers.wiki.gg/images/C4_Pack_Stratagem_Icon_Background.svg,7
 136,support,CQC-20 Breaching Hammer,"cqc-20 breaching hammer,cqc-20,breaching hammer,hammer","melee,armor,demo",any,siege_breakers,https://helldivers.wiki.gg/images/Breaching_Hammer_Stratagem_Icon_Background.svg,3
 137,support,GL-28 Belt-Fed Grenade Launcher,"gl-28 belt-fed grenade launcher,gl-28,belt-fed grenade launcher,belt-fed grenade","chaff,med,demo,backpack",any,siege_breakers,https://helldivers.wiki.gg/images/Belt-Fed_Grenade_Launcher_Stratagem_Icon_Background.svg,4

@@ -330,7 +330,7 @@ test("armor_pen: every weapon has valid armor-penetration data and non-weapon st
     } else assert.deepStrictEqual(i.armorPen, [], i.name);
   });
   const by = (n) => globalThis.HD2_DATA.items.find((i) => i.name === n).armorPen;
-  assert.deepStrictEqual([by("AR-23 Liberator"), by("AR-23P Liberator Penetrator"), by("RS-422 Railgun"), by("G-3 Smoke"), by("LAS-17 Double-Edge Sickle")], [[2], [3], [5], [-1], [2, 4]]);
+  assert.deepStrictEqual([by("AR-23 Liberator"), by("AR-23P Liberator Penetrator"), by("RS-422 Railgun"), by("G-3 Smoke"), by("LAS-17 Double-Edge Sickle"), by("GR-8 Recoilless Rifle"), by("PLAS-45 Epoch"), by("CQC-9 Defoliation Tool")], [[2], [3], [5], [-1], [2, 4], [5, 6], [4, 5], [3, 5]]);
 });
 
 console.log("\n" + passed + " engine rule tests passed" + (process.exitCode ? " (with failures)" : ""));

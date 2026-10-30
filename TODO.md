@@ -8,8 +8,9 @@ Items we agreed to come back to. Nothing below is started unless marked.
       cards as the wiki's icons (both, side by side, for two-mode weapons). Possible follow-ups: show it in My Gear rows
       too; use it for the "anti-armor" tag/rules and sub-faction advice; stratagem attacks (sentries, Eagles, orbitals)
       have ratings but are not in the column; `LAS-12 Sai` is on the wiki's primary list but not in the CSV; check
-      whether the wiki's Weapons page shows two icons for any support weapon (its support section didn't load, so
-      those use one main value).
+      whether any other support weapon shows two icons on the wiki's Weapons page (Boss set Recoilless Rifle 5/6, Epoch
+      4/5 and Defoliation Tool 3/5 on 2026-10-30; the page's support section didn't load for me, so the rest use one
+      main value).
 - [ ] **Colour the rest of the UI**: weapon tags (the pills only cover ~9 of the ~40 tags) and the faction buttons
       themselves (the selected one already takes the faction colour).
 - [ ] **Migrate images from wiki hotlinks to saved files** (Boss, 2026-10-30). Plan: (1) `tools/fetch_images.py` reads the
