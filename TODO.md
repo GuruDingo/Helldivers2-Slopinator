@@ -37,8 +37,9 @@ Items we agreed to come back to. Nothing below is started unless marked.
 - [ ] **Weapon lock UI** (Boss, 2026-10-30): format the lock options (the Locks panel) the same way as the Randomizer output
       cards (same card layout, thumbnails, pills, AP icons), instead of the plain lock grid.
 - [ ] **My Gear list order** (Boss, 2026-10-30): show the My Gear lists in the order the game does (menu / warbond /
-      chronological order) instead of `hd2gear.csv` order. Needs an order for the items inside each category (a column in the
-      CSV or a rank from the wiki) and for the warbonds.
+      chronological order) instead of `hd2gear.csv` order. Unblocked 2026-10-30: the CSV is now in release order and has a
+      `release_date` column (exposed to the page as `released`); what remains is the UI sort and the menu order inside each category.
+      Check `RELEASE_DATES_CHECK.md` first (45 shop/event items are assumed launch day, 11 warbond dates are estimates).
 - [ ] **Odds transparency**: explain why a build was flagged or why the faction was relaxed (tooltips / details).
 
 ## Rules
@@ -73,6 +74,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
+- **CSV in release order + release_date column + game version note** (Boss, 2026-10-30): `hd2gear.csv` is sorted oldest to newest (id 1 = oldest, highest id = newest; same-day items keep their old relative order) with a new `release_date` column; `build_gear.py` reads it as `released` and warns on a missing or malformed date. Dates are best effort (wiki "added to the game" entries, news for Truth Enforcers, estimates for 11 warbonds, launch day assumed for 45 shop/event items) and listed in `RELEASE_DATES_CHECK.md` for Boss to correct. The page shows "Updated for Helldivers 2 version 1.007.202" under the title (hand-edited line in `docs/index.html`). Also: rule builder selects narrowed so row 1 stays on one line; the collapsible heading is just "Add your own rule".
 - **Shield rule, pistols and weapon-type tags** (Boss, 2026-10-30): the rule is now "A hand-held shield needs a one-handed primary or a melee weapon" (written as: if a hand-held shield and no one-handed primary, then a melee weapon in primary / secondary). Every secondary now carries `onehand` (20 pistols added; the 6 melee secondaries had it), but pistols deliberately do not satisfy the shield rule. The outcome of the rule is unchanged from before (the old rule was satisfied by exactly those same weapons), so the odds baseline did not move. Weapon-type tags: PLAS-101 Purifier got `assault rifle`; Eruptor, Exploding Crossbow, Evictor, Scythe and Torcher got `special`. New titles: Charge, Shield, Shotgun, Assault Rifle, SMG, Marksman Rifle, Special (32 of 42 titled).
 - **Clear custom rules** button next to Reset to system defaults (Boss): removes the rules the player added for tags that have no default row; the default rows (edited or not) stay. Hidden while there are none.
 - **Eight default rules are now editable rows** (Boss): Backpack = 1, Anti-Tank >= 1, Medium Killer >= 1, Base Breaker >= 1, Panic Weapon >= 1, Vehicle <= 1, Eagle <= 2 and Mines <= 1 moved from the Default rules switches to dim rows at the top of Additional rules. Adding a rule for the same tag edits the row (a clash with a default number lets the default give way); the x removes it; the new **Reset to system defaults** button restores all eight (rules added for other tags stay). An edited row is the player's own requirement, so it ranks as top priority; an untouched row is still the engine's default rule with its tier. Engine: `Engine.RULES` entries carry a `preset` ({tag, min, max}); no change to how builds are made (tests prove a preset handed over as a requirement behaves the same). Rules, edits and removals are now saved in `hd2_settings` (Additional rules used to be lost on reload). New title: Mines.
