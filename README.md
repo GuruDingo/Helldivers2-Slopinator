@@ -23,12 +23,21 @@ tests/                 rule tests, seeded regression test, UI smoke test (run_al
 TODO.md                pinned follow-ups and open decisions
 ```
 
-## Updating the gear
+## Updating the gear (new content from the wiki)
 
-1. Edit `hd2gear.csv` (new item = new row; new warbond = also add a row to `hd2warbonds.csv`).
-2. `python tools/build_gear.py` - checks for typos (unknown category/warbond, duplicate names or
-   nicknames...) and rebuilds `docs/gear-data.js`. It writes nothing if it finds an error.
-3. Commit the CSV(s) **and** `docs/gear-data.js`.
+Do this when a release adds weapons, stratagems or a warbond. The wiki's page for each item has what you need.
+
+1. **Collect the data for each new item**: name, category (`primary`, `secondary`, `throwable`, `support`, `backpack`, `vehicle`, `eagle`, `orbital`, `sentry`, `defensive`), the warbond it belongs to, its picture address (the weapon's "Render" image, or the stratagem icon image), and its armor penetration (below).
+2. **Add a row to `hd2gear.csv`** (Excel is fine; keep the file's line endings). Columns: `id` (next number), `category`, `name`, `nicknames` (lower case, comma separated, each unique across the game), `tags`, `factions` (`any`, or a list of `bug`, `bot`, `squid`), `warbond` (a key from `hd2warbonds.csv`, or `base`), `img_url` (the wiki address) and `armor_pen`. Tags and factions are judgment calls; copy a similar item.
+   - `armor_pen` is the main attack's armor-penetration icon number (-1 no hitbox, 0 unarmored, 2 light, 3 medium, 4 heavy, 5-10 anti-tank I-VI, 11 indestructible), two numbers joined by `/` for a two-mode weapon (`2/4`), blank for something that does no damage. For stratagems, use the AP icon the wiki page leads with, not the structure's own armor (`AV`) icons.
+3. **If there is a new warbond**: add a row to `hd2warbonds.csv` (key, display name, cover image address; the key is what the items' `warbond` column uses), and add its title icon to `WARBOND_ICONS` in `docs/app.js`. Only a new Requisition shop needs more: add its key to `warbondPillName` and `WARBOND_GROUPS` in `docs/app.js` (ask me). The UI tests work out the item count from the data, but they still hard-code the number of warbonds (36) and top-level My Gear blocks (31), so those two numbers need updating when a warbond is added.
+4. **Rebuild**: `python tools/build_gear.py`. It checks for typos (unknown category or warbond, duplicate names or nicknames, bad `armor_pen`) and rebuilds `docs/gear-data.js`; it writes nothing if it finds an error. Warnings about a missing picture or `armor_pen` are only reminders.
+5. **Save the new pictures**: GitHub's Actions tab -> "Fetch images" -> Run workflow (or `python tools/fetch_images.py`), then merge the `images-fetched` branch it creates. Only missing files are downloaded. Until that is done the new items show their wiki pictures, so nothing breaks. See "Saved images".
+6. **Check the tags** (this is a manual step, not part of the build): follow `TAG_CHECK.md` (`python tools/tag_checks.py`). It flags missing implied tags and tags used by fewer than three items; nothing is changed without your say-so.
+7. **Re-save the odds baseline and run every test**: `node tests/regression.js --update-baseline`, then `node tests/run_all.js`. New items change the odds, so the regression test's baseline needs refreshing after an intentional change like this.
+8. **Publish**: commit the CSVs, `docs/gear-data.js`, `docs/img/` and `tests/baseline.json` on a branch, open a pull request (the test run attaches a downloadable build so you can try it first), merge it, and hard-refresh the live site.
+
+Renaming an item changes the name your saved My Gear ticks and faction edits are keyed by, so those items will show as new (unticked) in a browser that had saved settings.
 
 ## Trying it locally
 

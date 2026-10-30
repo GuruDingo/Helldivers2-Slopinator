@@ -6,7 +6,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
 - [x] ~~Show armor penetration on weapon cards~~ done 2026-10-30: `armor_pen` column in `hd2gear.csv` for all 141 weapons
       (main attack, `2/4` for two-mode weapons), validated by the build, exported as `armorPen`, and shown on the loadout
       cards as the wiki's icons (both, side by side, for two-mode weapons). Possible follow-ups: show it in My Gear rows
-      too; use it for the "anti-armor" tag/rules and sub-faction advice; `LAS-12 Sai` is on the wiki's primary list but not in the CSV; check
+      too; use it for the "anti-armor" tag/rules and sub-faction advice; check
       whether any other support weapon shows two icons on the wiki's Weapons page (Boss set Recoilless Rifle 5/6, Epoch
       4/5 and Defoliation Tool 3/5 on 2026-10-30; the page's support section didn't load for me, so the rest use one
       main value).
@@ -22,8 +22,9 @@ Items we agreed to come back to. Nothing below is started unless marked.
       single-file build embeds them (2.3 MB, works offline). Re-run the fetch (Actions -> Fetch images, or the script)
       when a new item / warbond / wiki image is added. Follow-ups: warbond header art (covers are saved but not shown);
       check the live site shows the My Gear thumbnails (item below).
-- [ ] **Host the tool at a URL** (Boss, 2026-10-30): see the hosting notes in the reply of 2026-10-30; first step is
-      turning on GitHub Pages for `/docs`. Open choices: custom domain, analytics/feedback, shareable-loadout links.
+- [x] ~~Host the tool at a URL~~ done 2026-10-30: live at https://gurudingo.github.io/Helldivers2-Slopinator/ (GitHub Pages, `main` / `/docs`). Open choices still: custom domain, analytics/feedback, shareable-loadout links.
+- [ ] **Decide on the two temporary Liberty Day 2026 stratagems** (found by the wiki scan, 2026-10-30): **Orbital Confetti** (non-lethal orbital) and **Eagle Fly By** (does nothing), both added mid-patch 1.007.201 on 2026-10-25 as event items (not in any warbond). Not added to the CSV. If wanted: category `orbital` / `eagle`, warbond `fomo` (Campaign/Event Rewards), no `armor_pen`.
+- [ ] **Maybe rename G/40-K Meltamine**: the wiki page is titled "G/40-K Melta Mine" (the CSV says Meltamine; "melta mine" is already a nickname). Renaming would orphan saved ticks / faction edits for it.
 - [ ] **Proof the new stratagem AP values** (Boss, 2026-10-30; PR #3 is already merged and live, so this is now a correction pass). Wiki pages were summarised, not
       read in full, so check these against the wiki: K-9 (7), Orbital EMS Strike (7), EMS Mortar Sentry (6), Eagle
       Strafing Run (5) vs the other Eagles (7), Maelstrom (4, missiles 5), Rover (2, fire is 4), Incendiary Mines (4,
@@ -85,6 +86,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
+- **LAS-12 Sai** added (primary, Superstore, `smg,chaff,onehand,med,panic,charge`, bug+squid, AP 3). Wiki scan the same day: no other permanent weapon or stratagem is missing from the CSV (primaries 57/57, secondaries 26/26, throwables 24/24, backpacks, vehicles, sentries, emplacements, Eagles, orbitals and support weapons all match), and the wiki's "Obedient Democracy Support Troopers" warbond is the same four items as our `odst` (Halo: ODST) warbond. The UI tests no longer hard-code the item count.
 - **Armor penetration on stratagems** (icons moved to the right of the item name): 50 attacking stratagems now have `armor_pen` (page's lead AP icon; two values for Patriot, Lumberer, Bastion; Dog Breath counted as just 5 per Boss). Worth a second look on the wiki: K-9 (7), EMS Strike (7) and EMS Mortar Sentry (6) look high for what they do, Eagle Strafing Run (5) vs the other Eagles (7), and Maelstrom (4, missiles are 5).
 - **Armor penetration data**: new `armor_pen` column in `hd2gear.csv` (141 weapons), build validation, `armorPen` in the exported data, and the wiki icon links in the README. The cards now show it (both icons for two-mode weapons).
 - **Enable for all factions** button in Edit factions mode, next to Reset to defaults: ticks all three factions for the items shown (second click to confirm; respects the search filter). Reset to defaults undoes it.

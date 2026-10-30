@@ -55,6 +55,7 @@ id,category,name,nicknames,tags,factions,warbond,img_url,armor_pen
 54,primary,VG-70 Variable,"vg-70 variable,vg-70,variable","assault rifle,chaff,med,panic",any,control_group,https://helldivers.wiki.gg/images/VG-70_Variable_Primary_Render.png,2
 55,primary,FLAM-66 Torcher,"flam-66 torcher,flam-66,torcher","fire,chaff",any,freedoms_flame,https://helldivers.wiki.gg/images/FLAM-66_Torcher_Primary_Render.png,4
 56,primary,JAR-5 Dominator,"jar-5 dominator,jar-5,dominator,dom","assault rifle,med",any,steeled_veterans,https://helldivers.wiki.gg/images/JAR-5_Dominator_Primary_Render.png,3
+202,primary,LAS-12 Sai,"las-12 sai,las-12,sai","smg,chaff,onehand,med,panic,charge","bug,squid",superstore,https://helldivers.wiki.gg/images/LAS-12_Sai_Primary_Render.png,3
 57,secondary,P-92 Warrant,"p-92 warrant,p-92,warrant","chaff,panic","bug,squid",superstore,https://helldivers.wiki.gg/images/P-92_Warrant_Secondary_Render.png,3
 58,secondary,P-2 Peacemaker,"p-2 peacemaker,p-2,peacemaker",chaff,"bot,squid",base,https://helldivers.wiki.gg/images/P-2_Peacemaker_Secondary_Render.png,2
 59,secondary,P-19 Redeemer,"p-19 redeemer,p-19,redeemer","chaff,panic","bug,squid",helldivers_mobilize,https://helldivers.wiki.gg/images/P-19_Redeemer_Secondary_Render.png,2

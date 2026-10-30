@@ -33,6 +33,7 @@ function check(label, cond, extra) {
   win.HTMLElement.prototype.scrollIntoView = function () {};
   win.confirm = () => true;
   const $ = (id) => doc.getElementById(id);
+  const ACTIVE = win.HD2_DATA.items.filter((i) => i.factions.indexOf("none") === -1).length; // every item that can roll (the tests used to hard-code this number)
   const click = (el) => el.dispatchEvent(new win.MouseEvent("click", { bubbles: true, cancelable: true }));
   const generate = () => $("controls").dispatchEvent(new win.Event("submit", { bubbles: true, cancelable: true }));
   const setFaction = (v) => {
@@ -57,18 +58,18 @@ function check(label, cond, extra) {
   console.log("Page build");
   check("no script errors / HD2Engine loaded", typeof win.HD2Engine === "object");
   check("My Gear: 36 warbonds, the six Requisition shops grouped under one header (31 top-level blocks)", doc.querySelectorAll("#gear-list .wb-block:not(.wb-group)").length === 36 && doc.querySelectorAll("#gear-list .wb-group").length === 1 && doc.querySelectorAll("#gear-list > .wb-block").length === 31, doc.querySelectorAll("#gear-list .wb-block").length);
-  check("200 gear rows", doc.querySelectorAll("#gear-list .gear-row").length === 200);
+  check(ACTIVE + " gear rows (every active item)", doc.querySelectorAll("#gear-list .gear-row").length === ACTIVE);
   check("every gear row has a lazy thumbnail from the item's image link", Array.from(doc.querySelectorAll("#gear-list .gear-row")).every((r) => { const i = r.querySelector("img.gear-thumb"); return i && i.getAttribute("loading") === "lazy" && /^https:\/\//.test(i.getAttribute("src")); }));
   { const t = rowOf("AR-23 Liberator").querySelector("img.gear-thumb"); t.dispatchEvent(new win.Event("error"));
     check("a thumbnail that can't load becomes a blank square of the same size", !rowOf("AR-23 Liberator").querySelector("img.gear-thumb") && !!rowOf("AR-23 Liberator").querySelector(".gear-thumb-blank")); }
-  check("new browser starts with everything owned", $("grand-total").textContent === "200 / 200 items owned", $("grand-total").textContent);
-  check("pool line on the Randomizer tab", /Rolling from 200 of 200 items\./.test(poolText()), poolText());
+  check("new browser starts with everything owned", $("grand-total").textContent === ACTIVE + " / " + ACTIVE + " items owned", $("grand-total").textContent);
+  check("pool line on the Randomizer tab", new RegExp("Rolling from " + ACTIVE + " of " + ACTIVE + " items\\.").test(poolText()), poolText());
   check("old Warbonds / Exclude sections are gone", !$("warbond-grid") && !$("exclude-input"));
   check("Base Game rows: checked and locked", (() => { const b = Array.from(doc.querySelectorAll("#gear-list .wb-block")).find((x) => /Base Game/.test(x.textContent)); const boxes = Array.from(b.querySelectorAll("input[data-item]")); return boxes.length === 6 && boxes.every((c) => c.checked && c.disabled) && !b.querySelector("[data-all]"); })());
   const DEFAULTS = {}; win.HD2_DATA.items.forEach((i) => { DEFAULTS[i.name] = i.factions.join(","); });
   const defaultOf = (name) => DEFAULTS[name];
   const customCount = () => doc.querySelectorAll("#gear-list .gear-row.fac-custom").length;
-  check("first visit wrote the owned list to localStorage", Object.keys(JSON.parse(win.localStorage.getItem("hd2_tracker"))).length === 194);
+  check("first visit wrote the owned list to localStorage", Object.keys(JSON.parse(win.localStorage.getItem("hd2_tracker"))).length === ACTIVE - win.HD2_DATA.items.filter((i) => i.warbond === "base" && i.factions.indexOf("none") === -1).length); // everything except the always-owned Base Game items
   check("7 lock inputs", doc.querySelectorAll("#lock-grid input").length === 7);
   check("datalists filled", $("dl-primary").children.length > 40 && $("dl-strat").children.length > 60);
   check("require tag dropdown lists only titled tags (17), by title", (() => { const o = Array.from($("require-tag").children); const t = o.map((x) => x.textContent); return o.length === 17 && t.includes("Team Assist") && t.includes("Fire") && t.every((x, i) => i === 0 || t[i - 1].localeCompare(x) <= 0) && !o.some((x) => ["onehand", "stun", "smg", "mortar"].includes(x.value)) && o.some((x) => x.value === "assist"); })(), Array.from($("require-tag").children).map((x) => x.textContent).join(", "));
@@ -119,10 +120,10 @@ function check(label, cond, extra) {
 
   console.log("Pool line follows the faction");
   const validFor = (f) => win.HD2_DATA.items.filter((i) => win.HD2Engine.worksFor(i, f)).length;
-  check("any -> 'of N items' with N = every active item", new RegExp("of " + validFor("any") + " items").test(poolText()) && validFor("any") === 200, poolText());
+  check("any -> 'of N items' with N = every active item", new RegExp("of " + validFor("any") + " items").test(poolText()) && validFor("any") === ACTIVE, poolText());
   for (const [f, adj] of [["bug", "Terminid"], ["bot", "Automaton"], ["squid", "Illuminate"]]) {
     setFaction(f);
-    check(f + " -> denominator is the " + validFor(f) + " items valid for that faction", poolText().indexOf("of " + validFor(f) + " " + adj + "-compatible items") !== -1 && validFor(f) < 200, poolText());
+    check(f + " -> denominator is the " + validFor(f) + " items valid for that faction", poolText().indexOf("of " + validFor(f) + " " + adj + "-compatible items") !== -1 && validFor(f) < ACTIVE, poolText());
   }
   setFaction("bug");
   click(blockBtn(win.HD2_DATA.items.find((i) => win.HD2Engine.worksFor(i, "bug") && i.warbond !== "base").name));
@@ -132,7 +133,7 @@ function check(label, cond, extra) {
   click(blockBtn(botOnly));
   check("blocking an item the faction can't use doesn't change that faction's line", !/blocked/.test(poolText()), poolText());
   click($("gear-unblock-all"));
-  check("My Gear's own totals ignore the faction", $("grand-total").textContent === "200 / 200 items owned");
+  check("My Gear's own totals ignore the faction", $("grand-total").textContent === ACTIVE + " / " + ACTIVE + " items owned");
   setFaction("any");
 
   console.log("Validation");
@@ -140,14 +141,14 @@ function check(label, cond, extra) {
   check("count 0 -> error", errors().some((e) => /Loadouts must be/.test(e)), errors());
   $("count").value = "1";
   click($("gear-clear"));
-  check("own nothing -> only the 6 Base Game items left in the pool", /Rolling from 6 of 200/.test(poolText()), poolText());
+  check("own nothing -> only the 6 Base Game items left in the pool", new RegExp("Rolling from 6 of " + ACTIVE).test(poolText()), poolText());
   generate();
   check("pool too small -> error pointing at My Gear, no cards", errors().some((e) => /My Gear/.test(e)) && cards() === 0, errors());
   doc.querySelectorAll('#gear-list .gear-row').forEach((row) => { if (row.querySelector("input").disabled) click(row.querySelector(".block-btn")); });
   generate();
   check("empty pool -> clear error", errors().some((e) => /gear pool is empty/.test(e)), errors());
   click($("gear-unblock-all")); click($("gear-select-all"));
-  check("Unblock all + Own everything -> back to 200", /Rolling from 200 of 200/.test(poolText()), poolText());
+  check("Unblock all + Own everything -> back to everything", new RegExp("Rolling from " + ACTIVE + " of " + ACTIVE).test(poolText()), poolText());
   $("lock-primary").value = "definitely not a gun"; generate();
   check("unknown lock -> error", errors().some((e) => /unknown item/.test(e)), errors());
   $("lock-primary").value = "AC-8 Autocannon"; generate();
@@ -237,7 +238,7 @@ function check(label, cond, extra) {
 
   click(blockBtn("AR-23 Liberator"));
   check("Block button pressed", blockBtn("AR-23 Liberator").getAttribute("aria-pressed") === "true");
-  check("pool line counts it", /Rolling from 199 of 200.*1 blocked/.test(poolText()), poolText());
+  check("pool line counts it", new RegExp("Rolling from " + (ACTIVE - 1) + " of " + ACTIVE + ".*1 blocked").test(poolText()), poolText());
   check("block saved", JSON.parse(win.localStorage.getItem("hd2_blocked")).includes("AR-23 Liberator"));
   $("lock-primary").value = "AR-23 Liberator"; generate();
   check("locking a blocked item -> error", errors().some((e) => /isn't in your gear pool \(blocked\)/.test(e)), errors());
@@ -249,7 +250,7 @@ function check(label, cond, extra) {
   }
   check("blocked item never rolls (25 tries)", !sawExcluded);
   click(blockBtn("AR-23 Liberator"));
-  check("Block toggles back off", blockBtn("AR-23 Liberator").getAttribute("aria-pressed") === "false" && /Rolling from 200 of 200/.test(poolText()));
+  check("Block toggles back off", blockBtn("AR-23 Liberator").getAttribute("aria-pressed") === "false" && new RegExp("Rolling from " + ACTIVE + " of " + ACTIVE).test(poolText()));
   setOwnedItem("AC-8 Autocannon", false);
   $("lock-strat1").value = "AC-8 Autocannon"; generate();
   check("locking an item you don't own -> error", errors().some((e) => /not owned/.test(e)), errors());
@@ -349,18 +350,18 @@ function check(label, cond, extra) {
   click(firstBlock.querySelector(".wb-header"));
   check("clicking a header opens that section", firstBlock.querySelector(".wb-items").classList.contains("open"));
   click($("gear-clear"));
-  check("Own nothing -> 6 / 200 (Base Game stays) and saves {}", $("grand-total").textContent === "6 / 200 items owned" && win.localStorage.getItem("hd2_tracker") === "{}", $("grand-total").textContent + " " + win.localStorage.getItem("hd2_tracker"));
+  check("Own nothing -> 6 / everything (Base Game stays) and saves {}", $("grand-total").textContent === "6 / " + ACTIVE + " items owned" && win.localStorage.getItem("hd2_tracker") === "{}", $("grand-total").textContent + " " + win.localStorage.getItem("hd2_tracker"));
   const firstBox = firstBlock.querySelector("input[data-item]");
   firstBox.checked = true; firstBox.dispatchEvent(change());
   check("tick saves to localStorage", !!JSON.parse(win.localStorage.getItem("hd2_tracker"))[firstBox.getAttribute("data-item")]);
   click(firstBlock.querySelector("[data-none]"));
   click(firstBlock.querySelector("[data-all]"));
   const n1 = Number(firstBlock.querySelector(".pool-count").textContent);
-  check("per-warbond All owns just that warbond", n1 === firstBlock.querySelectorAll("input[data-item]").length && $("grand-total").textContent === (6 + n1) + " / 200 items owned", n1 + " / " + $("grand-total").textContent);
+  check("per-warbond All owns just that warbond", n1 === firstBlock.querySelectorAll("input[data-item]").length && $("grand-total").textContent === (6 + n1) + " / " + ACTIVE + " items owned", n1 + " / " + $("grand-total").textContent);
   click(firstBlock.querySelector("[data-none]"));
-  check("per-warbond None clears it", firstBlock.querySelector(".pool-count").textContent === "0" && $("grand-total").textContent === "6 / 200 items owned");
+  check("per-warbond None clears it", firstBlock.querySelector(".pool-count").textContent === "0" && $("grand-total").textContent === "6 / " + ACTIVE + " items owned");
   click($("gear-select-all"));
-  check("Own everything -> 200 / 200", $("grand-total").textContent === "200 / 200 items owned");
+  check("Own everything -> all owned", $("grand-total").textContent === ACTIVE + " / " + ACTIVE + " items owned");
   click(blockBtn("AC-8 Autocannon"));
   check("blocked item shown in the summary", /1 blocked/.test($("gear-detail").textContent), $("gear-detail").textContent);
   // Blocked-but-owned styling and the per-warbond counts
@@ -632,7 +633,7 @@ function check(label, cond, extra) {
       const dr = domR.window.document;
       const thumbs = Array.from(dr.querySelectorAll("#gear-list img.gear-thumb")).map((i) => i.getAttribute("src"));
       const saved = Object.keys(domR.window.HD2_DATA.images).length;
-      check("the single-file build shows every saved picture from inside the file (no network needed)", saved > 0 && thumbs.length === 200 && thumbs.filter((t) => t.startsWith("data:image/")).length >= 150, thumbs.filter((t) => t.startsWith("data:image/")).length + " of " + thumbs.length + " thumbnails are embedded");
+      check("the single-file build shows every saved picture from inside the file (no network needed)", saved > 0 && thumbs.length === ACTIVE && thumbs.filter((t) => t.startsWith("data:image/")).length >= 150, thumbs.filter((t) => t.startsWith("data:image/")).length + " of " + thumbs.length + " thumbnails are embedded");
       domR.window.close();
     }
   }
@@ -641,7 +642,7 @@ function check(label, cond, extra) {
   click($("reset-all"));
   check("reset restores faction any + 1 loadout", doc.querySelector('input[name="faction"]:checked').value === "any" && $("count").value === "1");
   check("reset switches default rules back on and clears added rules", win.HD2Engine.RULES.every((r) => sw(r.id).checked) && doc.querySelectorAll("#require-chips .chip").length === 0 && JSON.parse(win.localStorage.getItem("hd2_settings")).disabledRules.length === 0);
-  check("...but leaves My Gear alone", blockBtn("AC-8 Autocannon").getAttribute("aria-pressed") === "true" && $("grand-total").textContent === "200 / 200 items owned");
+  check("...but leaves My Gear alone", blockBtn("AC-8 Autocannon").getAttribute("aria-pressed") === "true" && $("grand-total").textContent === ACTIVE + " / " + ACTIVE + " items owned");
 
   console.log(failed ? "\n" + failed + " check(s) FAILED" : "\nAll UI checks passed");
   process.exit(failed ? 1 : 0);
