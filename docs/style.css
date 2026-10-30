@@ -277,3 +277,12 @@ hr.divider { border: none; border-top: 1px solid var(--accent); margin: 1.5rem 0
 .add-row select { max-width: 100%; }
 .add-row input[type=number] { width: 4.2rem; }
 .chips + .btn-row { margin-top: .6rem; }
+.builder { margin-top: .9rem; border-top: 1px solid #333; padding-top: .6rem; }
+.builder > summary { cursor: pointer; font-size: .85rem; color: #ccc; margin-bottom: .5rem; }
+.b-row { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; margin: .4rem 0; }
+.b-row .b-prefix { font-size: .8rem; color: #999; min-width: 2.6rem; }
+.b-row select { max-width: 100%; }
+.b-row input[type=number] { width: 4.2rem; }
+.b-row .chip-x { background: none; border: none; color: #aaa; cursor: pointer; font-size: 1.1rem; padding: 0 4px; }
+.b-row .chip-x:hover { color: #f44336; }
+.rules-subtitle { font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: #888; margin: .9rem 0 .2rem; }

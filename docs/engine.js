@@ -50,24 +50,38 @@
   // kind "guarantee" = checked on the finished build; "limit" = enforced while the stratagems are being picked.
   // `disabledRules: ["armor", "capEagle", ...]` switches any of them off. The in-game limits are not listed
   // here on purpose: nothing can turn those off.
-  // A rule with `preset: { tag, min?, max? }` is a plain count of one tag over the whole build ("Anti-Tank >= 1",
-  // "Vehicle <= 1"). The website shows those as editable rows next to the player's own rules rather than as a switch;
-  // an edited row is handed to the engine as a requirement for that tag with the preset's rule id in disabledRules,
-  // which behaves exactly like the preset did (tests/engine_rules.js checks that). The numbers in `preset` are the
-  // system defaults and must match what the engine enforces below.
+  // The website shows every default rule as a row next to the player's own rules (there are no switches any more).
+  //  - `preset: { tag, min?, max? }` is a plain count of one tag over the whole build ("Anti-Tank >= 1", "Vehicle <= 1").
+  //    The player edits such a row by handing the engine a requirement for that tag with the rule's id in disabledRules,
+  //    which behaves exactly like the preset did (tests/engine_rules.js checks that). The numbers in `preset` are the
+  //    system defaults and must match what the engine enforces below.
+  //  - `rules: [...]` are generic rules (see "Generic rules" below): a count of the items a selector picks, in one
+  //    scope, optionally only `when` other counts hold, or a spread between several tags. `fill: true` means the rule is
+  //    enforced while the stratagems are picked and never flagged afterwards (a limit that locks may break silently);
+  //    `waive: "allStratLocked"` skips the check when all four stratagem slots are locked.
   var RULES = [
     { id: "backpack", kind: "guarantee", label: "Exactly one backpack-slot item", note: "Also stops a second backpack being picked.", preset: { tag: "backpack", min: 1, max: 1 } },
-    { id: "support", kind: "guarantee", label: "At least one support weapon" },
+    { id: "support", kind: "guarantee", label: "At least one support weapon", waive: "allStratLocked",
+      rules: [{ must: { sel: "cat:support", scope: "strats", min: 1 } }] },
     { id: "armor", kind: "guarantee", label: "At least one anti-tank item", preset: { tag: "armor", min: 1 } },
     { id: "med", kind: "guarantee", label: "At least one medium-enemy killer", preset: { tag: "med", min: 1 } },
-    { id: "chaff", kind: "guarantee", label: "A chaff killer in primary or secondary" },
+    { id: "chaff", kind: "guarantee", label: "A chaff killer in primary or secondary",
+      rules: [{ must: { sel: "tag:chaff", scope: "ps", min: 1 } }] },
     { id: "demo", kind: "guarantee", label: "At least one base breaker", preset: { tag: "demo", min: 1 } },
     { id: "panic", kind: "guarantee", label: "A panic weapon in primary, secondary or throwable", preset: { tag: "panic", min: 1 } },
-    { id: "balance", kind: "guarantee", label: "Chaff / medium / anti-tank counts within 3 of each other" },
-    { id: "demoEscalation", kind: "guarantee", label: "Two base breakers when no weapon is one" },
-    { id: "shield", kind: "guarantee", label: "A shield backpack needs a one-handed weapon" },
-    { id: "supply", kind: "guarantee", label: "No supply pack alongside 2+ no-ammo items" },
-    { id: "capSupport", kind: "limit", label: "One regular support weapon, or up to two expendable ones (never mixed)" },
+    { id: "balance", kind: "guarantee", label: "Chaff / medium / anti-tank counts within 3 of each other",
+      rules: [{ spread: { tags: ["chaff", "med", "armor"], max: 3 } }] },
+    { id: "demoEscalation", kind: "guarantee", label: "Two base breakers when no weapon is one",
+      rules: [{ when: [{ sel: "tag:demo", scope: "weapons", max: 0 }, { sel: "tag:demo", scope: "all", min: 1 }], must: { sel: "tag:demo", scope: "all", min: 2 } }] },
+    { id: "shield", kind: "guarantee", label: "A shield backpack needs a one-handed weapon",
+      rules: [{ when: [{ sel: "tag:handheld", scope: "strats", min: 1 }], must: { sel: "tag:onehand", scope: "ps", min: 1 } }] },
+    { id: "supply", kind: "guarantee", label: "No supply pack alongside 2+ no-ammo items",
+      rules: [{ when: [{ sel: "grp:noAmmo", scope: "all", min: 2 }], must: { sel: "tag:supply", scope: "strats", max: 0 } }] },
+    { id: "capRegular", kind: "limit", label: "At most 1 regular (non-expendable) support weapon", fill: true,
+      rules: [{ must: { sel: "grp:regularSupport", scope: "strats", max: 1 } }] },
+    { id: "capExpend", kind: "limit", label: "At most 2 expendable support weapons", preset: { tag: "expendable", max: 2 } },
+    { id: "capMixed", kind: "limit", label: "Never a regular and an expendable support weapon together", fill: true,
+      rules: [{ when: [{ sel: "grp:regularSupport", scope: "strats", min: 1 }], must: { sel: "tag:expendable", scope: "strats", max: 0 } }] },
     { id: "capVehicle", kind: "limit", label: "At most 1 vehicle", preset: { tag: "vehicle", max: 1 } },
     { id: "capEagle", kind: "limit", label: "At most 2 Eagles", preset: { tag: "eagle", max: 2 } },
     { id: "capMine", kind: "limit", label: "At most 1 mine", preset: { tag: "mines", max: 1 } },
@@ -79,12 +93,15 @@
   // many low-tier rules it misses (set by Boss, 2026-10-29).
   var RULE_TIER = {
     require: 0,                                   // the player's own "Require N+ of a tag" requirements
+    custom: 0,                                    // the player's own scoped / if-then rules (same level)
     backpack: 1, shield: 1, supply: 1,            // high
     armor: 2, chaff: 2, demo: 2,                  // medium
     support: 3, med: 3, panic: 3,                 // low
     demoEscalation: 4, balance: 4,                // bottom
   };
   var TIER_COUNT = 5;
+  // "capSupport" was one switch for the three support limits; a saved or hand-written disabledRules list may still use it.
+  var RULE_ALIASES = { capRegular: ["capSupport"], capExpend: ["capSupport"], capMixed: ["capSupport"] };
   function tierOf(id) { return Object.prototype.hasOwnProperty.call(RULE_TIER, id) ? RULE_TIER[id] : 2; }
 
   // Lower is better. Misses are compared tier by tier from the top; "shortfall" (how far short the numeric
@@ -125,6 +142,116 @@
     });
     return out;
   }
+  // -- Generic rules ------------------------------------------------------------------
+  // A rule counts the items a SELECTOR picks inside a SCOPE and says how many there may be:
+  //   condition  { sel, scope?, min?, max? }       e.g. { sel: "tag:armor", scope: "all", min: 1 }
+  //   rule       { must: condition }                       -> must hold
+  //              { when: [condition, ...], must: condition } -> must hold whenever every `when` condition holds
+  //              { spread: { tags: [...], max } }          -> the counts of those tags differ by at most max
+  // Selectors: "tag:<tag>", "cat:<category>", or a named group (SELECTOR_GROUPS). Scopes: SCOPES.
+  // Rules are plain data so the page can save them and show them as sentences.
+  var SELECTOR_GROUPS = {
+    regularSupport: function (i) { return i.cat === "support" && !has(i, "expendable"); },   // a support weapon that is not expendable
+    noAmmo: function (i) { return has(i, "charge") || (i.cat === "support" && has(i, "expendable")); }, // charge weapon or expendable support
+  };
+  var SCOPES = ["all", "weapons", "ps", "strats", "primary", "secondary", "throwable"];
+  var selectorCache = {};
+  function makeSelector(id) {
+    if (Object.prototype.hasOwnProperty.call(selectorCache, id)) return selectorCache[id];
+    var m = /^(tag|cat|grp):(.+)$/.exec(String(id));
+    var fn = null;
+    if (m && m[1] === "tag") fn = function (i) { return has(i, m[2]); };
+    else if (m && m[1] === "cat") fn = function (i) { return i.cat === m[2]; };
+    else if (m && Object.prototype.hasOwnProperty.call(SELECTOR_GROUPS, m[2])) fn = SELECTOR_GROUPS[m[2]];
+    selectorCache[id] = fn;
+    return fn;
+  }
+  // ctx = { primary, secondary, throwable, strats: [stratagems chosen so far] }
+  function scopeItems(scope, ctx) {
+    switch (scope || "all") {
+      case "primary": return [ctx.primary];
+      case "secondary": return [ctx.secondary];
+      case "throwable": return [ctx.throwable];
+      case "ps": return [ctx.primary, ctx.secondary];
+      case "weapons": return [ctx.primary, ctx.secondary, ctx.throwable];
+      case "strats": return ctx.strats;
+      default: return [ctx.primary, ctx.secondary, ctx.throwable].concat(ctx.strats);
+    }
+  }
+  function condCount(cond, ctx) {
+    var pick = makeSelector(cond.sel);
+    return scopeItems(cond.scope, ctx).filter(function (i) { return i && pick(i); }).length;
+  }
+  function condGap(cond, n) {
+    if (cond.min !== undefined && n < cond.min) return cond.min - n;
+    if (cond.max !== undefined && n > cond.max) return n - cond.max;
+    return 0;
+  }
+  // null when the rule holds, otherwise { actual, gap } (actual = the count that broke it, or the spread).
+  function evalRule(rule, ctx) {
+    if (rule.spread) {
+      var counts = rule.spread.tags.map(function (t) { return condCount({ sel: "tag:" + t }, ctx); });
+      var spread = Math.max.apply(null, counts) - Math.min.apply(null, counts);
+      return spread > rule.spread.max ? { actual: spread, gap: spread - rule.spread.max } : null;
+    }
+    var when = rule.when || [];
+    for (var w = 0; w < when.length; w++) {
+      if (condGap(when[w], condCount(when[w], ctx))) return null;   // the "if" part doesn't hold: nothing to check
+    }
+    var n = condCount(rule.must, ctx);
+    var gap = condGap(rule.must, n);
+    return gap ? { actual: n, gap: gap } : null;
+  }
+  // A limit that can be enforced while stratagems are picked: only an upper bound, no lower bound.
+  function isUpperOnly(rule) {
+    return !!rule.must && rule.must.max !== undefined && rule.must.min === undefined;
+  }
+  // Does a stratagem count towards this rule at all? (Used so a rule the locks already break doesn't block unrelated picks.)
+  function touchesStrat(rule, s) {
+    var conds = (rule.when || []).concat(rule.must ? [rule.must] : []);
+    return conds.some(function (c) {
+      return (c.scope === undefined || c.scope === "all" || c.scope === "strats") && makeSelector(c.sel)(s);
+    });
+  }
+
+  function cleanCond(c) {
+    if (!c || typeof c !== "object" || typeof c.sel !== "string" || !makeSelector(c.sel)) return null;
+    var scope = c.scope === undefined ? "all" : c.scope;
+    if (SCOPES.indexOf(scope) === -1) return null;
+    if (c.sel.indexOf("cat:") === 0 && WEAPON_CATEGORIES.concat(STRATAGEM_CATEGORIES).indexOf(c.sel.slice(4)) === -1) return null;
+    var out = { sel: c.sel, scope: scope };
+    var num = function (v) { return typeof v === "number" && v >= 0 && v <= 7 && Math.floor(v) === v; };
+    if (c.min !== undefined) { if (!num(c.min)) return null; out.min = c.min; }
+    if (c.max !== undefined) { if (!num(c.max)) return null; out.max = c.max; }
+    if (out.min === undefined && out.max === undefined) return null;
+    if (out.min !== undefined && out.max !== undefined && out.min > out.max) return null;
+    return out;
+  }
+  // Checks and copies a rule; returns null for anything malformed (saved settings are never trusted).
+  function normalizeRule(r) {
+    if (!r || typeof r !== "object") return null;
+    if (r.spread) {
+      var sp = r.spread;
+      if (!sp || !Array.isArray(sp.tags) || sp.tags.length < 2 || sp.tags.length > 4) return null;
+      if (!sp.tags.every(function (t) { return typeof t === "string" && /^[A-Za-z0-9_ -]{1,40}$/.test(t); })) return null;
+      if (!(typeof sp.max === "number" && sp.max >= 0 && sp.max <= 7 && Math.floor(sp.max) === sp.max)) return null;
+      return { spread: { tags: sp.tags.slice(), max: sp.max } };
+    }
+    var must = cleanCond(r.must);
+    if (!must) return null;
+    var out = { must: must };
+    if (r.when !== undefined) {
+      if (!Array.isArray(r.when) || r.when.length > 3) return null;
+      var when = r.when.map(cleanCond);
+      if (when.some(function (c) { return !c; })) return null;
+      if (when.length) out.when = when;
+    }
+    return out;
+  }
+  function normalizeRules(list) {
+    return (Array.isArray(list) ? list : []).map(normalizeRule).filter(function (r) { return r; });
+  }
+
   var NO_RULES_OFF = new Set();
 
   function create(data, options) {
@@ -189,10 +316,15 @@
     }
 
     // -- One build attempt (port of try_build) ----------------------------
-    function tryBuild(faction, ownedSet, locks, requirementsIn, excluded, disabledIn) {
+    function tryBuild(faction, ownedSet, locks, requirementsIn, excluded, disabledIn, customIn) {
       var requirements = normalizeRequirements(requirementsIn); // tag -> { min?, max? }
+      var customRules = normalizeRules(customIn);                // the player's own generic rules (scoped counts, if/then, spread)
       var disabled = disabledIn instanceof Set ? disabledIn : new Set(disabledIn || NO_RULES_OFF);
-      function ruleOn(id) { return !disabled.has(id); }
+      function ruleOn(id) {
+        if (disabled.has(id)) return false;
+        var also = RULE_ALIASES[id];
+        return !(also && also.some(function (a) { return disabled.has(a); }));
+      }
       function reqMin(t) { return Object.prototype.hasOwnProperty.call(requirements, t) ? requirements[t].min : undefined; }
       function reqMax(t) { return Object.prototype.hasOwnProperty.call(requirements, t) ? requirements[t].max : undefined; }
       function inPool(x) {
@@ -246,6 +378,13 @@
       // Returns false if the stratagem breaks a cap. It updates `state` as it goes, so the caller
       // passes a scratch copy and only keeps it when the pick is accepted (see legacyCounterLeak).
       var maxTags = legacyCounterLeak ? [] : Object.keys(requirements).filter(function (t) { return requirements[t].max !== undefined; });
+      // Generic limits enforced while picking: the default support limits, plus any of the player's own rules that only
+      // cap a count. (The original tool, legacyCounterLeak, has its support limits written out in admit() below.)
+      var fillRules = [];
+      if (!legacyCounterLeak) {
+        RULES.forEach(function (r) { if (r.fill && r.rules && ruleOn(r.id)) fillRules = fillRules.concat(r.rules); });
+        customRules.forEach(function (r) { if (isUpperOnly(r)) fillRules.push(r); });
+      }
       function admit(s, state, soFar) {
         if (!legacyCounterLeak) {
           for (var h = 0; h < IN_GAME_LIMITS.length; h++) {
@@ -257,15 +396,27 @@
           var mt = maxTags[mx];
           if (has(s, mt) && soFar.filter(function (i) { return has(i, mt); }).length >= requirements[mt].max) return false;
         }
-        if (s.cat === "support" && !has(s, "expendable")) {
-          if (ruleOn("capSupport") && (state.supportRegular || state.supportExpend > 0)) return false;
-          state.supportRegular = true;
-        } else if (s.cat === "support" && has(s, "expendable")) {
-          var moreExpend = neededFor("expend", s, soFar);
-          if (ruleOn("capSupport")) {
-            if (state.supportRegular && !moreExpend) return false;
-            if (state.supportExpend >= 2 && !moreExpend) return false;
+        if (fillRules.length) {
+          // would this pick break one of them? A rule the locks already break only stops picks that count towards it.
+          var ctxAfter = { primary: primary, secondary: secondary, throwable: throwable, strats: soFar.slice(3).concat([s]) };
+          for (var fr = 0; fr < fillRules.length; fr++) {
+            if (touchesStrat(fillRules[fr], s) && evalRule(fillRules[fr], ctxAfter)) return false;
           }
+        }
+        if (legacyCounterLeak) {
+          if (s.cat === "support" && !has(s, "expendable")) {
+            if (ruleOn("capSupport") && (state.supportRegular || state.supportExpend > 0)) return false;
+            state.supportRegular = true;
+          } else if (s.cat === "support" && has(s, "expendable")) {
+            var moreExpendOld = neededFor("expend", s, soFar);
+            if (ruleOn("capSupport")) {
+              if (state.supportRegular && !moreExpendOld) return false;
+              if (state.supportExpend >= 2 && !moreExpendOld) return false;
+            }
+            state.supportExpend += 1;
+          }
+        } else if (s.cat === "support" && has(s, "expendable")) {
+          if (ruleOn("capExpend") && state.supportExpend >= 2 && !neededFor("expend", s, soFar)) return false;
           state.supportExpend += 1;
         }
         if (has(s, "backpack")) {
@@ -365,10 +516,6 @@
         fail("backpack", "Exactly one backpack-slot item");
       }
 
-      // At least one support weapon - unless all 4 stratagem slots were locked.
-      var supportCount = chosen.filter(function (s) { return s.cat === "support"; }).length;
-      if (!allLocked && supportCount < 1) fail("support", "At least one support weapon");
-
       var coversArmor = anyHas(allItems, "armor");
       var coversMed = anyHas(allItems, "med");
       var coversChaff = anyHas([primary, secondary], "chaff");
@@ -381,7 +528,6 @@
       var hasReq = function (t) { return reqMin(t) !== undefined || reqMax(t) === 0; };
       if (!hasReq("armor") && !coversArmor) fail("armor", "At least one anti-tank item");
       if (!hasReq("med") && !coversMed) fail("med", "At least one medium-enemy killer");
-      if (!hasReq("chaff") && !coversChaff) fail("chaff", "A chaff killer in primary or secondary");
       if (!hasReq("demo") && !coversDemo) fail("demo", "At least one base breaker");
       if (!hasReq("panic") && !coversPanic) fail("panic", "A panic weapon in primary, secondary or throwable");
 
@@ -398,38 +544,28 @@
         }
       });
 
-      // Tag balance: chaff / med / armor counts may differ by at most 3.
-      var chaffN = countHas(allItems, "chaff");
-      var medN = countHas(allItems, "med");
-      var armorN = countHas(allItems, "armor");
-      var spread = Math.max(chaffN, medN, armorN) - Math.min(chaffN, medN, armorN);
-      if (ruleOn("balance") && (Math.abs(chaffN - medN) > 3 || Math.abs(chaffN - armorN) > 3 || Math.abs(medN - armorN) > 3)) {
-        shortfall += spread - 3;
-        fail("balance", "Chaff / medium / anti-tank counts within 3 of each other");
-      }
+      // The default rules that are written as generic rules (support, chaff, balance, base-breaker escalation, shield,
+      // supply; see RULES). The support limits are `fill` rules: enforced while picking, never flagged here.
+      var ctx = { primary: primary, secondary: secondary, throwable: throwable, strats: chosen };
+      RULES.forEach(function (r) {
+        if (!r.rules || r.fill || !ruleOn(r.id)) return;
+        if (r.waive === "allStratLocked" && allLocked) return;   // the loadout is entirely the player's choice
+        r.rules.forEach(function (rule) {
+          var bad = evalRule(rule, ctx);
+          if (!bad) return;
+          if (rule.spread) shortfall += bad.gap;
+          fail(r.id, r.label);
+        });
+      });
 
-      // Demo escalation: if only stratagems provide demo, require at least 2 of them.
-      var demoItems = allItems.filter(function (i) { return has(i, "demo"); });
-      var demoFromWeapons = weapons.filter(function (i) { return has(i, "demo"); });
-      if (demoItems.length && !demoFromWeapons.length && demoItems.length < 2) {
-        fail("demoEscalation", "Two base breakers when no weapon is one");
-      }
-
-      // A hand-held shield backpack (tag "handheld": the ballistic and directional shields, not the bubble generators)
-      // needs a one-handed primary or secondary.
-      if (chosen.some(function (s) { return has(s, "handheld"); })) {
-        if (!(has(primary, "onehand") || has(secondary, "onehand"))) {
-          fail("shield", "Shield backpack needs a one-handed weapon");
-        }
-      }
-
-      // Supply stratagems are blocked at 2+ "no-ammo" factors (charge weapons + expendable supports).
-      var chargeCount = countHas([primary, secondary].concat(chosen), "charge");
-      if (chargeCount + st.supportExpend >= 2) {
-        if (chosen.some(function (s) { return has(s, "supply"); })) {
-          fail("supply", "No supply pack alongside 2+ no-ammo items");
-        }
-      }
+      // The player's own generic rules (scoped counts, if/then, balance). Locks are never changed to satisfy them: a lock that
+      // breaks one just gets it reported, like any other rule.
+      customRules.forEach(function (rule) {
+        var bad = evalRule(rule, ctx);
+        if (!bad) return;
+        shortfall += bad.gap;
+        unmet.push({ id: "custom", label: "Custom rule", tier: tierOf("custom"), rule: rule, actual: bad.actual });
+      });
 
       return {
         primary: primary, secondary: secondary, throwable: throwable, strategems: chosen,
@@ -448,6 +584,7 @@
         owned: new Set(opts.ownedWarbonds || allWarbondKeys),
         locks: opts.locks || {},
         requirements: normalizeRequirements(opts.requirements),
+        customRules: normalizeRules(opts.customRules),
         disabled: new Set(opts.disabledRules || []),
         excluded: opts.excluded instanceof Set ? opts.excluded : new Set(opts.excluded || []),
         maxAttempts: opts.maxAttempts || 1000,
@@ -460,7 +597,7 @@
     function attempt(faction, o) {
       var best = null;
       for (var n = 0; n < o.maxAttempts; n++) {
-        var c = tryBuild(faction, o.owned, o.locks, o.requirements, o.excluded, o.disabled);
+        var c = tryBuild(faction, o.owned, o.locks, o.requirements, o.excluded, o.disabled, o.customRules);
         if (!c) continue;
         if (!c.unmet.length) return c;
         if (!best || c.score < best.score) best = c;
@@ -533,6 +670,10 @@
     RULE_TIER: RULE_TIER,
     RULES: RULES,
     normalizeRequirements: normalizeRequirements,
+    normalizeRule: normalizeRule,
+    normalizeRules: normalizeRules,
+    SCOPES: SCOPES,
+    SELECTOR_GROUPS: Object.keys(SELECTOR_GROUPS),
     scoreUnmet: scoreUnmet,
     WEAPON_CATEGORIES: WEAPON_CATEGORIES,
     STRATAGEM_CATEGORIES: STRATAGEM_CATEGORIES,

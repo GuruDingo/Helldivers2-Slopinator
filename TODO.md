@@ -15,9 +15,9 @@ Items we agreed to come back to. Nothing below is started unless marked.
       single-file build embeds them (2.3 MB, works offline). Re-run the fetch (Actions -> Fetch images, or the script)
       when a new item / warbond / wiki image is added. The warbond covers are saved too, but not shown anywhere (header art is parked, 2026-10-30).
 - [x] ~~Host the tool at a URL~~ done 2026-10-30: live at https://gurudingo.github.io/Helldivers2-Slopinator/ (GitHub Pages, `main` / `/docs`). Open choices still: custom domain, analytics/feedback, shareable-loadout links.
-- [~] **Give every tag a display title.** 22 of 42 tags have titles now (the 9 old ones, "assist" is shown as
+- [~] **Give every tag a display title.** 24 of 42 tags have titles now (the 9 old ones, "assist" is shown as
       "Team Assist", plus Fire, Stealth, Orbital, Eagle, Sentry, Gas, Vehicle, Arc, and since 2026-10-30 Explosive, Laser,
-      Plasma and Hand-Held Shield, then Mines). Only titled tags appear in the "Require tags" dropdown; the other 20 are hidden until
+      Plasma and Hand-Held Shield, then Mines, then One-Handed and Supply). Only titled tags appear in the Rules dropdown; the other 18 are hidden until
       they get a title. `hd2-tags.xlsx` (sent earlier) is now
       out of date. Possible next step: move tag titles/pill colours into a `hd2tags.csv` instead of `TAG_NAMES` in
       `docs/app.js`.
@@ -54,14 +54,13 @@ Items we agreed to come back to. Nothing below is started unless marked.
       Partly done 2026-10-29: a required tag now overrides the cap for its own tag (Eagle 3, mines 2...), and FRV / tank /
       exosuit (max 1 each) are in-game limits that sit ABOVE the ranking. Still open: should the backpack join the in-game
       limits? Where do the other caps and faction fit rank?
-- [~] **More default rules as editable rows** (Boss, 2026-10-30): the eight plain tag-count rules are now rows in Additional rules (see Done). The other seven still need new engine features before they can be rows: category rules ("at least one support weapon", "one regular support weapon..."), a slot scope ("chaff killer in primary or secondary"), and the conditional / multi-tag rules (balance, two base breakers, shield needs a one-hander, no supply with 2+ no-ammo). Design options are in `claude/RULES_ENGINE_OPTIONS.md` (project doc); nothing is built yet. Priority tiers for converted rows wait for the full priority reset below.
-- [~] **"Rules" menu** - first version done 2026-10-29: one Rules panel with a switch for every default rule (grouped by
-      priority, caps included, in-game limits locked) and the "Additional rules" (at least / at most / exactly, ranges,
-      bans). Possible follow-ups:
+- [x] ~~**More default rules as editable rows**~~ done 2026-10-30 (Boss: "all seven", if/then rules for players, locks win): all 17 default rules are rows; the engine has category / group selectors, slot scopes, if/then and balance rules (see README, Rules panel). Nine of them can be removed but not edited in place; edited rows rank as the player's own requirements until the full priority reset below. Two deliberate behaviour changes: a chaff requirement no longer replaces the chaff-in-primary/secondary default, and an expendable-support minimum no longer allows mixed supports. `capSupport` is now `capRegular` / `capExpend` / `capMixed` (old saved name still works).
+- [~] **"Rules" menu** - first version done 2026-10-29, rebuilt 2026-10-30 as one list of rows (every default rule a row, no
+      switches), a simple add form and a rule builder (categories, scopes, if/then, balance). Possible follow-ups:
       - [ ] **Challenge mode**: presets such as "no support weapon" or "all Eagles", built from rule switches + rules.
       - [ ] Per-rule priority editing (drag to re-rank the tiers) - today the tiers are fixed in `RULE_TIER`.
-      - [ ] Rules for item categories (e.g. "no Orbitals") rather than only tags.
-      - [ ] Optional: let a tag with no title be chosen in Additional rules (the dropdown still lists only the 22 titled tags).
+      - [x] Rules for item categories (e.g. "no Orbitals"): done 2026-10-30 via the rule builder.
+      - [ ] Optional: let a tag with no title be chosen in Additional rules (the dropdown still lists only the 24 titled tags).
 - [ ] **Faction rules: sub-factions.** Extend the faction rules (`works_for` / the `factions` column) to
       specify sub-factions (e.g. unit types within Terminids / Automatons / Illuminate).
 - [x] ~~Editable faction recommendations~~ done 2026-10-29 (My Gear > "Edit factions"; see README). Possible follow-ups:

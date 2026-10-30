@@ -28,6 +28,7 @@
     fire: "Fire", stealth: "Stealth", orbital: "Orbital", eagle: "Eagle", sentry: "Sentry",
     gas: "Gas", vehicle: "Vehicle", arc: "Arc",
     explosive: "Explosive", laser: "Laser", plasma: "Plasma", handheld: "Hand-Held Shield", mines: "Mines",
+    onehand: "One-Handed", supply: "Supply",
   };
   // Order here = order of the pills on a card. Tags not listed here still work in the rules,
   // they just don't get a pill. (Pills need a title in TAG_NAMES above too.)
@@ -48,6 +49,7 @@
   // Accent colour per faction (the page's accent follows the selected faction; "any" is Super Credit Blue).
   var FACTION_COLORS = { any: "#70F5FF", bug: "#FF8D1F", bot: "#FF6161", squid: "#CD8AEA" };
   var MAX_COUNT = 20;
+  var MAX_CUSTOM_RULES = 30;
   var MAX_RULE_COUNT = 7;   // largest count a rule can ask for (a loadout has 7 slots)
 
   // ---------------------------------------------------------------------------
@@ -212,6 +214,9 @@
     if (u.id === "require") {
       return "Rule: " + u.how + " " + (TAG_NAMES[u.tag] || u.tag) + " (this build has " + u.actual + ")";
     }
+    if (u.id === "custom") {
+      return "Rule: " + describeRule(u.rule) + (u.rule.spread ? " (this build's counts are " + u.actual + " apart)" : " (this build has " + u.actual + ")");
+    }
     return u.label;
   }
 
@@ -274,12 +279,12 @@
     return box;
   }
 
-  function renderLoadouts(loadouts, faction, locks, requirements, disabledRules) {
+  function renderLoadouts(loadouts, faction, locks, requirements, disabledRules, customRules) {
     var results = $("results");
     results.textContent = "";
     // Results keep the colour of the faction they were generated for, even if you switch faction afterwards.
     results.style.setProperty("--accent", FACTION_COLORS[faction] || FACTION_COLORS.any);
-    lastRun = { faction: faction, requirements: JSON.parse(JSON.stringify(requirements)), disabledRules: (disabledRules || []).slice(), entries: [] };
+    lastRun = { faction: faction, requirements: JSON.parse(JSON.stringify(requirements)), disabledRules: (disabledRules || []).slice(), customRules: JSON.parse(JSON.stringify(customRules || [])), entries: [] };
     loadouts.forEach(function (lo, idx) {
       var entry = { lo: lo, locks: Object.assign({}, locks), node: null };
       lastRun.entries.push(entry);
@@ -307,7 +312,7 @@
     var excluded = excludedNames();
     // Anything held fixed stays even if you blocked it since (it's already on screen).
     Object.keys(callLocks).forEach(function (k) { excluded.delete(callLocks[k].name); });
-    var base = { faction: lastRun.faction, locks: callLocks, requirements: lastRun.requirements, disabledRules: lastRun.disabledRules };
+    var base = { faction: lastRun.faction, locks: callLocks, requirements: lastRun.requirements, disabledRules: lastRun.disabledRules, customRules: lastRun.customRules };
     var lo = null, note = null;
     try {
       var ex = new Set(excluded);
@@ -358,7 +363,8 @@
   // ---------------------------------------------------------------------------
   var state = {
     requirements: {},    // tag -> { min?, max? }  (the "Additional rules")
-    disabledRules: {},   // default rule id -> true when switched off
+    disabledRules: {},   // default rule id -> true when removed from the rules list
+    customRules: [],     // the player's own generic rules: scoped counts, categories, if/then, balance (see Engine.normalizeRule)
   };
 
   // ---- My Gear model: what you own (item level) and what you have blocked ----
@@ -602,15 +608,21 @@
     if (r.min !== undefined && r.max !== undefined) return "between " + r.min + " and " + r.max;
     return r.min !== undefined ? "at least " + r.min : "at most " + r.max;
   }
-  // ---- Preset rows ----
-  // Eight of the default rules are plain counts of one tag (Engine.RULES entries with a `preset`: Anti-Tank >= 1,
-  // Vehicle <= 1, ...). They are shown as editable rows in "Additional rules" instead of switches. A row still at its
-  // default is handed to the engine as the default rule (it keeps its priority tier and wording). Once edited it is one
-  // of the player's own requirements for that tag and the default is switched off for the engine. A removed row is
-  // state.disabledRules[id]; "Reset to system defaults" brings all eight back.
+  // ---- The rules list ----
+  // Every default rule is a row in the Rules list, none is a switch. Three kinds of row:
+  //  - preset rows: the nine default rules that are a plain count of one tag (Engine.RULES entries with a `preset`: Anti-Tank >= 1,
+  //    Vehicle <= 1, ...). A row still at its default is handed to the engine as the default rule (it keeps its priority tier and
+  //    wording). Adding a rule for the same tag edits it: the row becomes one of the player's own requirements for that tag and the
+  //    default is switched off for the engine.
+  //  - generic default rows: the other default rules (Engine.RULES entries with `rules`: support, chaff in primary / secondary,
+  //    shield, supply, balance, ...). They can be removed (not edited in place: remove one and build your own).
+  //  - the player's own rules: plain tag counts (state.requirements) and generic rules (state.customRules).
+  // A removed default is state.disabledRules[id]; "Reset to system defaults" brings them all back.
   var PRESETS = Engine.RULES.filter(function (r) { return r.preset; });
   var PRESET_IDS = {};
   PRESETS.forEach(function (p) { PRESET_IDS[p.id] = true; });
+  var DEFAULT_IDS = {};
+  Engine.RULES.forEach(function (r) { DEFAULT_IDS[r.id] = true; });
   function presetForTag(tag) { return PRESETS.filter(function (p) { return p.preset.tag === tag; })[0] || null; }
   function presetDefault(p) {
     var d = {};
@@ -619,20 +631,56 @@
     return d;
   }
   function sameReq(a, b) { return a.min === b.min && a.max === b.max; }
-  // The rows shown: the eight presets (default or edited) that haven't been removed, then the player's other rules.
+
+  // -- Rules as sentences --
+  var SCOPE_LABELS = {
+    all: "whole loadout", ps: "primary + secondary", weapons: "all three weapons", strats: "stratagems",
+    primary: "primary", secondary: "secondary", throwable: "throwable",
+  };
+  var GROUP_LABELS = { regularSupport: "Regular support weapon", noAmmo: "No-ammo item (charge weapon or expendable support)" };
+  var CATEGORY_ORDER = ["primary", "secondary", "throwable", "support", "backpack", "vehicle", "eagle", "orbital", "sentry", "defensive"];
+  function categoryLabel(c) { return WEAPON_CAT_LABELS[c] || TYPE_LABELS[c] || c; }
+  function selectorLabel(id) {
+    var m = /^(tag|cat|grp):(.+)$/.exec(id);
+    if (!m) return id;
+    if (m[1] === "tag") return TAG_NAMES[m[2]] || m[2];
+    if (m[1] === "cat") return categoryLabel(m[2]);
+    return GROUP_LABELS[m[2]] || m[2];
+  }
+  function condText(c) {
+    return selectorLabel(c.sel) + " " + reqText(c) + (c.scope && c.scope !== "all" ? " (" + SCOPE_LABELS[c.scope] + ")" : "");
+  }
+  function describeRule(r) {
+    if (r.spread) {
+      return "Balance: " + r.spread.tags.map(function (t) { return TAG_NAMES[t] || t; }).join(", ") + " counts within " + r.spread.max + " of each other";
+    }
+    var must = condText(r.must);
+    if (!r.when || !r.when.length) return must;
+    return "If " + r.when.map(condText).join(" and ") + ", then " + must;
+  }
+
+  // The rows shown, in order: default rows (RULES order), the player's plain tag rules, the player's generic rules.
   function ruleRows() {
     var rows = [];
-    PRESETS.forEach(function (p) {
-      var tag = p.preset.tag;
-      if (state.requirements[tag]) rows.push({ tag: tag, req: state.requirements[tag], preset: p, pristine: false });
-      else if (!state.disabledRules[p.id]) rows.push({ tag: tag, req: presetDefault(p), preset: p, pristine: true });
+    // Default rows run from the highest priority tier to the lowest, the support / vehicle / Eagle limits last.
+    var byTier = Engine.RULES.map(function (r, i) { return { r: r, i: i, t: Engine.RULE_TIER[r.id] || 9 }; })
+      .sort(function (x, y) { return x.t - y.t || x.i - y.i; }).map(function (x) { return x.r; });
+    byTier.forEach(function (r) {
+      if (r.preset) {
+        var tag = r.preset.tag;
+        if (state.requirements[tag]) rows.push({ kind: "plain", tag: tag, req: state.requirements[tag], preset: r, pristine: false });
+        else if (!state.disabledRules[r.id]) rows.push({ kind: "plain", tag: tag, req: presetDefault(r), preset: r, pristine: true });
+      } else if (!state.disabledRules[r.id]) {
+        rows.push({ kind: "default", rule: r, text: r.label, detail: describeRule(r.rules[0]), pristine: true });
+      }
     });
     Object.keys(state.requirements).forEach(function (tag) {
-      if (!presetForTag(tag)) rows.push({ tag: tag, req: state.requirements[tag], preset: null, pristine: false });
+      if (!presetForTag(tag)) rows.push({ kind: "plain", tag: tag, req: state.requirements[tag], preset: null, pristine: false });
     });
+    state.customRules.forEach(function (rule, i) { rows.push({ kind: "custom", rule: rule, index: i, text: describeRule(rule), pristine: false }); });
     return rows;
   }
-  // Rules handed to the engine: the player's switches, plus every preset that was removed or replaced by an edited row.
+  // Rules handed to the engine as switched off: the removed defaults, plus every preset replaced by an edited row.
   function disabledList() {
     var ids = Object.keys(state.disabledRules);
     PRESETS.forEach(function (p) {
@@ -640,52 +688,68 @@
     });
     return ids;
   }
-  function presetsChanged() {
-    return PRESETS.some(function (p) { return state.disabledRules[p.id] || state.requirements[p.preset.tag]; });
+  function defaultsChanged() {
+    return Object.keys(state.disabledRules).length > 0 || PRESETS.some(function (p) { return state.requirements[p.preset.tag]; });
   }
-  function switchesOff() {
-    return Object.keys(state.disabledRules).filter(function (id) { return !PRESET_IDS[id]; });
+  // Rules the player added themselves: plain rules for tags that have no default row, and generic rules.
+  function customTags() {
+    return Object.keys(state.requirements).filter(function (tag) { return !presetForTag(tag); });
   }
+  function hasCustom() { return customTags().length > 0 || state.customRules.length > 0; }
   function renderRulesSummary() {
-    var added = 0, edited = 0;
+    var added = state.customRules.length, edited = 0, off = 0;
     Object.keys(state.requirements).forEach(function (tag) { if (presetForTag(tag)) edited++; else added++; });
-    var off = switchesOff().length;
-    PRESETS.forEach(function (p) { if (state.disabledRules[p.id] && !state.requirements[p.preset.tag]) off++; });
+    Object.keys(state.disabledRules).forEach(function (id) {
+      var p = PRESET_IDS[id] ? Engine.RULES.filter(function (r) { return r.id === id; })[0] : null;
+      if (!p || !state.requirements[p.preset.tag]) off++;   // a preset replaced by an edited row is counted as edited, not off
+    });
     var parts = [];
     if (added) parts.push(added + " added");
     if (edited) parts.push(edited + " edited");
     if (off) parts.push(off + " off");
     $("rules-summary").textContent = parts.length ? "(" + parts.join(", ") + ")" : "";
   }
+  function tierNote(id) {
+    var t = Engine.RULE_TIER[id];
+    return t ? TIER_TITLES[t].toLowerCase() : "limit";
+  }
   function renderRequireChips() {
     var box = $("require-chips");
     box.textContent = "";
     ruleRows().forEach(function (row) {
-      var tag = row.tag, r = row.req, name = TAG_NAMES[tag] || tag;
-      var what = row.pristine
-        ? "Default rule (" + (Engine.RULE_TIER[row.preset.id] ? TIER_TITLES[Engine.RULE_TIER[row.preset.id]].toLowerCase() : "limit") + "): " + reqWords(r) + " " + name
-        : reqWords(r);
-      box.appendChild(h("span", { class: "chip" + (row.pristine ? " preset" : ""), "data-tag": tag, title: what }, name + " " + reqText(r),
-        h("button", { type: "button", "aria-label": "Remove rule: " + reqWords(r) + " " + name, onclick: function () {
-          delete state.requirements[tag];
+      var text, title, remove;
+      if (row.kind === "plain") {
+        var name = TAG_NAMES[row.tag] || row.tag;
+        text = name + " " + reqText(row.req);
+        title = row.pristine ? "Default rule (" + tierNote(row.preset.id) + "): " + reqWords(row.req) + " " + name : reqWords(row.req) + " " + name;
+        remove = function () {
+          delete state.requirements[row.tag];
           if (row.preset) state.disabledRules[row.preset.id] = true;   // a removed default stays removed until reset
-          onRulesChanged();
-        } }, "×")));
+        };
+      } else if (row.kind === "default") {
+        text = row.text;
+        title = "Default rule (" + tierNote(row.rule.id) + "): " + row.detail;
+        remove = function () { state.disabledRules[row.rule.id] = true; };
+      } else {
+        text = row.text;
+        title = "Your rule: " + row.text;
+        remove = function () { state.customRules.splice(row.index, 1); };
+      }
+      box.appendChild(h("span", { class: "chip" + (row.pristine ? " preset" : ""), "data-tag": row.tag || null, "data-rule": row.rule && row.rule.id || null, title: title }, text,
+        h("button", { type: "button", "aria-label": "Remove rule: " + text, onclick: function () { remove(); onRulesChanged(); } }, "×")));
     });
-    $("presets-reset").hidden = !presetsChanged();
-    $("custom-clear").hidden = !customTags().length;
+    $("presets-reset").hidden = !defaultsChanged();
+    $("custom-clear").hidden = !hasCustom();
     renderRulesSummary();
-  }
-  // Rules the player added for tags that have no default row (edited default rows are not "custom": Reset handles those).
-  function customTags() {
-    return Object.keys(state.requirements).filter(function (tag) { return !presetForTag(tag); });
   }
   function clearCustom() {
     customTags().forEach(function (tag) { delete state.requirements[tag]; });
+    state.customRules = [];
     onRulesChanged();
   }
   function resetPresets() {
-    PRESETS.forEach(function (p) { delete state.disabledRules[p.id]; delete state.requirements[p.preset.tag]; });
+    state.disabledRules = {};
+    PRESETS.forEach(function (p) { delete state.requirements[p.preset.tag]; });
     onRulesChanged();
   }
   function addRequirement() {
@@ -720,50 +784,115 @@
     onRulesChanged();
   }
 
-  // ---- Default rules (switches) ----
-  // Generated from the engine's own list so the panel can't drift from what the engine enforces. Guarantees are
-  // grouped by priority; the caps come after. The in-game limits (one FRV / tank / exosuit) can't be switched off.
-  var TIER_TITLES = { 1: "High priority", 2: "Medium priority", 3: "Low priority", 4: "Lowest priority" };
-  function buildDefaultRules() {
-    var box = $("rules-default");
-    box.textContent = "";
-    function row(r) {
-      var input = h("input", { type: "checkbox", role: "switch", "data-rule": r.id });
-      input.checked = !state.disabledRules[r.id];
-      var row = h("div", { class: "rule-row" + (input.checked ? "" : " off") },
-        h("label", { class: "switch" }, input, h("span", { class: "switch-track", "aria-hidden": "true" }),
-          h("span", null, r.label, r.note ? h("span", { class: "rule-note" }, r.note) : null)));
-      input.addEventListener("change", function () {
-        if (input.checked) delete state.disabledRules[r.id]; else state.disabledRules[r.id] = true;
-        row.classList.toggle("off", !input.checked);
-        onRulesChanged();
-      });
-      return row;
-    }
-    var guarantees = Engine.RULES.filter(function (r) { return r.kind === "guarantee" && !r.preset; });
-    [1, 2, 3, 4].forEach(function (tier) {
-      var group = guarantees.filter(function (r) { return Engine.RULE_TIER[r.id] === tier; });
-      if (!group.length) return;
-      box.appendChild(h("div", { class: "rule-tier" }, TIER_TITLES[tier]));
-      group.forEach(function (r) { box.appendChild(row(r)); });
-    });
-    box.appendChild(h("div", { class: "rule-tier" }, "Limits"));
-    Engine.RULES.filter(function (r) { return r.kind === "limit" && !r.preset; }).forEach(function (r) { box.appendChild(row(r)); });
-    box.appendChild(h("div", { class: "rule-row locked" },
-      h("span", { class: "lock-mark", "aria-hidden": "true" }, "🔒"),
-      h("span", null, "At most 1 FRV, 1 tank and 1 exosuit ", h("span", { class: "rule-note" }, "Game rule, always on."))));
-    $("rules-reset").hidden = !switchesOff().length;
+
+  // ---- Rule builder: categories, slots, if / then, balance ----
+  // Builds Engine generic rules (see engine.js, "Generic rules") from drop-downs. Every rule goes through
+  // Engine.normalizeRule, the same check the saved settings pass on load.
+  var SCOPE_ORDER = ["all", "ps", "weapons", "strats", "primary", "secondary", "throwable"];
+  function titledTags() {
+    var tags = {};
+    DATA.items.forEach(function (i) { i.tags.forEach(function (t) { tags[t] = true; }); });
+    return Object.keys(tags).filter(function (t) { return TAG_NAMES[t]; }).sort(function (a, b) { return TAG_NAMES[a].localeCompare(TAG_NAMES[b]); });
   }
+  function selectorSelect() {
+    var sel = h("select", { class: "b-sel", "aria-label": "What to count" });
+    var g1 = h("optgroup", { label: "Tags" }), g2 = h("optgroup", { label: "Categories" }), g3 = h("optgroup", { label: "Groups" });
+    titledTags().forEach(function (t) { g1.appendChild(h("option", { value: "tag:" + t }, TAG_NAMES[t])); });
+    CATEGORY_ORDER.forEach(function (c) { g2.appendChild(h("option", { value: "cat:" + c }, categoryLabel(c))); });
+    Engine.SELECTOR_GROUPS.forEach(function (g) { g3.appendChild(h("option", { value: "grp:" + g }, GROUP_LABELS[g] || g)); });
+    sel.appendChild(g1); sel.appendChild(g2); sel.appendChild(g3);
+    return sel;
+  }
+  // One "count of X, in Y, at least / at most / exactly N" row. read() gives the condition, or null if the number is not allowed.
+  function condRow(role, prefix, onRemove) {
+    var sel = selectorSelect();
+    var scope = h("select", { class: "b-scope", "aria-label": "Where to count" });
+    SCOPE_ORDER.forEach(function (k) { scope.appendChild(h("option", { value: k }, k === "all" ? "in the whole loadout" : "in " + SCOPE_LABELS[k])); });
+    var op = h("select", { class: "b-op", "aria-label": "Rule type" },
+      h("option", { value: "min" }, "at least"), h("option", { value: "max" }, "at most"), h("option", { value: "eq" }, "exactly"));
+    var n = h("input", { type: "number", class: "b-n", min: "0", max: String(MAX_RULE_COUNT), value: "1", "aria-label": "Count" });
+    var label = h("span", { class: "b-prefix" }, prefix);
+    var kids = [label, sel, scope, op, n];
+    if (onRemove) kids.push(h("button", { type: "button", class: "chip-x", "aria-label": "Remove this condition", onclick: onRemove }, "×"));
+    var el = h("div", { class: "b-row", "data-role": role }, kids);
+    el.setPrefix = function (t) { label.textContent = t; };
+    el.read = function () {
+      var v = parseInt(n.value, 10);
+      if (!(v >= 0 && v <= MAX_RULE_COUNT) || (op.value === "min" && v < 1)) return null;
+      var c = { sel: sel.value, scope: scope.value };
+      if (op.value === "min" || op.value === "eq") c.min = v;
+      if (op.value === "max" || op.value === "eq") c.max = v;
+      return c;
+    };
+    return el;
+  }
+  function initRuleBuilder() {
+    var box = $("builder-body");
+    box.textContent = "";
+    var whenRows = [];
+    var whenBox = h("div", { id: "b-when" });
+    var mustRow = condRow("must", "Require");
+    function relabel() {
+      whenRows.forEach(function (r, i) { r.setPrefix(i === 0 ? "If" : "and"); });
+      mustRow.setPrefix(whenRows.length ? "then" : "Require");
+      $("b-add-if").hidden = whenRows.length >= 2;
+    }
+    function addIf() {
+      if (whenRows.length >= 2) return;
+      var row = condRow("when", "If", function () { whenRows.splice(whenRows.indexOf(row), 1); row.remove(); relabel(); });
+      whenRows.push(row); whenBox.appendChild(row); relabel();
+    }
+    box.appendChild(h("p", { class: "hint" }, "A count of what the selector picks, in the part of the loadout you choose. Add an ‘if’ and the rule only applies when that condition holds (for example: if Eagle at least 2, then Orbital at most 0). Locks always win: a locked item is never swapped out, and a rule it breaks is reported above the loadout."));
+    box.appendChild(whenBox);
+    box.appendChild(mustRow);
+    box.appendChild(h("div", { class: "btn-row" },
+      h("button", { type: "button", class: "ctrl-btn", id: "b-add-if", onclick: addIf }, "+ Add an ‘if’ condition"),
+      h("button", { type: "button", class: "ctrl-btn", id: "b-add", onclick: function () {
+        var when = whenRows.map(function (r) { return r.read(); }), must = mustRow.read();
+        if (!must || when.some(function (c) { return !c; })) { showMessages(["Check the numbers: ‘at least’ needs 1 to " + MAX_RULE_COUNT + ", the others 0 to " + MAX_RULE_COUNT + "."]); return; }
+        addCustomRule(when.length ? { when: when, must: must } : { must: must });
+        whenRows.slice().forEach(function (r) { r.remove(); }); whenRows.length = 0; relabel();
+      } }, "Add rule")));
+    // balance
+    box.appendChild(h("h4", { class: "rules-subtitle" }, "Balance"));
+    var tagSel = function (optional) {
+      var s = h("select", { class: "bal-tag", "aria-label": "Tag" });
+      if (optional) s.appendChild(h("option", { value: "" }, "(none)"));
+      titledTags().forEach(function (t) { s.appendChild(h("option", { value: t }, TAG_NAMES[t])); });
+      return s;
+    };
+    var t1 = tagSel(false), t2 = tagSel(false), t3 = tagSel(true);
+    t1.value = "chaff"; t2.value = "med"; t3.value = "armor";   // the same three the default balance rule uses
+    var balN = h("input", { type: "number", class: "bal-n", min: "0", max: String(MAX_RULE_COUNT), value: "3", "aria-label": "Largest allowed difference" });
+    box.appendChild(h("div", { class: "b-row" }, t1, t2, t3, h("span", { class: "b-prefix" }, "counts within"), balN, h("span", { class: "b-prefix" }, "of each other"),
+      h("button", { type: "button", class: "ctrl-btn", id: "bal-add", onclick: function () {
+        var tags = [t1.value, t2.value, t3.value].filter(function (t, i, a) { return t && a.indexOf(t) === i; });
+        var v = parseInt(balN.value, 10);
+        if (tags.length < 2 || !(v >= 0 && v <= MAX_RULE_COUNT)) { showMessages(["Pick at least two different tags and a difference from 0 to " + MAX_RULE_COUNT + "."]); return; }
+        addCustomRule({ spread: { tags: tags, max: v } });
+      } }, "Add rule")));
+    relabel();
+  }
+  function addCustomRule(raw) {
+    var rule = Engine.normalizeRule(raw);
+    if (!rule) { showMessages(["That rule can't be built. Check the numbers."]); return; }
+    if (state.customRules.some(function (r) { return JSON.stringify(r) === JSON.stringify(rule); })) { showMessages(["You already have that rule."]); return; }
+    if (state.customRules.length >= MAX_CUSTOM_RULES) { showMessages(["That's the most custom rules there is room for (" + MAX_CUSTOM_RULES + ")."]); return; }
+    showMessages([]);
+    state.customRules.push(rule);
+    onRulesChanged();
+  }
+
+  var TIER_TITLES = { 1: "High priority", 2: "Medium priority", 3: "Low priority", 4: "Lowest priority" };
   // Called after any change to the rules: redraws the rows and the summary and saves the settings.
   function onRulesChanged() {
-    $("rules-reset").hidden = !switchesOff().length;
     renderRequireChips();
     saveSettings();
   }
 
   // ---- Persistence (faction) ----
   function saveSettings() {
-    store.set(SETTINGS_KEY, { faction: selectedFaction(), disabledRules: Object.keys(state.disabledRules), requirements: state.requirements });
+    store.set(SETTINGS_KEY, { faction: selectedFaction(), disabledRules: Object.keys(state.disabledRules), requirements: state.requirements, customRules: state.customRules });
     applyFactionTheme(); updatePoolLine();
   }
   function applyFactionTheme() { document.documentElement.setAttribute("data-faction", selectedFaction()); }
@@ -775,10 +904,12 @@
       if (radio) radio.checked = true;
     }
     if (Array.isArray(s.disabledRules)) {
-      var known = {};
-      Engine.RULES.forEach(function (r) { known[r.id] = true; });
-      s.disabledRules.forEach(function (id) { if (known[id]) state.disabledRules[id] = true; });
+      s.disabledRules.forEach(function (id) {
+        if (DEFAULT_IDS[id]) state.disabledRules[id] = true;
+        if (id === "capSupport") ["capRegular", "capExpend", "capMixed"].forEach(function (x) { state.disabledRules[x] = true; });   // the old single switch
+      });
     }
+    state.customRules = Engine.normalizeRules(s.customRules).slice(0, MAX_CUSTOM_RULES);
     // The player's own rules (and edited default rows). Anything that doesn't look right is skipped, not trusted.
     if (s.requirements && typeof s.requirements === "object") {
       var tagsInData = {};
@@ -806,7 +937,7 @@
     LOCK_SLOTS.forEach(function (s) { $("lock-" + s.key).value = ""; });
     state.requirements = {};
     state.disabledRules = {};
-    buildDefaultRules();
+    state.customRules = [];
     renderRequireChips(); updateLockSummary(); saveSettings();   // My Gear is left alone: it's your data, not an option
     showMessages([]);
     $("results").textContent = "";
@@ -880,7 +1011,7 @@
       try {
         loadouts.push(engine.generateLoadoutRelaxed({
           faction: faction, locks: locks,
-          requirements: state.requirements, excluded: excluded, disabledRules: disabledList(),
+          requirements: state.requirements, excluded: excluded, disabledRules: disabledList(), customRules: state.customRules,
         }));
       } catch (e) {
         if (!(e instanceof Engine.GenerationError)) throw e;
@@ -890,7 +1021,7 @@
     }
     showMessages(problems);
     if (loadouts.length) {
-      renderLoadouts(loadouts, faction, locks, state.requirements, disabledList());
+      renderLoadouts(loadouts, faction, locks, state.requirements, disabledList(), state.customRules);
       $("results").scrollIntoView({ behavior: "smooth", block: "start" });
     } else {
       $("results").textContent = "";
@@ -1141,7 +1272,6 @@
     buildLockGrid();
     buildRequireSelect();
     loadSettings();
-    buildDefaultRules();
     applyFactionTheme();
     // Faction emblems on the faction buttons and in the Edit factions legend.
     FAC_KEYS.concat(["any"]).forEach(function (f) {
@@ -1164,10 +1294,7 @@
       $("require-n").min = $("require-op").value === "min" ? 1 : 0;
       if ($("require-op").value === "min" && parseInt($("require-n").value, 10) < 1) $("require-n").value = 1;
     });
-    $("rules-reset").addEventListener("click", function () {
-      switchesOff().forEach(function (id) { delete state.disabledRules[id]; });   // the default rows are restored by their own button
-      buildDefaultRules(); onRulesChanged();
-    });
+    initRuleBuilder();
     $("presets-reset").addEventListener("click", resetPresets);
     $("custom-clear").addEventListener("click", clearCustom);
     $("reset-all").addEventListener("click", resetAll);

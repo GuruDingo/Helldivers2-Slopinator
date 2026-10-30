@@ -280,7 +280,7 @@ test("In-game limits still win over 'at least': a tank request never gives two t
 });
 
 test("Rules list: every default rule has an id, a label and a kind", () => {
-  assert(HD2Engine.RULES.length === 15 && HD2Engine.RULES.every((r) => r.id && r.label && /^(guarantee|limit)$/.test(r.kind)));
+  assert(HD2Engine.RULES.length === 17 && HD2Engine.RULES.every((r) => r.id && r.label && /^(guarantee|limit)$/.test(r.kind)));
   assert.deepStrictEqual(HD2Engine.RULES.filter((r) => r.kind === "guarantee").map((r) => r.id).sort(), ["armor", "backpack", "balance", "chaff", "demo", "demoEscalation", "med", "panic", "shield", "supply", "support"]);
 });
 test("A rule switched off is never flagged (locks that miss anti-tank, with the armor rule off)", () => {
@@ -360,9 +360,9 @@ const asRequirements = (over) => {
   return { disabledRules: PRESETS.map((p) => p.id), requirements: Object.assign(req, over || {}) };
 };
 
-test("Presets: eight rules carry their system-default tag counts", () => {
+test("Presets: nine rules carry their system-default tag counts", () => {
   const got = PRESETS.map((p) => p.id + ":" + p.preset.tag + ":" + (p.preset.min ?? "") + ":" + (p.preset.max ?? "")).sort();
-  assert.deepStrictEqual(got, ["armor:armor:1:", "backpack:backpack:1:1", "capEagle:eagle::2", "capMine:mines::1", "capVehicle:vehicle::1", "demo:demo:1:", "med:med:1:", "panic:panic:1:"]);
+  assert.deepStrictEqual(got, ["armor:armor:1:", "backpack:backpack:1:1", "capEagle:eagle::2", "capExpend:expendable::2", "capMine:mines::1", "capVehicle:vehicle::1", "demo:demo:1:", "med:med:1:", "panic:panic:1:"]);
   PRESETS.forEach((p) => assert(HD2Engine.RULES.some((r) => r === p)));
 });
 test("Presets: the default counts, handed over as the player's own requirements, give builds that follow them", () => {
@@ -401,6 +401,90 @@ test("Presets: a removed preset is not enforced (no Anti-Tank row -> builds with
 test("Presets: Backpack at most 0 (the Backpack row edited to ban backpacks) builds with none", () => {
   const o = asRequirements({ backpack: { max: 0 } });
   for (let i = 0; i < 100; i++) assert.strictEqual(countTag(engine.generateLoadoutRelaxed(Object.assign({ faction: "any" }, o)), "backpack"), 0);
+});
+
+// ---- Generic rules: scoped counts, categories, if/then, spread; the seven non-plain defaults ----------------------
+const strict = (n, opts) => Array.from({ length: n }, () => engine.generateLoadoutRelaxed(Object.assign({ faction: "any" }, opts)));
+const catCount = (l, cat) => [l.primary, l.secondary, l.throwable].concat(l.strategems).filter((i) => i.cat === cat).length;
+const regularSupports = (l) => l.strategems.filter((i) => i.cat === "support" && !HD2Engine.has(i, "expendable")).length;
+const expendables = (l) => l.strategems.filter((i) => HD2Engine.has(i, "expendable")).length;
+
+test("Generic rules: malformed rules are dropped, good ones are copied", () => {
+  const good = { when: [{ sel: "cat:eagle", scope: "strats", min: 2 }], must: { sel: "cat:orbital", max: 0 } };
+  const bad = [null, 5, {}, { must: { sel: "nope", min: 1 } }, { must: { sel: "tag:armor", scope: "moon", min: 1 } }, { must: { sel: "tag:armor", min: 3, max: 1 } },
+    { must: { sel: "tag:armor" } }, { must: { sel: "tag:armor", min: 9 } }, { when: "x", must: { sel: "tag:armor", min: 1 } }, { spread: { tags: ["a"], max: 1 } }, { spread: { tags: ["a", "b"], max: -1 } }];
+  assert.strictEqual(HD2Engine.normalizeRules(bad.concat([good])).length, 1);
+  const copy = HD2Engine.normalizeRule(good);
+  assert.notStrictEqual(copy, good);
+  assert.deepStrictEqual(copy, { when: [{ sel: "cat:eagle", scope: "strats", min: 2 }], must: { sel: "cat:orbital", scope: "all", max: 0 } });
+});
+test("Generic rules: a category rule (no Orbitals) is kept by every build", () => {
+  const rule = { must: { sel: "cat:orbital", max: 0 } };
+  const bs = strict(400, { customRules: [rule] });
+  bs.forEach((l) => { assert.strictEqual(catCount(l, "orbital"), 0); assert.deepStrictEqual(l.unmet, []); });
+});
+test("Generic rules: a slot scope counts only that slot (a chaff killer as PRIMARY: every build has one)", () => {
+  const bs = strict(300, { customRules: [{ must: { sel: "tag:chaff", scope: "primary", min: 1 } }] });
+  bs.forEach((l) => { assert(HD2Engine.has(l.primary, "chaff")); assert.deepStrictEqual(l.unmet, []); });
+  assert(strict(300, {}).some((l) => !HD2Engine.has(l.primary, "chaff")), "without the rule a chaff-less primary should appear");
+});
+test("Generic rules: if / then holds only when the condition does (2+ Eagles -> no Orbitals; fewer Eagles may have Orbitals)", () => {
+  const rule = { when: [{ sel: "cat:eagle", scope: "strats", min: 2 }], must: { sel: "cat:orbital", max: 0 } };
+  const bs = strict(1200, { customRules: [rule] });
+  bs.forEach((l) => { assert.deepStrictEqual(l.unmet, []); if (catCount(l, "eagle") >= 2) assert.strictEqual(catCount(l, "orbital"), 0); });
+  assert(bs.some((l) => catCount(l, "eagle") >= 2), "needs builds with two Eagles");
+  assert(bs.some((l) => catCount(l, "eagle") < 2 && catCount(l, "orbital") > 0), "builds without two Eagles may still have an Orbital");
+});
+test("Generic rules: an if/then with two 'if' conditions needs both", () => {
+  const rule = { when: [{ sel: "cat:eagle", min: 1 }, { sel: "cat:orbital", min: 1 }], must: { sel: "cat:sentry", max: 0 } };
+  strict(800, { customRules: [rule] }).forEach((l) => { if (catCount(l, "eagle") && catCount(l, "orbital")) assert.strictEqual(catCount(l, "sentry"), 0); });
+});
+test("Generic rules: a balance (spread) rule keeps the counts close", () => {
+  const rule = { spread: { tags: ["med", "armor"], max: 1 } };
+  const bs = strict(400, { customRules: [rule] });
+  const strictBs = bs.filter((l) => !l.unmet.length);
+  assert(strictBs.length > 50, "too few builds met a spread of 1: " + strictBs.length);
+  strictBs.forEach((l) => assert(Math.abs(countTag(l, "med") - countTag(l, "armor")) <= 1));
+});
+test("Generic rules: a rule that cannot hold is reported with its count, and the build still completes", () => {
+  const rule = { must: { sel: "tag:armor", min: 7 } };
+  const l = engine.generateLoadoutRelaxed({ faction: "any", customRules: [rule] });
+  const u = l.unmet.find((x) => x.id === "custom");
+  assert(u && u.tier === 0 && u.rule.must.min === 7 && u.actual === countTag(l, "armor") && l.strategems.length === 4);
+});
+test("Locks win: a locked item is never swapped to satisfy a rule; the rule it breaks is reported", () => {
+  const locks = { strat1: pick("Eagle Airstrike"), strat2: pick("Eagle Strafing Run") };
+  const rule = { must: { sel: "cat:eagle", max: 1 } };
+  strict(200, { locks, customRules: [rule] }).forEach((l) => {
+    assert(l.strategems[0] === locks.strat1 && l.strategems[1] === locks.strat2);
+    assert(l.unmet.some((u) => u.id === "custom"), "the broken rule should be reported");
+    assert.strictEqual(catCount(l, "eagle"), 2, "no third Eagle should be added around the locks");
+  });
+});
+test("Locks win (default limits): two locked regular supports are kept, no limit is flagged and no third is added", () => {
+  const locks = { strat1: pick("RS-422 Railgun"), strat2: pick("AC-8 Autocannon") };
+  strict(200, { locks }).forEach((l) => {
+    assert(l.strategems[0] === locks.strat1 && l.strategems[1] === locks.strat2);
+    assert(!ids(l).some((x) => /^cap/.test(x)), "limits are never flagged: " + ids(l));
+    assert.strictEqual(regularSupports(l), 2);
+  });
+});
+test("Support limits: a regular support is never mixed with an expendable one, and never two regulars; switch off -> both appear", () => {
+  strict(600, {}).forEach((l) => { assert(regularSupports(l) <= 1); assert(!(regularSupports(l) && expendables(l)), "mixed"); assert(expendables(l) <= 2); });
+  assert(strict(1500, { disabledRules: ["capMixed"] }).some((l) => regularSupports(l) && expendables(l)), "never saw a mixed build with the rule off");
+  assert(strict(1500, { disabledRules: ["capRegular"] }).some((l) => regularSupports(l) >= 2), "never saw two regulars with the rule off");
+  assert(strict(2500, { disabledRules: ["capExpend"] }).some((l) => expendables(l) >= 3), "never saw three expendables with the rule off");
+});
+test("Support limits: the old single 'capSupport' switch still turns all three off", () => {
+  const bs = strict(1500, { disabledRules: ["capSupport"] });
+  assert(bs.some((l) => regularSupports(l) && expendables(l)) && bs.some((l) => regularSupports(l) >= 2));
+});
+test("Default rules written as generic rules still flag what a build misses (shield needs a one-hander; support needs one)", () => {
+  const two = ["AR-23 Liberator", "P-19 Redeemer"].map(pick);
+  const l = engine.generateLoadoutRelaxed({ faction: "any", locks: { primary: two[0], secondary: two[1], strat1: pick("SH-20 Ballistic Shield Backpack") } });
+  assert(ids(l).includes("shield"));
+  const noSupport = engine.generateLoadoutRelaxed({ faction: "any", disabledRules: ["support"] });
+  assert(!ids(noSupport).includes("support"));
 });
 
 console.log("\n" + passed + " engine rule tests passed" + (process.exitCode ? " (with failures)" : ""));

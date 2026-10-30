@@ -12,6 +12,7 @@ const steps = [
   ["Build data + bundle", "python3", ["tools/build_gear.py", "--bundle"]],
   ["Image tool tests", "python3", ["tests/fetch_images_test.py"]],
   ["Rule tests", "node", ["tests/engine_rules.js"]],
+  ["Engine parity (generic rules vs hand-written)", "node", ["tests/engine_parity.js"]],
   ["Regression (invariants + odds)", "node", ["tests/regression.js"]],
 ];
 if (hasJsdom) steps.push(["UI smoke test", "node", ["tests/ui_smoke.js"]]);
