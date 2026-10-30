@@ -12,6 +12,11 @@ Items we agreed to come back to. Nothing below is started unless marked.
       main value).
 - [ ] **Colour the rest of the UI**: weapon tags (the pills only cover ~9 of the ~40 tags) and the faction buttons
       themselves (the selected one already takes the faction colour).
+- [ ] **Find out why the My Gear thumbnails don't show on the live site** (Boss, 2026-10-30; do AFTER the image
+      migration). PR #4 was pushed but Boss saw no images. Likely causes to check: PR #4's base is the
+      `stratagem-armor-pen` branch (not `main`), so merging it doesn't touch the live site until #3 is merged and #4 is
+      retargeted; the browser cache (hard refresh); or the wiki blocking hotlinks (the loadout cards use the same links,
+      so compare). Bundle/test builds show the thumbnails in my screenshots.
 - [ ] **Migrate images from wiki hotlinks to saved files** (Boss, 2026-10-30). Plan: (1) `tools/fetch_images.py` reads the
       CSVs plus `WARBOND_ICONS` / `FAC_ICON_URL` and saves everything into `docs/img/{items,warbonds,titles,factions}/`
       (skips existing files, polite rate limit; must run on Boss's machine because the sandbox can't reach wiki.gg
@@ -25,8 +30,8 @@ Items we agreed to come back to. Nothing below is started unless marked.
 - [ ] **Proof the new stratagem AP values BEFORE merging PR #3** (Boss, 2026-10-30). Wiki pages were summarised, not
       read in full, so check these against the wiki: K-9 (7), Orbital EMS Strike (7), EMS Mortar Sentry (6), Eagle
       Strafing Run (5) vs the other Eagles (7), Maelstrom (4, missiles 5), Rover (2, fire is 4), Incendiary Mines (4,
-      explosion 3), Gas Mortar Sentry (6) and Mortar Sentry (3, headline is AV only), the four two-value ones (Patriot
-      3/6, Lumberer 4/6, Bastion 4/8, Dog Breath 5/6), and whether the two smoke strikes should really be blank.
+      explosion 3), Gas Mortar Sentry (6) and Mortar Sentry (3, headline is AV only), the three two-value ones (Patriot
+      3/6, Lumberer 4/6, Bastion 4/8; Dog Breath is set to 5 by Boss), and whether the two smoke strikes should really be blank.
 - [~] **Artwork in My Gear** (Boss, 2026-10-30). DONE: a lazy-loaded thumbnail (44x32) at the left of every item row, from the
       item's `img_url` (blank square if it can't load; the loadout cards are unchanged, no compact mode on the Randomizer
       tab, per Boss). STILL TO DO: warbond cover art in the warbond headers (28 of 36 warbonds have an `img_url`; the
@@ -82,7 +87,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - lock/block-style undo for the last faction edit.
 
 ## Done 2026-10-30
-- **Armor penetration on stratagems** (icons moved to the right of the item name): 50 attacking stratagems now have `armor_pen` (page's lead AP icon; two values for Patriot, Lumberer, Bastion, Dog Breath). Worth a second look on the wiki: K-9 (7), EMS Strike (7) and EMS Mortar Sentry (6) look high for what they do, Eagle Strafing Run (5) vs the other Eagles (7), and Maelstrom (4, missiles are 5).
+- **Armor penetration on stratagems** (icons moved to the right of the item name): 50 attacking stratagems now have `armor_pen` (page's lead AP icon; two values for Patriot, Lumberer, Bastion; Dog Breath counted as just 5 per Boss). Worth a second look on the wiki: K-9 (7), EMS Strike (7) and EMS Mortar Sentry (6) look high for what they do, Eagle Strafing Run (5) vs the other Eagles (7), and Maelstrom (4, missiles are 5).
 - **Armor penetration data**: new `armor_pen` column in `hd2gear.csv` (141 weapons), build validation, `armorPen` in the exported data, and the wiki icon links in the README. The cards now show it (both icons for two-mode weapons).
 - **Enable for all factions** button in Edit factions mode, next to Reset to defaults: ticks all three factions for the items shown (second click to confirm; respects the search filter). Reset to defaults undoes it.
 
