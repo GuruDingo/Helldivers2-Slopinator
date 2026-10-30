@@ -30,8 +30,10 @@
   };
   // Order here = order of the pills on a card. Tags not listed here still work in the rules,
   // they just don't get a pill.
+  // The three "crayon" pills follow the enemy-level colours: Chaff green, Medium blue, Anti-Armor red. They are deliberately
+  // a little different from the green / blue / red of the stratagem icons (#699655 / #55b9d2 / #dc6455) so the two don't blur.
   var TAG_COLORS = {
-    melee: "#382E02", expendable: "#0F0D02", chaff: "#27ae32", med: "#ec7843", armor: "#c0392b",
+    melee: "#382E02", expendable: "#0F0D02", chaff: "#27ae32", med: "#2f80ed", armor: "#c62828",
     demo: "#4b058d", panic: "#2943b9", assist: "#534e05", backpack: "#555555",
   };
   var TYPE_COLORS = {
