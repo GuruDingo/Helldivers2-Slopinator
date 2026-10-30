@@ -203,6 +203,7 @@ hr.divider { border: none; border-top: 1px solid var(--accent); margin: 1.5rem 0
 .link-btn { background: none; border: none; color: var(--accent); text-decoration: underline; cursor: pointer; font-size: inherit; padding: 0 0 0 .4rem; }
 .link-btn:hover { color: #fff; }
 
+.version-note { margin: -.2rem 0 .8rem; font-size: .75rem; color: #777; }
 .disclaimer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid #2a2a2a; font-size: .72rem; color: #666; line-height: 1.5; }
 
 /* ---------- edit factions (My Gear) ---------- */

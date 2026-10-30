@@ -64,6 +64,12 @@ def load_items(warbond_keys):
             cat = (row.get("category") or "").strip()
             factions = split_list(row.get("factions"))
             warbond = (row.get("warbond") or "").strip() or "base"
+            released = (row.get("release_date") or "").strip()
+            if not released:
+                warnings.append(f"{where}: no release_date")
+            elif not re.fullmatch(r"\d{4}-\d{2}-\d{2}", released):
+                errors.append(f"{where}: release_date '{released}' must look like 2024-02-08")
+                released = ""
 
             if not name:
                 errors.append(f"{where}: missing name")
@@ -109,9 +115,17 @@ def load_items(warbond_keys):
                 "tags": split_list(row.get("tags")),
                 "factions": factions,
                 "warbond": warbond,
+                "released": released,
                 "imgUrl": (row.get("img_url") or "").strip(),
                 "armorPen": armor_pen,
             })
+
+    # the CSV is kept in release order: ids count up from 1 and release_date never goes backwards
+    for pos, it in enumerate(items, start=1):
+        if it["id"] != str(pos):
+            warnings.append(f"{it['name']}: id {it['id'] or '(none)'} is not its row number {pos} (rows are numbered in release order)")
+        if pos > 1 and it["released"] and items[pos - 2]["released"] and it["released"] < items[pos - 2]["released"]:
+            warnings.append(f"{it['name']}: release_date {it['released']} is earlier than the row above ({items[pos - 2]['released']}); rows should be oldest first")
 
     # duplicate names / nicknames (the lock + exclude boxes resolve by either one)
     seen_names = {}
