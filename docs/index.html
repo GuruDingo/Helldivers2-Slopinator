@@ -56,24 +56,9 @@
         <div class="section-body">
           <p class="hint">Every loadout is checked against these rules. The dim rows are the system defaults: remove one with the ×, or change a "how many" row by adding a rule for the same tag in "Add your own rule" above (it replaces that number). Your own rules are the solid rows. When a build can't meet everything, higher-priority rules are protected first, and locks always win.</p>
           <details class="builder" id="rule-builder">
-            <summary>Add your own rule</summary>
+            <summary>Add your own rule (how many, categories, slots, if / then, balance)</summary>
             <div class="builder-part">
-              <h4 class="builder-title">How many of a tag</h4>
-              <div class="add-row">
-                <select id="require-tag" aria-label="Tag"></select>
-                <select id="require-op" aria-label="Rule type">
-                  <option value="min">at least</option>
-                  <option value="max">at most</option>
-                  <option value="eq">exactly</option>
-                </select>
-                <input type="number" id="require-n" min="1" max="7" value="2" aria-label="Count">
-                <button type="button" class="ctrl-btn" id="require-add">Add</button>
-              </div>
-              <p class="hint"><em>At least</em> and <em>at most</em> on the same tag make a range. <em>At most 0</em> / <em>exactly 0</em> bans the tag.</p>
-            </div>
-            <div class="builder-part">
-              <h4 class="builder-title">Custom rule: categories, slots, if / then, balance</h4>
-              <div id="builder-body"></div>
+                            <div id="builder-body"></div>
             </div>
           </details>
           <div class="chips" id="require-chips"></div>

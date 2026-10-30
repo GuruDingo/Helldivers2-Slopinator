@@ -586,18 +586,6 @@
   }
 
   // ---- Requirements ----
-  function buildRequireSelect() {
-    var tags = {};
-    DATA.items.forEach(function (i) { i.tags.forEach(function (t) { tags[t] = true; }); });
-    var sel = $("require-tag");
-    sel.textContent = "";
-    // Only tags that have a display title are offered, alphabetically by title.
-    Object.keys(tags).filter(function (t) { return TAG_NAMES[t]; }).sort(function (a, b) {
-      return TAG_NAMES[a].localeCompare(TAG_NAMES[b]);
-    }).forEach(function (t) {
-      sel.appendChild(h("option", { value: t }, TAG_NAMES[t]));
-    });
-  }
   function reqText(r) {
     if (r.min !== undefined && r.min === r.max) return "= " + r.min;
     if (r.min !== undefined && r.max !== undefined) return r.min + "–" + r.max;
@@ -752,10 +740,8 @@
     PRESETS.forEach(function (p) { delete state.requirements[p.preset.tag]; });
     onRulesChanged();
   }
-  function addRequirement() {
-    var tag = $("require-tag").value;
-    var op = $("require-op").value;
-    var n = parseInt($("require-n").value, 10);
+  // A plain "how many of this tag, in the whole loadout" rule. It builds on the row already shown for that tag (see below).
+  function addRequirement(tag, op, n) {
     if (!tag) return;
     if (!(n >= 0 && n <= 7) || (op === "min" && n < 1)) {
       showMessages([op === "min" ? "‘At least’ needs a whole number from 1 to 7." : "The count must be a whole number from 0 to 7."]);
@@ -842,7 +828,7 @@
       var row = condRow("when", "If", function () { whenRows.splice(whenRows.indexOf(row), 1); row.remove(); relabel(); });
       whenRows.push(row); whenBox.appendChild(row); relabel();
     }
-    box.appendChild(h("p", { class: "hint" }, "A count of what the selector picks, in the part of the loadout you choose. Add an ‘if’ and the rule only applies when that condition holds (for example: if Eagle at least 2, then Orbital at most 0). Locks always win: a locked item is never swapped out, and a rule it breaks is reported above the loadout."));
+    box.appendChild(h("p", { class: "hint" }, "A count of what the selector picks, in the part of the loadout you choose. Add an ‘if’ and the rule only applies when that condition holds (for example: if Eagle at least 2, then Orbital at most 0). A plain count of one tag in the whole loadout (say Anti-Tank at most 2) changes that tag’s row: it merges into a range like 1–2, replaces a default number, and “at most 0” bans the tag. Locks always win: a locked item is never swapped out, and a rule it breaks is reported above the loadout."));
     box.appendChild(whenBox);
     box.appendChild(mustRow);
     box.appendChild(h("div", { class: "btn-row" },
@@ -850,6 +836,11 @@
       h("button", { type: "button", class: "ctrl-btn", id: "b-add", onclick: function () {
         var when = whenRows.map(function (r) { return r.read(); }), must = mustRow.read();
         if (!must || when.some(function (c) { return !c; })) { showMessages(["Check the numbers: ‘at least’ needs 1 to " + MAX_RULE_COUNT + ", the others 0 to " + MAX_RULE_COUNT + "."]); return; }
+        if (!when.length && must.scope === "all" && must.sel.indexOf("tag:") === 0) {
+          // A plain tag count over the whole loadout is the same as editing that tag's row: it merges ranges, replaces a default number and lifts a default cap.
+          addRequirement(must.sel.slice(4), must.min !== undefined && must.max !== undefined ? "eq" : must.min !== undefined ? "min" : "max", must.min !== undefined ? must.min : must.max);
+          return;
+        }
         addCustomRule(when.length ? { when: when, must: must } : { must: must });
         whenRows.slice().forEach(function (r) { r.remove(); }); whenRows.length = 0; relabel();
       } }, "Add rule")));
@@ -1270,7 +1261,6 @@
     fillDatalist("dl-strat", engine.pools.strategems);
 
     buildLockGrid();
-    buildRequireSelect();
     loadSettings();
     applyFactionTheme();
     // Faction emblems on the faction buttons and in the Edit factions legend.
@@ -1288,12 +1278,6 @@
     buildGear();
 
     $("controls").addEventListener("submit", onGenerate);
-    $("require-add").addEventListener("click", addRequirement);
-    $("require-op").addEventListener("change", function () {
-      // "At least" needs 1+; the other two accept 0 (a ban).
-      $("require-n").min = $("require-op").value === "min" ? 1 : 0;
-      if ($("require-op").value === "min" && parseInt($("require-n").value, 10) < 1) $("require-n").value = 1;
-    });
     initRuleBuilder();
     $("presets-reset").addEventListener("click", resetPresets);
     $("custom-clear").addEventListener("click", clearCustom);
