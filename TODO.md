@@ -12,21 +12,16 @@ Items we agreed to come back to. Nothing below is started unless marked.
       main value).
 - [ ] **Colour the rest of the UI**: weapon tags (the pills only cover ~9 of the ~40 tags) and the faction buttons
       themselves (the selected one already takes the faction colour).
-- [ ] **Find out why the My Gear thumbnails don't show on the live site** (Boss, 2026-10-30; do AFTER the image
-      migration). PR #4 was merged into the `stratagem-armor-pen` branch, NOT `main` (its base), so it never
+- [ ] **Find out why the My Gear thumbnails don't show on the live site** (Boss, 2026-10-30; the image migration is done, so check now). PR #4 was merged into the `stratagem-armor-pen` branch, NOT `main` (its base), so it never
       reached the live site: fixed by PR #5, which carries it to `main`. After that, if images are still missing, check the
       browser cache (hard refresh) and whether the wiki blocks the hotlinks (the loadout cards use the same links, so
       compare). Bundle/test builds show the thumbnails in my screenshots.
-- [~] **Migrate images from wiki hotlinks to saved files** (Boss, 2026-10-30). BUILT (PR "Image migration tool"): `tools/fetch_images.py`
-      collects every wiki image the site uses (items, warbond covers, faction/warbond/requisition icons, the 13 AP icons;
-      ~276 files) into `docs/img/{items,warbonds,icons}/` (rasters shrunk to WebP, SVGs kept), writes
-      `docs/img/manifest.json`; `build_gear.py` copies it into `HD2_DATA.images` and the page uses the saved copy of any
-      picture that has one (wiki link otherwise); the single-file bundle embeds the pictures. Also a "Fetch images" GitHub
-      Action (Run workflow -> branch `images-fetched` + a download), because my sandbox can't reach wiki.gg images.
-      NOT DONE YET: actually running it (Boss clicks Run workflow, or runs the script locally), then merging the images
-      branch; if GitHub's servers are blocked by the wiki, use `--from-dir` with a zip Boss downloads some other way.
-      Afterwards: warbond header art (covers are fetched but not shown), a README credit (done), decide whether to
-      keep the wiki URLs as fallback forever (they are).
+- [x] ~~Migrate images from wiki hotlinks to saved files~~ done 2026-10-30: `tools/fetch_images.py` + the "Fetch images" GitHub Action
+      saved all 276 images (2.2 MB: 201 item pictures, 28 warbond covers, 47 icons) into `docs/img/`, `build_gear.py`
+      exports them as `HD2_DATA.images`, the page prefers the saved copy (wiki link only as a fallback), and the
+      single-file build embeds them (2.3 MB, works offline). Re-run the fetch (Actions -> Fetch images, or the script)
+      when a new item / warbond / wiki image is added. Follow-ups: warbond header art (covers are saved but not shown);
+      check the live site shows the My Gear thumbnails (item below).
 - [ ] **Host the tool at a URL** (Boss, 2026-10-30): see the hosting notes in the reply of 2026-10-30; first step is
       turning on GitHub Pages for `/docs`. Open choices: custom domain, analytics/feedback, shareable-loadout links.
 - [ ] **Proof the new stratagem AP values** (Boss, 2026-10-30; PR #3 is already merged and live, so this is now a correction pass). Wiki pages were summarised, not
