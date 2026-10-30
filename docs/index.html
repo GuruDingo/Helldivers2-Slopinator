@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Helldivers 2 Slopinator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+
+  <header class="site-header">
+    <h1>Helldivers 2 Slopinator</h1>
+    <p class="tagline">A Loadout Randomizer Fan-Project</p>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button type="button" class="tab active" role="tab" data-view="randomizer" aria-selected="true">Randomizer</button>
+      <button type="button" class="tab" role="tab" data-view="gear" aria-selected="false">My Gear</button>
+    </nav>
+  </header>
+
+  <!-- ===================== RANDOMIZER ===================== -->
+  <section id="view-randomizer">
+    <form id="controls" class="panel" autocomplete="off">
+
+      <div class="control-row">
+        <fieldset class="field">
+          <legend>Faction</legend>
+          <div class="segmented" id="faction-group">
+            <label><input type="radio" name="faction" value="any" checked><span>Any</span></label>
+            <label><input type="radio" name="faction" value="bug"><span>Terminids</span></label>
+            <label><input type="radio" name="faction" value="bot"><span>Automatons</span></label>
+            <label><input type="radio" name="faction" value="squid"><span>Illuminate</span></label>
+          </div>
+        </fieldset>
+        <div class="field">
+          <label for="count">Loadouts</label>
+          <input type="number" id="count" min="1" max="20" value="1">
+        </div>
+      </div>
+
+      <div class="pool-line">
+        <span id="pool-text"></span>
+        <button type="button" class="link-btn" id="pool-edit">Edit in My Gear</button>
+      </div>
+
+      <details class="section">
+        <summary>Lock slots <span class="summary-note" id="lock-summary"></span></summary>
+        <div class="section-body">
+          <p class="hint">Pin specific gear and randomize the rest. Type a name or nickname (e.g. <em>liberator</em>, <em>eat-17</em>). Locks override the slot rules (backpack count, support caps, etc.). If your locks make some guarantees impossible, the loadout is still built and the missed guarantees are listed above it.</p>
+          <div class="lock-grid" id="lock-grid"></div>
+        </div>
+      </details>
+
+      <details class="section" id="rules-section">
+        <summary>Rules <span class="summary-note" id="rules-summary"></span></summary>
+        <div class="section-body">
+          <h3 class="rules-title">Default rules</h3>
+          <p class="hint">What every loadout is checked against. Switch one off and the randomizer stops enforcing it. When a build can't meet everything, higher-priority rules are protected first.</p>
+          <div id="rules-default"></div>
+          <div class="btn-row"><button type="button" class="ctrl-btn" id="rules-reset" hidden>Turn all default rules back on</button></div>
+
+          <h3 class="rules-title">Additional rules</h3>
+          <p class="hint">Your own rule for how many items with a tag the whole loadout must have. Adding a rule for a tag replaces the default check for it. <em>At least</em> and <em>at most</em> on the same tag make a range. <em>At most 0</em> / <em>exactly 0</em> bans the tag.</p>
+          <div class="add-row">
+            <select id="require-tag" aria-label="Tag"></select>
+            <select id="require-op" aria-label="Rule type">
+              <option value="min">at least</option>
+              <option value="max">at most</option>
+              <option value="eq">exactly</option>
+            </select>
+            <input type="number" id="require-n" min="1" max="7" value="2" aria-label="Count">
+            <button type="button" class="ctrl-btn" id="require-add">Add</button>
+          </div>
+          <div class="chips" id="require-chips"></div>
+        </div>
+      </details>
+
+      <div class="generate-row">
+        <button type="submit" class="primary-btn" id="generate">Generate loadout</button>
+        <button type="button" class="ctrl-btn" id="reset-all">Reset options</button>
+      </div>
+    </form>
+
+    <div id="messages" aria-live="polite"></div>
+    <div id="results"></div>
+  </section>
+
+  <!-- ===================== MY GEAR ===================== -->
+  <section id="view-gear" hidden>
+    <div class="gear-head">
+      <p class="hint gear-intro">
+        Tick what you own; the randomizer only rolls owned gear. <strong>Block</strong> takes an item out of the
+        pool without un-owning it. Base Game gear is always owned (you can still block it).
+        Saved in this browser only.
+      </p>
+      <label class="switch" title="Change which factions each item is recommended against">
+        <input type="checkbox" id="edit-factions" role="switch">
+        <span class="switch-track" aria-hidden="true"></span>
+        <span>Edit factions</span>
+      </label>
+    </div>
+    <div class="fac-tools" id="fac-tools" hidden>
+      <p class="hint">
+        Tick which factions each item is recommended against:
+        <span class="fac-legend fac-bug" data-fac-legend="bug"> Terminid</span>,
+        <span class="fac-legend fac-bot" data-fac-legend="bot"> Automaton</span>,
+        <span class="fac-legend fac-squid" data-fac-legend="squid"> Illuminate</span>.
+        All three ticked works against anything; with none ticked an item only rolls when the faction is Any.
+        An item you've changed gets a coloured edge and a &#8634; button to put it back.
+      </p>
+      <div class="btn-row">
+        <span class="fac-count" id="fac-count"></span>
+        <button type="button" class="ctrl-btn danger" id="fac-reset">Reset to defaults</button>
+      </div>
+    </div>
+    <div class="total-bar"><span id="grand-total">0 / 0 items owned</span> <span class="total-detail" id="gear-detail"></span></div>
+    <div class="gear-tools">
+      <input type="search" id="gear-search" placeholder="Find an item or warbond…" aria-label="Find an item" autocomplete="off" title="Search by item name, nickname or warbond name">
+      <p class="hint" id="gear-filter-note" hidden></p>
+      <div class="btn-row">
+        <button type="button" class="ctrl-btn" id="gear-expand">Expand all</button>
+        <button type="button" class="ctrl-btn" id="gear-collapse">Collapse all</button>
+        <button type="button" class="ctrl-btn" id="gear-select-all">Own everything</button>
+        <button type="button" class="ctrl-btn" id="gear-unblock-all">Unblock all</button>
+        <button type="button" class="ctrl-btn danger" id="gear-clear">Own nothing</button>
+      </div>
+    </div>
+    <div id="gear-list"></div>
+  </section>
+
+  <footer class="disclaimer">
+    Unofficial fan project. Helldivers&trade; 2 and all related names, art and trademarks belong to Arrowhead Game Studios
+    and Sony Interactive Entertainment. Item images are linked from the Helldivers wiki. Not affiliated with or endorsed by either.
+    This tool is intended to always be free and never to be monetized.
+    This tool was made using AI vibe code, and as such is prone to error. It does not deserve your love, trust, or appreciation.
+  </footer>
+</div>
+
+<datalist id="dl-primary"></datalist>
+<datalist id="dl-secondary"></datalist>
+<datalist id="dl-throwable"></datalist>
+<datalist id="dl-strat"></datalist>
+
+<script src="gear-data.js"></script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
