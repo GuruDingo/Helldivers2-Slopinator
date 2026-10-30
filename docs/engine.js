@@ -410,8 +410,9 @@
         fail("demoEscalation", "Two base breakers when no weapon is one");
       }
 
-      // Shield backpack needs a one-handed primary or secondary.
-      if (chosen.some(function (s) { return has(s, "shield"); })) {
+      // A hand-held shield backpack (tag "handheld": the ballistic and directional shields, not the bubble generators)
+      // needs a one-handed primary or secondary.
+      if (chosen.some(function (s) { return has(s, "handheld"); })) {
         if (!(has(primary, "onehand") || has(secondary, "onehand"))) {
           fail("shield", "Shield backpack needs a one-handed weapon");
         }
