@@ -9,7 +9,7 @@
  *     panic weapon (primary/secondary/throwable only), base breaker (2 if no weapon has it)
  *   - chaff / med / armor counts may differ by at most 3
  *   - support: max 1 non-expendable, max 2 expendable, never mixed, at least 1 total
- *   - exactly 1 backpack-slot item; shield backpacks need a one-handed weapon
+ *   - exactly 1 backpack-slot item; hand-held shields need a one-handed primary or a melee weapon
  *   - max 1 vehicle, max 2 eagle, max 1 mine stratagem - but a "Require N+ <tag>" request for that same tag
  *     (eagle, mines, vehicle/frv/tank/mech, backpack, expendable) overrides the cap, so "Eagle >= 3" can be met
  *   - IN-GAME LIMITS that nothing overrides: at most one FRV, one tank and one exosuit (mech)
@@ -73,8 +73,10 @@
       rules: [{ spread: { tags: ["chaff", "med", "armor"], max: 3 } }] },
     { id: "demoEscalation", kind: "guarantee", label: "Two base breakers when no weapon is one",
       rules: [{ when: [{ sel: "tag:demo", scope: "weapons", max: 0 }, { sel: "tag:demo", scope: "all", min: 1 }], must: { sel: "tag:demo", scope: "all", min: 2 } }] },
-    { id: "shield", kind: "guarantee", label: "A shield backpack needs a one-handed weapon",
-      rules: [{ when: [{ sel: "tag:handheld", scope: "strats", min: 1 }], must: { sel: "tag:onehand", scope: "ps", min: 1 } }] },
+    // Pistols are one-handed too, but they do not count here: the shield needs a one-handed PRIMARY or a (one-handed) melee weapon.
+    // Written as "if there is no one-handed primary, then a melee weapon in primary / secondary".
+    { id: "shield", kind: "guarantee", label: "A hand-held shield needs a one-handed primary or a melee weapon",
+      rules: [{ when: [{ sel: "tag:handheld", scope: "strats", min: 1 }, { sel: "tag:onehand", scope: "primary", max: 0 }], must: { sel: "tag:melee", scope: "ps", min: 1 } }] },
     { id: "supply", kind: "guarantee", label: "No supply pack alongside 2+ no-ammo items",
       rules: [{ when: [{ sel: "grp:noAmmo", scope: "all", min: 2 }], must: { sel: "tag:supply", scope: "strats", max: 0 } }] },
     { id: "capRegular", kind: "limit", label: "At most 1 regular (non-expendable) support weapon", fill: true,

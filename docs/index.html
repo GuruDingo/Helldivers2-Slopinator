@@ -54,28 +54,19 @@
       <details class="section" id="rules-section">
         <summary>Rules <span class="summary-note" id="rules-summary"></span></summary>
         <div class="section-body">
-          <p class="hint">Every loadout is checked against these rules. The dim rows are the system defaults: remove one with the ×, or change a "how many" row by adding a rule for the same tag below (it replaces that number). Your own rules are the solid rows. When a build can't meet everything, higher-priority rules are protected first, and locks always win.</p>
-          <div class="add-row">
-            <select id="require-tag" aria-label="Tag"></select>
-            <select id="require-op" aria-label="Rule type">
-              <option value="min">at least</option>
-              <option value="max">at most</option>
-              <option value="eq">exactly</option>
-            </select>
-            <input type="number" id="require-n" min="1" max="7" value="2" aria-label="Count">
-            <button type="button" class="ctrl-btn" id="require-add">Add</button>
-          </div>
-          <p class="hint"><em>At least</em> and <em>at most</em> on the same tag make a range. <em>At most 0</em> / <em>exactly 0</em> bans the tag.</p>
+          <p class="hint">Every loadout is checked against these rules. The dim rows are the system defaults: remove one with the ×, or change a "how many" row by adding a rule for the same tag in "Add your own rule" above (it replaces that number). Your own rules are the solid rows. When a build can't meet everything, higher-priority rules are protected first, and locks always win.</p>
+          <details class="builder" id="rule-builder">
+            <summary>Add your own rule (how many, categories, slots, if / then, balance)</summary>
+            <div class="builder-part">
+                            <div id="builder-body"></div>
+            </div>
+          </details>
           <div class="chips" id="require-chips"></div>
           <div class="btn-row"><button type="button" class="ctrl-btn" id="presets-reset" hidden title="Brings back every default rule you removed or changed. Rules you added yourself stay.">Reset to system defaults</button> <button type="button" class="ctrl-btn" id="custom-clear" hidden title="Removes the rules you added yourself. The default rows are left as they are.">Clear custom rules</button></div>
           <div class="rule-row locked">
             <span class="lock-mark" aria-hidden="true">🔒</span>
             <span>At most 1 FRV, 1 tank and 1 exosuit <span class="rule-note">Game rule, always on.</span></span>
           </div>
-          <details class="builder" id="rule-builder">
-            <summary>Build a custom rule (categories, slots, if / then, balance)</summary>
-            <div id="builder-body"></div>
-          </details>
         </div>
       </details>
 

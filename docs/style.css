@@ -277,7 +277,10 @@ hr.divider { border: none; border-top: 1px solid var(--accent); margin: 1.5rem 0
 .add-row select { max-width: 100%; }
 .add-row input[type=number] { width: 4.2rem; }
 .chips + .btn-row { margin-top: .6rem; }
-.builder { margin-top: .9rem; border-top: 1px solid #333; padding-top: .6rem; }
+.builder { margin: .2rem 0 .9rem; border-bottom: 1px solid #333; padding-bottom: .6rem; }
+.builder-part { margin-bottom: .8rem; }
+.builder-part + .builder-part { border-top: 1px solid #2a2a2a; padding-top: .7rem; }
+.builder-title { margin: 0 0 .4rem; font-size: .8rem; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: .04em; }
 .builder > summary { cursor: pointer; font-size: .85rem; color: #ccc; margin-bottom: .5rem; }
 .b-row { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; margin: .4rem 0; }
 .b-row .b-prefix { font-size: .8rem; color: #999; min-width: 2.6rem; }

@@ -418,7 +418,8 @@
       // A hand-held shield backpack (tag "handheld": the ballistic and directional shields, not the bubble generators)
       // needs a one-handed primary or secondary.
       if (chosen.some(function (s) { return has(s, "handheld"); })) {
-        if (!(has(primary, "onehand") || has(secondary, "onehand"))) {
+        // 2026-10-30 (Boss): pistols are tagged one-handed now but do not count; a one-handed primary or a melee weapon does.
+        if (!(has(primary, "onehand") || has(primary, "melee") || has(secondary, "melee"))) {
           fail("shield", "Shield backpack needs a one-handed weapon");
         }
       }

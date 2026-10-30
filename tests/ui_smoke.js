@@ -72,7 +72,7 @@ function check(label, cond, extra) {
   check("first visit wrote the owned list to localStorage", Object.keys(JSON.parse(win.localStorage.getItem("hd2_tracker"))).length === ACTIVE - win.HD2_DATA.items.filter((i) => i.warbond === "base" && i.factions.indexOf("none") === -1).length); // everything except the always-owned Base Game items
   check("7 lock inputs", doc.querySelectorAll("#lock-grid input").length === 7);
   check("datalists filled", $("dl-primary").children.length > 40 && $("dl-strat").children.length > 60);
-  check("require tag dropdown lists only titled tags (24), by title", (() => { const o = Array.from($("require-tag").children); const t = o.map((x) => x.textContent); return o.length === 24 && t.includes("Team Assist") && t.includes("Fire") && t.includes("Laser") && t.includes("Plasma") && t.includes("Hand-Held Shield") && t.includes("Explosive") && t.includes("One-Handed") && t.includes("Supply") && t.every((x, i) => i === 0 || t[i - 1].localeCompare(x) <= 0) && !o.some((x) => ["stun", "smg", "mortar"].includes(x.value)) && o.some((x) => x.value === "assist"); })(), Array.from($("require-tag").children).map((x) => x.textContent).join(", "));
+  check("the rule builder lists only titled tags (32) under Tags, by title", (() => { const o = Array.from(doc.querySelector('#builder-body .b-row[data-role="must"] optgroup').children); const t = o.map((x) => x.textContent); return o.length === 32 && t.includes("Team Assist") && t.includes("Fire") && t.includes("Laser") && t.includes("Plasma") && t.includes("Hand-Held Shield") && t.includes("Explosive") && t.includes("One-Handed") && t.includes("Supply") && t.includes("Support Weapon") && t.includes("Charge") && t.includes("Shotgun") && t.includes("SMG") && t.includes("Special") && t.every((x, i) => i === 0 || t[i - 1].localeCompare(x) <= 0) && !o.some((x) => ["tag:stun", "tag:mortar"].includes(x.value)) && o.some((x) => x.value === "tag:assist"); })(), Array.from(doc.querySelector('#builder-body .b-row[data-role="must"] optgroup').children).map((x) => x.textContent).join(", "));
   check("autocomplete options carry names only (no category labels)",
     Array.from(doc.querySelectorAll("#dl-strat option")).every((o) => !o.hasAttribute("label")) &&
     $("dl-strat").querySelector("option[value='AC-8 Autocannon']") !== null);
@@ -257,13 +257,20 @@ function check(label, cond, extra) {
   $("lock-strat1").value = "";
   setOwnedItem("AC-8 Autocannon", true);
 
-  const addRule = (tag, op, n) => { $("require-tag").value = tag; $("require-op").value = op; $("require-op").dispatchEvent(new win.Event("change")); $("require-n").value = String(n); click($("require-add")); };
+  // A plain "tag, whole loadout, at least / at most / exactly N" rule through the builder (it edits the tag's row).
+  const addRule = (tag, op, n) => {
+    const m = doc.querySelector('#builder-body .b-row[data-role="must"]'), fire = (el) => el.dispatchEvent(new win.Event("change", { bubbles: true }));
+    m.querySelector(".b-sel").value = "tag:" + tag; fire(m.querySelector(".b-sel"));
+    m.querySelector(".b-scope").value = "all"; fire(m.querySelector(".b-scope"));
+    m.querySelector(".b-op").value = op; fire(m.querySelector(".b-op"));
+    m.querySelector(".b-n").value = String(n); click($("b-add"));
+  };
   const chips = () => Array.from(doc.querySelectorAll("#require-chips .chip"));
   const chipTexts = () => chips().map((c) => c.firstChild.textContent);
   const chipFor = (tag) => doc.querySelector('#require-chips .chip[data-tag="' + tag + '"]');
   const removeChip = (tag) => click(chipFor(tag).querySelector("button"));
   // Every default rule is a row, listed from the highest priority tier to the lowest, the limits last.
-  const DEFAULT_ROWS = ["Backpack = 1", "A shield backpack needs a one-handed weapon", "No supply pack alongside 2+ no-ammo items",
+  const DEFAULT_ROWS = ["Backpack = 1", "A hand-held shield needs a one-handed primary or a melee weapon", "No supply pack alongside 2+ no-ammo items",
     "Anti-Tank ≥ 1", "A chaff killer in primary or secondary", "Base Breaker ≥ 1",
     "At least one support weapon", "Medium Killer ≥ 1", "Panic Weapon ≥ 1",
     "Chaff / medium / anti-tank counts within 3 of each other", "Two base breakers when no weapon is one",
@@ -295,7 +302,7 @@ function check(label, cond, extra) {
 
   console.log("Rules panel");
   check("rules panel is one list: no 'Require tags', no separate default switches", !/Require tags/.test(doc.body.textContent) && /Rules/.test($("rules-section").textContent) && !/Additional rules/.test($("rules-section").textContent) && !doc.querySelector("#rules-default"));
-  check("operator offers at least / at most / exactly", Array.from($("require-op").children).map((o) => o.textContent).join("|") === "at least|at most|exactly");
+  check("operator offers at least / at most / exactly", Array.from(doc.querySelectorAll('#builder-body .b-row[data-role="must"] .b-op option')).map((o) => o.textContent).join("|") === "at least|at most|exactly");
   check("in-game limits row is shown and has no switch", /1 FRV, 1 tank and 1 exosuit/.test($("rules-section").textContent) && doc.querySelectorAll("#rules-section .rule-row.locked input").length === 0);
   addRule("eagle", "max", 1); addRule("sentry", "eq", 0); addRule("chaff", "min", 2); addRule("chaff", "max", 3);
   check("chips: at most / exactly / range (Eagle edits its default row; the others are added after the defaults)", chipTexts().join("|") === DEFAULT_ROWS.join("|").replace("Eagle ≤ 2", "Eagle ≤ 1") + "|Sentry = 0|Chaff Killer 2–3", chipTexts().join("|"));
@@ -368,10 +375,10 @@ function check(label, cond, extra) {
   setv(doc.querySelector(".bal-n"), 1);
   click($("bal-add"));
   check("a balance rule reads as a sentence", chipTexts().includes("Balance: Chaff Killer, Medium Killer, Anti-Tank counts within 1 of each other"), chipTexts().join("|"));
-  build([], ["tag:armor", "all", "min", 7]);
+  build([], ["cat:sentry", "all", "min", 7]);
   $("count").value = "2"; generate();
   check("custom rules are used when generating (no red error), builds still complete", cards() === 14 && errors().length === 0, cards() + " " + errors());
-  check("...and a custom rule the build can't meet is listed by its sentence", /Rule: Anti-Tank ≥ 7 \(this build has \d\)/.test((doc.querySelector("#results .rules-warning") || {}).textContent || ""), (doc.querySelector("#results .rules-warning") || {}).textContent);
+  check("...and a custom rule the build can't meet is listed by its sentence", /Rule: Sentry ≥ 7 \(this build has \d\)/.test((doc.querySelector("#results .rules-warning") || {}).textContent || ""), (doc.querySelector("#results .rules-warning") || {}).textContent);
   $("count").value = "1";
   click($("custom-clear"));
   check("'Clear custom rules' removes every custom rule, and saves that", chipTexts().join("|") === DEFAULT_ROWS.join("|") && JSON.parse(win.localStorage.getItem("hd2_settings")).customRules.length === 0 && $("custom-clear").hidden && $("rules-summary").textContent === "");
