@@ -2,7 +2,6 @@
   "_about": "Tag consistency rules checked by tools/build_gear.py. They only FLAG problems (as warnings); nothing is ever changed automatically. Edit this file to change what gets flagged.",
 
   "implications": [
-    { "if": "beam",    "then": "fire",    "except": ["Orbital Laser"], "note": "Boss removed fire from Orbital Laser on purpose (2026-10-29)" },
     { "if": "heal",    "then": "assist" },
     { "if": "taunt",   "then": "assist" },
     { "if": "stun",    "then": "assist" },
