@@ -14,25 +14,13 @@ Items we agreed to come back to. Nothing below is started unless marked.
       exports them as `HD2_DATA.images`, the page prefers the saved copy (wiki link only as a fallback), and the
       single-file build embeds them (2.3 MB, works offline). Re-run the fetch (Actions -> Fetch images, or the script)
       when a new item / warbond / wiki image is added. The warbond covers are saved too, but not shown anywhere (header art is parked, 2026-10-30).
-- [x] ~~Host the tool at a URL~~ done 2026-10-30: live at https://gurudingo.github.io/Helldivers2-Slopinator/ (GitHub Pages, `main` / `/docs`). Open choices still: custom domain, analytics/feedback, shareable-loadout links.
-- [~] **Give every tag a display title.** 41 of 44 tags have titles now (2026-10-30 added Stun, Smoke, Jump, Mech, FRV, Tank,
-      Rover, Mortar and Emplacement). Titles and pill colours now live in `hd2tags.csv` (done 2026-10-30; row order = pill
-      order, blank colour = no pill). Only titled tags appear in the Rules dropdown; the 3 left without a title are heal,
-      taunt and beam. `hd2-tags.xlsx` (sent earlier) is out of date: edit `hd2tags.csv` instead.
+- [x] ~~Host the tool at a URL~~ done 2026-10-30: live at https://gurudingo.github.io/Helldivers2-Slopinator/ (GitHub Pages, `main` / `/docs`). Open choices still: custom domain, analytics/feedback.
+- [x] ~~Give every tag a display title~~ done 2026-10-30: 41 of 44 tags have titles; titles and pill colours live in `hd2tags.csv`
+      (row order = pill order, blank colour = no pill). Heal, taunt and beam are left untitled on purpose (Boss, 2026-10-30), so they
+      are not offered in the Rules dropdown. `hd2-tags.xlsx` (sent earlier) is out of date: edit `hd2tags.csv` instead.
       Note: the Defensive category (mines, relays, emplacement guns) was relabelled from "Emplacement" on 2026-10-30 so it does not clash with the Emplacement tag.
-- [ ] **Check the "meme" elemental builds are tagged properly** (fire, arc, gas, explosive, stealth, laser/beam, ...),
-      and explore which other meme tags are worth having. Then expand the pill options and colours to include the
-      meme tags. (Done 2026-10-30 for the seven known meme tags, see Done; any new meme tag gets a pill from now on.)
-      - [ ] `explosive` (Boss, 2026-10-30): go through ALL the throwables and stratagems and tag everything that is
-            explosive (today it sits on a few weapons, plus the rule "secondary + demo -> explosive").
-      - [x] `laser` and `plasma` tags added 2026-10-30 (see Done). Nova / Quasar Cannon keep `laser` (settled, Boss).
 - [x] ~~Tag consistency checks~~ done 2026-10-29 as a manual Claude procedure (`TAG_CHECK.md`), deliberately NOT in the build. (The beam -> fire rule, and the Orbital Laser exception to it, were dropped 2026-10-30.)
 - [x] ~~Reroll one slot~~ done 2026-10-29: every card has a lock toggle and a reroll button, and each loadout has a "Reroll all unlocked" button (see README). Possible follow-ups: lock/unlock-all buttons; one "reroll all loadouts" button when generating several; card locks are per-loadout and are NOT copied back into the Locks panel.
-- [ ] **Shareable loadouts** (parked, Boss 2026-10-30: "not super important long term", do later): encode a build in the URL
-      (`#...`) so it can be sent to a friend; maybe a copy-as-text button for Discord. Design notes from the discussion:
-      link = faction + item ids per slot (ids are stable across renames), several loadouts joined with `~`, a version marker,
-      placeholder for unknown ids; build and faction only (not the recipient's rules or My Gear); "Copy link" and "Copy as text"
-      buttons per card. Open: include locks? one link for a whole batch? text format for Discord?
 - [ ] **My Gear list order** (Boss, 2026-10-30): show the My Gear lists in the order the game does (menu / warbond /
       chronological order) instead of `hd2gear.csv` order. The CSV is in release order and has a `release_date` column
       (exposed to the page as `released`, accepted as correct by Boss). Waiting on Boss: he will define the menu order of the
@@ -58,17 +46,23 @@ Items we agreed to come back to. Nothing below is started unless marked.
       - [x] ~~Challenge mode~~ dropped (Boss, 2026-10-30): players make their own challenges with custom rules.
       - [ ] Per-rule priority editing (drag to re-rank the tiers) - today the tiers are fixed in `RULE_TIER`.
       - [x] Rules for item categories (e.g. "no Orbitals"): done 2026-10-30 via the rule builder.
-      - [ ] Optional: let a tag with no title be chosen in the rule builder (the dropdown still lists only the 41 titled tags).
-- [ ] **Faction rules: sub-factions.** Extend the faction rules (`works_for` / the `factions` column) to
-      specify sub-factions (e.g. unit types within Terminids / Automatons / Illuminate).
+      - [x] ~~Let an untitled tag be chosen in the rule builder~~ dropped (Boss, 2026-10-30): the list is already long enough.
 - [x] ~~Editable faction recommendations~~ done 2026-10-29 (My Gear > "Edit factions"; see README). Possible follow-ups:
       - bulk faction buttons per warbond / per search result ("tick Automaton for everything shown"); "Enable for all factions" is done (2026-10-30);
       - export / import your edits (a small file or a copy-paste code) so friends can share faction lists, plus a
         "reset to the game-wide defaults" confirmation that lists what will change;
       - a "show edited only" filter and a way to see which edits the CSV has since made redundant;
       - faction presets such as "anti-tank first for Automatons";
-      - when sub-factions arrive, the same grid could gain columns, or an item could carry per-sub-faction ticks;
       - lock/block-style undo for the last faction edit.
+
+## Parked (taken off the to-do list by Boss, 2026-10-30; revisit only if he asks)
+- **Shareable loadouts** ("not super important long term"): encode a build in the URL
+      (`#...`) so it can be sent to a friend; maybe a copy-as-text button for Discord. Design notes from the discussion:
+      link = faction + item ids per slot (ids are stable across renames), several loadouts joined with `~`, a version marker,
+      placeholder for unknown ids; build and faction only (not the recipient's rules or My Gear); "Copy link" and "Copy as text"
+      buttons per card. Open: include locks? one link for a whole batch? text format for Discord?
+- **Faction rules: sub-factions.** Extend the faction rules (`works_for` / the `factions` column) to
+      specify sub-factions (e.g. unit types within Terminids / Automatons / Illuminate).
 
 ## Done 2026-10-30
 - **Dropped from the list** (Boss, 2026-10-30): the weapon-lock UI restyle ("it's fine for now"); the Nova / Quasar `laser` question is settled (they keep `laser`).
