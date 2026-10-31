@@ -294,8 +294,8 @@ function check(label, cond, extra) {
   const chipFor = (tag) => doc.querySelector('#require-chips .chip[data-tag="' + tag + '"]');
   const removeChip = (tag) => click(chipFor(tag).querySelector("button"));
   // Every default rule is a row, listed from the highest priority tier to the lowest, the limits last.
-  const DEFAULT_ROWS = ["Backpack = 1", "A hand-held shield needs a one-handed primary or a melee weapon", "No supply pack alongside 2+ no-ammo items",
-    "Anti-Tank ≥ 1", "A chaff killer in primary or secondary", "Base Breaker ≥ 1",
+  const DEFAULT_ROWS = ["A hand-held shield needs a one-handed primary or a melee weapon",
+    "Backpack = 1", "Anti-Tank ≥ 1", "A chaff killer in primary or secondary", "Base Breaker ≥ 1", "No supply pack alongside 2+ no-ammo items",
     "At least one support weapon", "Medium Killer ≥ 1", "Panic Weapon ≥ 1",
     "Chaff / medium / anti-tank counts within 3 of each other", "Two base breakers when no weapon is one",
     "At most 1 regular (non-expendable) support weapon", "Expendable ≤ 2", "Never a regular and an expendable support weapon together",
@@ -303,7 +303,7 @@ function check(label, cond, extra) {
   const ruleChip = (id) => doc.querySelector('#require-chips .chip[data-rule="' + id + '"]');
   check("every default rule starts as a dim row (no switches), highest priority first", chipTexts().join("|") === DEFAULT_ROWS.join("|") && chips().every((c) => c.classList.contains("preset")) && !doc.querySelector("#rules-default") && !doc.querySelector('#rules-section input[role="switch"]'), chipTexts().join("|"));
   check("...with no reset buttons yet, and nothing counted in the summary", $("presets-reset").hidden && $("custom-clear").hidden && $("rules-summary").textContent === "");
-  check("a default row's tooltip names its priority", /high priority/.test(ruleChip("shield").title) && /medium priority/.test(chipFor("armor").title) && /limit/.test(chipFor("vehicle").title), ruleChip("shield").title + " / " + chipFor("armor").title);
+  check("a default row's tooltip names its priority", /required/.test(ruleChip("shield").title) && /core/.test(chipFor("armor").title) && /limit/.test(chipFor("vehicle").title), ruleChip("shield").title + " / " + chipFor("armor").title);
   addRule("demo", "min", 3);
   check("adding a rule for a default row's tag edits that row (not a second chip)", chips().length === 17 && chipTexts().includes("Base Breaker ≥ 3") && !chipFor("demo").classList.contains("preset"), chipTexts().join("|"));
   check("...shows the reset button and counts one edited rule", !$("presets-reset").hidden && /1 edited/.test($("rules-summary").textContent), $("rules-summary").textContent);
@@ -315,7 +315,7 @@ function check(label, cond, extra) {
   check("unmeetable requirement still builds 7 cards (no error)", cards() === 28 || cards() === 7, cards() + " " + errors());
   check("...and lists the unmet requirement in a banner", /Rule: at least 4 Vehicle/.test((doc.querySelector("#results .rules-warning") || {}).textContent || ""),
     (doc.querySelector("#results .rules-warning") || {}).textContent);
-  check("...with a Why? detail and the rule's priority shown", !!doc.querySelector("#results .rules-warning details.why") && /\[your own rules\]/.test((doc.querySelector("#results .rules-warning") || {}).textContent || ""), (doc.querySelector("#results .rules-warning") || {}).textContent);
+  check("...with a Why? detail and the rule's priority shown", !!doc.querySelector("#results .rules-warning details.why") && /\[Overwrite\]/.test((doc.querySelector("#results .rules-warning") || {}).textContent || ""), (doc.querySelector("#results .rules-warning") || {}).textContent);
   check("...with no red error message", errors().length === 0, errors());
   check("'at least 4 vehicles' replaced the default 'at most 1' (the default's side of the clash is dropped)", chipTexts().includes("Vehicle ≥ 4") && !chipTexts().includes("Vehicle ≤ 1"), chipTexts().join("|"));
   chips().forEach((c) => click(c.querySelector("button")));

@@ -92,17 +92,21 @@
   // -- Rule priority --------------------------------------------------------
   // When a build can't meet every rule, imperfect builds are ranked by which rules they miss. 0 = most
   // important. A build that misses only lower tiers always beats one that misses a higher tier, however
-  // many low-tier rules it misses (a deliberate ranking).
+  // many low-tier rules it misses (a deliberate ranking). Four tiers:
+  //   Required  - how the game itself works (a hand-held shield needs a one-handed weapon)
+  //   Overwrite - the player's own rules; they trump a "good build" but not the game
+  //   Core      - the rules that make a build good (also any rule not listed below)
+  //   Preferred - nice to have
   var RULE_TIER = {
-    require: 0,                                   // the player's own "Require N+ of a tag" requirements
-    custom: 0,                                    // the player's own scoped / if-then rules (same level)
-    backpack: 1, shield: 1, supply: 1,            // high
-    armor: 2, chaff: 2, demo: 2,                  // medium
-    support: 3, med: 3, panic: 3,                 // low
-    demoEscalation: 4, balance: 4,                // bottom
+    shield: 0,                                    // Required
+    require: 1,                                   // Overwrite: the player's own "Require N+ of a tag" requirements
+    custom: 1,                                    // Overwrite: the player's own scoped / if-then rules (same level)
+    backpack: 2, supply: 2, armor: 2, chaff: 2, demo: 2,   // Core
+    support: 3, med: 3, panic: 3,                 // Preferred
+    demoEscalation: 3, balance: 3,
   };
-  var TIER_COUNT = 5;
-  var TIER_NAMES = ["your own rules", "high priority", "medium priority", "low priority", "lowest priority"];
+  var TIER_COUNT = 4;
+  var TIER_NAMES = ["Required", "Overwrite", "Core", "Preferred"];
   // "capSupport" was one switch for the three support limits; a saved or hand-written disabledRules list may still use it.
   var RULE_ALIASES = { capRegular: ["capSupport"], capExpend: ["capSupport"], capMixed: ["capSupport"] };
   function tierOf(id) { return Object.prototype.hasOwnProperty.call(RULE_TIER, id) ? RULE_TIER[id] : 2; }

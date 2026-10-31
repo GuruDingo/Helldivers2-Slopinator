@@ -206,7 +206,7 @@
         h("div", { class: "tag-row" }, tagPills(item))));
   }
 
-  // "Why" text for the results banners. Tier names come from the engine ("your own rules", "high priority", ...).
+  // "Why" text for the results banners. Tier names come from the engine ("Required", "Overwrite", "Core", "Preferred").
   function tierText(u) {
     var names = Engine.TIER_NAMES || [];
     return names[u.tier] ? " [" + names[u.tier] + "]" : "";
@@ -720,7 +720,7 @@
   function ruleRows() {
     var rows = [];
     // Default rows run from the highest priority tier to the lowest, the support / vehicle / Eagle limits last.
-    var byTier = Engine.RULES.map(function (r, i) { return { r: r, i: i, t: Engine.RULE_TIER[r.id] || 9 }; })
+    var byTier = Engine.RULES.map(function (r, i) { return { r: r, i: i, t: Engine.RULE_TIER.hasOwnProperty(r.id) ? Engine.RULE_TIER[r.id] : 9 }; })
       .sort(function (x, y) { return x.t - y.t || x.i - y.i; }).map(function (x) { return x.r; });
     byTier.forEach(function (r) {
       if (r.preset) {
@@ -768,7 +768,7 @@
   }
   function tierNote(id) {
     var t = Engine.RULE_TIER[id];
-    return t ? TIER_TITLES[t].toLowerCase() : "limit";
+    return t !== undefined ? TIER_TITLES[t].toLowerCase() : "limit";
   }
   function renderRequireChips() {
     var box = $("require-chips");
@@ -986,7 +986,7 @@
     onRulesChanged();
   }
 
-  var TIER_TITLES = { 1: "High priority", 2: "Medium priority", 3: "Low priority", 4: "Lowest priority" };
+  var TIER_TITLES = { 0: "Required", 1: "Overwrite", 2: "Core", 3: "Preferred" };
   // Called after any change to the rules: redraws the rows and the summary and saves the settings.
   function onRulesChanged() {
     renderRequireChips();

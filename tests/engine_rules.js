@@ -93,21 +93,20 @@ test("locked backpack-type stratagems still waive the one-backpack rule without 
 
 
 // ---- rule priority tiers ----
-test("tier table: require > backpack/shield/supply > armor/chaff/demo > support/med/panic > demoEscalation/balance", () => {
+test("tier table: Required (shield) > Overwrite (your own) > Core > Preferred", () => {
   const T = HD2Engine.RULE_TIER;
-  assert.strictEqual(T.require, 0);
-  ["backpack", "shield", "supply"].forEach((r) => assert.strictEqual(T[r], 1, r));
-  ["armor", "chaff", "demo"].forEach((r) => assert.strictEqual(T[r], 2, r));
-  ["support", "med", "panic"].forEach((r) => assert.strictEqual(T[r], 3, r));
-  ["demoEscalation", "balance"].forEach((r) => assert.strictEqual(T[r], 4, r));
+  assert.deepStrictEqual(HD2Engine.TIER_NAMES, ["Required", "Overwrite", "Core", "Preferred"]);
+  assert.strictEqual(T.shield, 0);
+  ["require", "custom"].forEach((r) => assert.strictEqual(T[r], 1, r));
+  ["backpack", "supply", "armor", "chaff", "demo"].forEach((r) => assert.strictEqual(T[r], 2, r));
+  ["support", "med", "panic", "demoEscalation", "balance"].forEach((r) => assert.strictEqual(T[r], 3, r));
 });
 test("scoring: one higher-tier miss is worse than any number of lower-tier misses", () => {
   const u = (...ids) => ids.map((id) => ({ id }));
   const S = HD2Engine.scoreUnmet;
-  assert(S(u("require"), 0) > S(u("backpack", "shield", "supply", "armor", "chaff", "demo", "support", "med", "panic", "demoEscalation", "balance"), 0));
-  assert(S(u("backpack"), 0) > S(u("armor", "chaff", "demo", "support", "med", "panic", "demoEscalation", "balance"), 0));
+  assert(S(u("shield"), 0) > S(u("require", "custom", "backpack", "supply", "armor", "chaff", "demo", "support", "med", "panic", "demoEscalation", "balance"), 0));
+  assert(S(u("require"), 0) > S(u("backpack", "supply", "armor", "chaff", "demo", "support", "med", "panic", "demoEscalation", "balance"), 0));
   assert(S(u("armor"), 0) > S(u("support", "med", "panic", "demoEscalation", "balance"), 0));
-  assert(S(u("support"), 0) > S(u("demoEscalation", "balance"), 0));
   assert(S(u("support", "med"), 0) > S(u("support"), 0), "same tier: fewer misses wins");
   assert(S(u("require"), 3) > S(u("require"), 1), "shortfall breaks ties");
   assert.strictEqual(S([], 0), 0);
@@ -127,7 +126,7 @@ test("best-effort build gives up the LOW-priority rule when it has to choose (ba
     const l = e.generateLoadoutRelaxed({ faction: "any", locks });
     assert.deepStrictEqual(l.strategems.map((s) => s.name).sort(), ["O1", "O2", "O3", "Pack"], "picked " + l.strategems.map((s) => s.name));
     assert.deepStrictEqual(ids(l), ["support"]);
-    assert.strictEqual(l.unmet[0].tier, 3);
+    assert.strictEqual(l.unmet[0].tier, 3); // Preferred
   }
 });
 
@@ -424,7 +423,7 @@ test("Generic rules: a rule that cannot hold is reported with its count, and the
   const rule = { must: { sel: "tag:armor", min: 7 } };
   const l = engine.generateLoadoutRelaxed({ faction: "any", customRules: [rule] });
   const u = l.unmet.find((x) => x.id === "custom");
-  assert(u && u.tier === 0 && u.rule.must.min === 7 && u.actual === countTag(l, "armor") && l.strategems.length === 4);
+  assert(u && u.tier === 1 && u.rule.must.min === 7 && u.actual === countTag(l, "armor") && l.strategems.length === 4);
 });
 test("Locks win: a locked item is never swapped to satisfy a rule; the rule it breaks is reported", () => {
   const locks = { strat1: pick("Eagle Airstrike"), strat2: pick("Eagle Strafing Run") };
