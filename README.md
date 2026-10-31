@@ -12,7 +12,8 @@ No server, no accounts, nothing to host except the files in `docs/`.
 ```
 hd2gear.csv            gear database - you edit this (Excel is fine)
 hd2warbonds.csv        warbond keys + display names + cover image URLs (img_url), in display order
-hd2tags.csv            tag display titles + pill colours (row order = pill order on a card)
+hd2tags.csv            tag display titles, rule-builder sections (group) + pill colours and order
+hd2ids.lock.json       every item id that has shipped (kept by the build; see "Permanent ids")
 tools/build_gear.py    validates both CSVs and writes docs/gear-data.js
 tools/fetch_images.py  saves the wiki images into docs/img/ (see "Saved images")
 docs/                  the website (this folder is what gets published)
@@ -31,13 +32,13 @@ TODO.md                pinned follow-ups and open decisions
 Do this when a release adds weapons, stratagems or a warbond. The wiki's page for each item has what you need.
 
 1. **Collect the data for each new item**: name, category (`primary`, `secondary`, `throwable`, `support`, `backpack`, `vehicle`, `eagle`, `orbital`, `sentry`, `defensive`), the warbond it belongs to, its picture address (the weapon's "Render" image, or the stratagem icon image), and its armor penetration (below).
-2. **Add a row to `hd2gear.csv`** (Excel is fine; keep the file's line endings). Columns: `id` (next number), `category`, `name`, `nicknames` (lower case, comma separated, each unique across the game), `tags`, `factions` (`any`, or a list of `bug`, `bot`, `squid`), `warbond` (a key from `hd2warbonds.csv`, or `base`), `img_url` (the wiki address), `armor_pen` and `release_date` (YYYY-MM-DD, the day it was added to the game). Tags and factions are judgment calls; copy a similar item. The rows are kept in release order, oldest first, with `id` counting up from 1, so a new item goes at the END with the next id (or, if you want it to sit with items from the same day, insert it among them and renumber). `RELEASE_DATES_CHECK.md` records where each date came from (Boss accepted the current dates as correct on 2026-10-30).
+2. **Add a row to `hd2gear.csv`** (Excel is fine; keep the file's line endings). Columns: `id` (permanent: the highest id so far + 1, see "Permanent ids"), `category`, `name`, `nicknames` (lower case, comma separated, each unique across the game), `tags`, `factions` (`any`, or a list of `bug`, `bot`, `squid`), `warbond` (a key from `hd2warbonds.csv`, or `base`), `img_url` (the wiki address), `armor_pen` and `release_date` (YYYY-MM-DD, the day it was added to the game). Tags and factions are judgment calls; copy a similar item. A new item gets the next free id (highest + 1) and can go anywhere in the file (the end is easiest); the order of the rows doesn't matter, because release order is the `release_date` column. `RELEASE_DATES_CHECK.md` records where each date came from (Boss accepted the current dates as correct on 2026-10-30).
    - `armor_pen` is the main attack's armor-penetration icon number (-1 no hitbox, 0 unarmored, 2 light, 3 medium, 4 heavy, 5-10 anti-tank I-VI, 11 indestructible), two numbers joined by `/` for a two-mode weapon (`2/4`), blank for something that does no damage. For stratagems, use the AP icon the wiki page leads with, not the structure's own armor (`AV`) icons.
 3. **If there is a new warbond**: add a row to `hd2warbonds.csv` (key, display name, cover image address; the key is what the items' `warbond` column uses), and add its title icon to `WARBOND_ICONS` in `docs/app.js`. Only a new Requisition shop needs more: add its key to `warbondPillName` and `WARBOND_GROUPS` in `docs/app.js` (ask me). The UI tests work out the item count from the data, but they still hard-code the number of warbonds (36) and top-level My Gear blocks (31), so those two numbers need updating when a warbond is added.
 4. **Rebuild**: `python tools/build_gear.py`. It checks for typos (unknown category or warbond, duplicate names or nicknames, bad `armor_pen`) and rebuilds `docs/gear-data.js`; it writes nothing if it finds an error. Warnings about a missing picture or `armor_pen` are only reminders.
 5. **Save the new pictures**: GitHub's Actions tab -> "Fetch images" -> Run workflow (or `python tools/fetch_images.py`), then merge the `images-fetched` branch it creates. Only missing files are downloaded. Until that is done the new items show their wiki pictures, so nothing breaks. See "Saved images".
 6. **Check the tags** (this is a manual step, not part of the build): follow `TAG_CHECK.md` (`python tools/tag_checks.py`). It flags missing implied tags and tags used by fewer than three items; nothing is changed without your say-so.
-   - A new **meme tag** (an elemental or themed build tag such as fire, arc, gas, stealth, explosive, laser or plasma) also needs a row in `hd2tags.csv` with a title and a pill colour (`pill_color`, like `#c8541a`); all meme tags get pills, and the row's position sets the pill order. Any other new tag only needs a row with a title (leave `pill_color` blank for no pill) if it should appear in the Rules dropdown. The build checks for duplicate tags, missing titles and malformed colours.
+   - A new **meme tag** (an elemental or themed build tag such as fire, arc, gas, stealth, explosive, laser or plasma) also needs a row in `hd2tags.csv` with a `group` (the section it sits under in the rule builder's dropdowns, e.g. Damage type), a title, a `pill_color` (like `#c8541a`) and a `pill_order` (the next free number; the lowest is leftmost on a card); all meme tags get pills. Any other new tag only needs a row with a group and a title (leave `pill_color` and `pill_order` blank for no pill) if it should appear in the Rules dropdown. Sections appear in the order they first show up in the file; tags are A-Z inside each section. The build checks for duplicate tags, missing titles or groups, malformed colours and clashing pill orders.
 7. **Re-save the odds baseline and run every test**: `node tests/regression.js --update-baseline`, then `node tests/run_all.js`. New items change the odds, so the regression test's baseline needs refreshing after an intentional change like this.
 8. **Publish**: commit the CSVs, `docs/gear-data.js`, `docs/img/` and `tests/baseline.json` on a branch, open a pull request (the test run attaches a downloadable build so you can try it first), merge it, and hard-refresh the live site.
 
@@ -109,7 +110,7 @@ On the My Gear tab, the **Edit factions** switch (top right) shows three ticks o
 - All three ticked is the same as `any`. With none ticked an item only rolls when the faction is Any.
 - Edited items get a coloured edge and a ↺ button that puts that one item back; **Reset to defaults** (only shown in this mode) resets everything, needs a second click to confirm, and while the search box is filtering it only resets the items shown.
 - **Enable for all factions** (next to Reset) ticks all three for every item that isn't already for all factions, with the same second-click confirmation and the same "shown only" behaviour while searching. It counts as an edit for any item whose CSV default was narrower, and Reset to defaults undoes it.
-- Only differences from the CSV are saved (`hd2_factions`), so when the CSV changes its defaults, items you haven't edited follow the new CSV. Edits are keyed by item name, so renaming an item in the CSV orphans its edit.
+- Only differences from the CSV are saved (`hd2_factions`), so when the CSV changes its defaults, items you haven't edited follow the new CSV. Edits are keyed by the item's permanent id, so renaming an item keeps its edit (older saves keyed by name are converted the first time the page loads).
 - Results already on screen are not changed; the next Generate or reroll uses the new lists.
 
 ## Locking and rerolling slots in the results
@@ -194,3 +195,12 @@ Recoilless, ...) came up ~41% of the time versus ~39% without the bug, and real 
 `engine.js` now only updates the counters when a pick is accepted. `HD2Engine.create(data, { legacyCounterLeak: true })`
 restores the old behaviour (used by the archived parity test). `node tests/archive/leak_impact.js` shows the size of the difference. The fixed loop is still a greedy first-fit over a shuffle, so it is not
 perfectly uniform over all legal loadouts - it just no longer has this accidental tilt.
+
+## Permanent ids
+
+Every item's `id` in `hd2gear.csv` is permanent (Boss, 2026-10-31). Players' browsers save their owned / blocked items and faction edits by id (`hd2_tracker`, `hd2_blocked`, `hd2_factions`), so an id must never be renumbered, reused or deleted; renaming an item is fine and keeps everyone's settings. The rules:
+
+- A new item gets the next free number (highest id + 1). Row order is free; release order is the `release_date` column.
+- To retire an item, set its `factions` to `none` rather than deleting the row.
+- `tools/build_gear.py` keeps `hd2ids.lock.json` (every id that has shipped, with the item's name and category) and refuses to build if an id disappears, changes category (a sign the rows were renumbered), is duplicated, or a new id is not above the highest one that has shipped. It prints a note when an item was renamed. Commit the lock file with the CSV.
+- Two names that were changed before ids existed (M-102 Fast Recon Vehicle -> Gunner FRV, G/40-K Meltamine -> Melta Mine) are mapped in `LEGACY_NAMES` in `docs/app.js` so old saves still find them.

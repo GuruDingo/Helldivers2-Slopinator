@@ -20,15 +20,20 @@
     orbital: "Orbital", sentry: "Sentry", defensive: "Defensive",
   };
   var WEAPON_CAT_LABELS = { primary: "Primary", secondary: "Secondary", throwable: "Throwable" };
-  // Tag display titles and pill colours come from hd2tags.csv (built into HD2_DATA.tags), not from this file.
-  // A tag with a title is offered in the rule builder; one with a colour also gets a pill on cards, in the CSV's row order.
-  // A tag with no row still works in the data and the rules, it just isn't offered and gets no pill.
+  // Tag display titles, dropdown sections and pill colours come from hd2tags.csv (built into HD2_DATA.tags), not from this file.
+  // A tag with a title is offered in the rule builder, under its group; one with a colour and a pill_order also gets a pill on
+  // cards (left to right by pill_order). A tag with no row still works in the data and the rules, it just isn't offered.
   // (The three "crayon" pills follow the enemy-level colours: Chaff green, Medium blue, Anti-Tank red.)
-  var TAG_NAMES = {}, TAG_COLORS = {};
+  var TAG_NAMES = {}, TAG_COLORS = {}, TAG_GROUPS = [], PILL_ORDER = [];
   (DATA.tags || []).forEach(function (t) {
     TAG_NAMES[t.tag] = t.title;
-    if (t.color) TAG_COLORS[t.tag] = t.color;
+    var g = TAG_GROUPS.filter(function (x) { return x.name === t.group; })[0];
+    if (!g) { g = { name: t.group, tags: [] }; TAG_GROUPS.push(g); }
+    g.tags.push(t.tag);
+    if (t.color && t.pillOrder) { TAG_COLORS[t.tag] = t.color; PILL_ORDER.push(t); }
   });
+  PILL_ORDER.sort(function (a, b) { return a.pillOrder - b.pillOrder; });
+  PILL_ORDER = PILL_ORDER.map(function (t) { return t.tag; });
   var TYPE_COLORS = {
     support: "#011419", backpack: "#011419", vehicle: "#011419",
     eagle: "#190301", orbital: "#190301", sentry: "#081901", defensive: "#081901",
@@ -75,9 +80,13 @@
     remove: function (key) { try { localStorage.removeItem(key); } catch (e) { /* ignore */ } },
   };
   var SETTINGS_KEY = "hd2_settings";   // randomizer settings: { faction, disabledRules, requirements }
-  var TRACKER_KEY = "hd2_tracker";     // items you own: { "Item Name": true }. Missing key = new browser = own everything.
-  var FACTIONS_KEY = "hd2_factions";   // your faction edits: { "Item Name": ["bug","bot"] } (only items that differ from the CSV)
-  var BLOCK_KEY = "hd2_blocked";       // items you have blocked: ["Item Name", ...]
+  // Saved per-item data is keyed by the item's permanent id (hd2gear.csv `id`), so renaming an item never loses it.
+  // Older versions keyed it by name; those entries are still read (see itemFromKey) and rewritten with ids.
+  var TRACKER_KEY = "hd2_tracker";     // items you own: { "12": true }. Missing key = new browser = own everything.
+  var FACTIONS_KEY = "hd2_factions";   // your faction edits: { "12": ["bug","bot"] } (only items that differ from the CSV)
+  var BLOCK_KEY = "hd2_blocked";       // items you have blocked: ["12", ...]
+  // Names that were changed before ids were used for saving; a saved entry under the old name still finds its item.
+  var LEGACY_NAMES = { "M-102 Fast Recon Vehicle": "M-102 Gunner FRV", "G/40-K Meltamine": "G/40-K Melta Mine" };
 
   var warbondName = {};
   DATA.warbonds.forEach(function (w) { warbondName[w.key] = w.name; });
@@ -131,7 +140,7 @@
   }
 
   function tagPills(item) {
-    return Object.keys(TAG_COLORS)
+    return PILL_ORDER
       .filter(function (tag) { return Engine.has(item, tag); })
       .map(function (tag) {
         return h("span", { class: "tag-pill", style: "background:" + TAG_COLORS[tag] }, TAG_NAMES[tag] || tag.toUpperCase());
@@ -467,6 +476,31 @@
   }
   var defaultFactions = {};  // name -> the CSV's factions list
   var facOverrides = {};     // name -> factions list that replaces the default
+  // Saved key -> item. A key made only of digits is an id; anything else is an old name-keyed entry.
+  var ITEM_BY_ID = {}, ITEM_BY_NAME = {};
+  ALL_ITEMS.forEach(function (i) { ITEM_BY_ID[i.id] = i; ITEM_BY_NAME[i.name] = i; });
+  function itemFromKey(key) {
+    if (/^\d+$/.test(String(key))) return ITEM_BY_ID[String(key)] || null;
+    return ITEM_BY_NAME[LEGACY_NAMES[key] || key] || null;
+  }
+  function isLegacyKey(key) { return !/^\d+$/.test(String(key)); }
+  // Reads a saved { key: value } object into { itemName: value }; name-keyed entries first so an id-keyed one wins.
+  // `legacy` reports whether any name-keyed entry was seen (so the caller can rewrite the save with ids).
+  function savedByName(saved) {
+    var out = { map: {}, legacy: false };
+    var keys = Object.keys(saved);
+    keys.filter(isLegacyKey).concat(keys.filter(function (k) { return !isLegacyKey(k); })).forEach(function (k) {
+      var it = itemFromKey(k);
+      if (isLegacyKey(k)) out.legacy = true;
+      if (it) out.map[it.name] = saved[k];
+    });
+    return out;
+  }
+  function byId(mapByName) {
+    var out = {};
+    Object.keys(mapByName).forEach(function (n) { if (ITEM_BY_NAME[n]) out[ITEM_BY_NAME[n].id] = mapByName[n]; });
+    return out;
+  }
   ALL_ITEMS.forEach(function (i) { defaultFactions[i.name] = i.factions.slice(); });
 
   function facFlags(list) {  // [bug, bot, squid] booleans, same rule as Engine.worksFor
@@ -486,15 +520,19 @@
   function loadFactions() {
     facOverrides = {};
     var saved = store.get(FACTIONS_KEY, null);
+    var legacy = false;
     if (saved && typeof saved === "object" && !Array.isArray(saved)) {
+      var r = savedByName(saved);
+      legacy = r.legacy;
       ALL_ITEMS.forEach(function (i) {
-        var v = saved[i.name];
+        var v = r.map[i.name];
         if (Array.isArray(v) && v.every(function (f) { return f === "any" || FAC_KEYS.indexOf(f) !== -1; })) {
           facOverrides[i.name] = facList(facFlags(v));
         }
       });
     }
     applyFactions();
+    if (legacy) saveFactions(); // rewrite the old name-keyed save with ids
   }
   function setItemFactions(item, flags) {
     var def = facFlags(defaultFactions[item.name]);
@@ -502,7 +540,7 @@
     else facOverrides[item.name] = facList(flags);
     applyFactions();
   }
-  function saveFactions() { store.set(FACTIONS_KEY, facOverrides); }
+  function saveFactions() { store.set(FACTIONS_KEY, byId(facOverrides)); }
   function onFactionEdit() { saveFactions(); refreshGear(); }
   // Back to the CSV defaults for items on screen (the search filter applies, like the other bulk buttons).
   function resetFactions(items) {
@@ -517,21 +555,30 @@
 
   function loadGear() {
     var saved = store.get(TRACKER_KEY, null);
+    var legacy = false;
     if (saved && typeof saved === "object" && !Array.isArray(saved)) {
-      owned = saved;
+      var r = savedByName(saved);
+      legacy = r.legacy;
+      owned = {};
+      Object.keys(r.map).forEach(function (n) { if (r.map[n]) owned[n] = true; });
     } else {
       // First visit in this browser: start with everything owned (people untick what they lack).
       owned = {};
       ALL_ITEMS.forEach(function (i) { if (!isBase(i)) owned[i.name] = true; });
-      store.set(TRACKER_KEY, owned);
+      store.set(TRACKER_KEY, byId(owned));
     }
     blocked = {};
     var n = store.get(BLOCK_KEY, []);
-    if (Array.isArray(n)) n.forEach(function (name) { blocked[name] = true; });
+    if (Array.isArray(n)) n.forEach(function (key) {
+      var it = itemFromKey(key);
+      if (isLegacyKey(key)) legacy = true;
+      if (it) blocked[it.name] = true;
+    });
+    if (legacy) saveGear(); // rewrite the old name-keyed save with ids
   }
   function saveGear() {
-    store.set(TRACKER_KEY, owned);
-    store.set(BLOCK_KEY, Object.keys(blocked));
+    store.set(TRACKER_KEY, byId(owned));
+    store.set(BLOCK_KEY, Object.keys(byId(blocked)));
   }
   // Counts over the items valid for a faction (omit the faction to count every item).
   function poolStats(faction) {
@@ -796,6 +843,14 @@
   // Builds Engine generic rules (see engine.js, "Generic rules") from drop-downs. Every rule goes through
   // Engine.normalizeRule, the same check the saved settings pass on load.
   var SCOPE_ORDER = ["all", "ps", "weapons", "strats", "primary", "secondary", "throwable"];
+  // The titled tags that some item carries, in the sections hd2tags.csv puts them in (sections in file order, tags A-Z inside each).
+  function groupedTags() {
+    var present = {};
+    titledTags().forEach(function (t) { present[t] = true; });
+    return TAG_GROUPS.map(function (g) {
+      return { name: g.name, tags: g.tags.filter(function (t) { return present[t]; }).sort(function (a, b) { return TAG_NAMES[a].localeCompare(TAG_NAMES[b]); }) };
+    }).filter(function (g) { return g.tags.length; });
+  }
   function titledTags() {
     var tags = {};
     DATA.items.forEach(function (i) { i.tags.forEach(function (t) { tags[t] = true; }); });
@@ -803,10 +858,14 @@
   }
   function selectorSelect() {
     var sel = h("select", { class: "b-sel", "aria-label": "What to count" });
-    var g1 = h("optgroup", { label: "Tags" }), g2 = h("optgroup", { label: "Categories" });
-    titledTags().forEach(function (t) { g1.appendChild(h("option", { value: "tag:" + t }, TAG_NAMES[t])); });
+    groupedTags().forEach(function (g) {
+      var og = h("optgroup", { label: g.name });
+      g.tags.forEach(function (t) { og.appendChild(h("option", { value: "tag:" + t }, TAG_NAMES[t])); });
+      sel.appendChild(og);
+    });
+    var g2 = h("optgroup", { label: "Categories" });
     CATEGORY_ORDER.forEach(function (c) { g2.appendChild(h("option", { value: "cat:" + c }, categoryLabel(c))); });
-    sel.appendChild(g1); sel.appendChild(g2);
+    sel.appendChild(g2);
     return sel;
   }
   // One "count of X, in Y, at least / at most / exactly N" row. read() gives the condition, or null if the number is not allowed.
@@ -869,7 +928,11 @@
     var tagSel = function (optional) {
       var s = h("select", { class: "bal-tag", "aria-label": "Tag" });
       if (optional) s.appendChild(h("option", { value: "" }, "(none)"));
-      titledTags().forEach(function (t) { s.appendChild(h("option", { value: t }, TAG_NAMES[t])); });
+      groupedTags().forEach(function (g) {
+        var og = h("optgroup", { label: g.name });
+        g.tags.forEach(function (t) { og.appendChild(h("option", { value: t }, TAG_NAMES[t])); });
+        s.appendChild(og);
+      });
       return s;
     };
     var t1 = tagSel(false), t2 = tagSel(false), t3 = tagSel(true);

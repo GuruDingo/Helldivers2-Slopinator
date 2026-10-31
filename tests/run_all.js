@@ -11,6 +11,8 @@ const hasJsdom = (() => { try { require.resolve("jsdom", { paths: [root, process
 const steps = [
   ["Build data + bundle", "python3", ["tools/build_gear.py", "--bundle"]],
   ["Image tool tests", "python3", ["tests/fetch_images_test.py"]],
+  ["Permanent item id tests", "python3", ["tests/id_lock_test.py"]],
+  ["Tag check tests", "python3", ["tests/tag_checks_test.py"]],
   ["Rule tests", "node", ["tests/engine_rules.js"]],
   ["Engine parity (generic rules vs hand-written)", "node", ["tests/engine_parity.js"]],
   ["Regression (invariants + odds)", "node", ["tests/regression.js"]],
