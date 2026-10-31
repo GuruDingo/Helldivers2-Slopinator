@@ -217,7 +217,7 @@ test("Require expendable >= 3 overrides the 2-expendable support cap", () => {
   assert(l, "never got 3 expendable supports");
 });
 
-// ---- additional rules: at least / at most / exactly, and switchable default rules (Boss, 2026-10-29) ----
+// ---- tag counts: at least / at most / exactly, and removable default rules (Boss, 2026-10-29) ----
 const reqFlag = (l) => l.unmet.filter((u) => u.id === "require");
 const flaggedFor = (l, tag) => reqFlag(l).some((u) => u.tag === tag);
 

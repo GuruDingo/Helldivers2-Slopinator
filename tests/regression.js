@@ -8,7 +8,7 @@
 //     inside the ticked warbonds, items valid for the faction unless the build was flagged factionOverridden,
 //     and no unmet rules on builds with no locks/requirements that were not forced to fall back.
 //  2. Odds: per-item appearance rates vs tests/baseline.json (two-proportion z-test, |z| < 5). This catches
-//     an accidental shift in how often an item shows up. If hd2gear.csv / hd2warbonds.csv changed since the
+//     an accidental shift in how often an item shows up. If hd2gear.csv / hd2warbonds.csv changed (tag titles in hd2tags.csv don't count) since the
 //     baseline was saved, the odds check is skipped with a notice (invariants still run); re-save the baseline.
 const fs = require("fs");
 const path = require("path");
@@ -30,7 +30,7 @@ function mulberry32(a) {
   };
 }
 
-const dataHash = crypto.createHash("sha256").update(JSON.stringify(globalThis.HD2_DATA)).digest("hex").slice(0, 16);
+const dataHash = crypto.createHash("sha256").update(JSON.stringify({ warbonds: globalThis.HD2_DATA.warbonds, items: globalThis.HD2_DATA.items })).digest("hex").slice(0, 16);
 const scenarios = JSON.parse(fs.readFileSync(path.join(__dirname, "scenarios.json"), "utf8"));
 const problems = [];
 const problem = (sc, msg) => { if (problems.length < 40) problems.push(`[${sc.name}] ${msg}`); };

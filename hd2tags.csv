@@ -1,0 +1,42 @@
+tag,title,pill_color
+melee,Melee,#382E02
+expendable,Expendable,#0F0D02
+chaff,Chaff Killer,#27ae32
+med,Medium Killer,#2f80ed
+armor,Anti-Tank,#c62828
+demo,Base Breaker,#4b058d
+panic,Panic Weapon,#2943b9
+assist,Team Assist,#d6336c
+backpack,Backpack,#555555
+fire,Fire,#c8541a
+gas,Gas,#7d8a1d
+arc,Arc,#0c8a96
+stealth,Stealth,#37474f
+explosive,Explosive,#a0700a
+laser,Laser,#8a8210
+plasma,Plasma,#8f3fe0
+orbital,Orbital,
+eagle,Eagle,
+sentry,Sentry,
+vehicle,Vehicle,
+handheld,Hand-Held Shield,
+mines,Mines,
+onehand,One-Handed,
+supply,Supply,
+support,Support Weapon,
+charge,Charge,
+shield,Shield,
+shotgun,Shotgun,
+assault rifle,Assault Rifle,
+smg,SMG,
+marksman rifle,Marksman Rifle,
+special,Special,
+stun,Stun,
+smoke,Smoke,
+jump,Jump,
+mech,Mech,
+frv,FRV,
+tank,Tank,
+rover,Rover,
+mortar,Mortar,
+emplacement,Emplacement,

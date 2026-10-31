@@ -136,6 +136,10 @@ input:focus-visible, select:focus-visible, button:focus-visible, summary:focus-v
   font-size: .82rem; padding: 8px 12px; border-radius: 6px; margin-bottom: .75rem; line-height: 1.4;
 }
 .rules-warning ul { margin: 4px 0 0 1.2rem; }
+.why { margin-top: 6px; }
+.why summary { cursor: pointer; font-weight: 700; }
+.why-line { margin: 4px 0 0; }
+.why ul { margin: 4px 0 0 1.2rem; }
 .item-img { width: 100%; height: 180px; object-fit: contain; display: block; background: #222323; }
 .img-placeholder {
   width: 100%; height: 180px; display: flex; align-items: center; justify-content: center;

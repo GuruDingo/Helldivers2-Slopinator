@@ -14,9 +14,9 @@
  *     (eagle, mines, vehicle/frv/tank/mech, backpack, expendable) overrides the cap, so "Eagle >= 3" can be met
  *   - IN-GAME LIMITS that nothing overrides: at most one FRV, one tank and one exosuit (mech)
  *   - supply stratagems are blocked once 2+ "no-ammo" factors are present
- *   - the player's own "additional rules" (requirements) say how many items with a tag the build must have:
+ *   - the player's own tag counts (requirements) say how many items with a tag the build must have:
  *     at least N, at most N, or exactly N (a count of 0 is allowed for "at most" / "exactly")
- *   - every default rule below can be switched off with the `disabledRules` option (see RULES); the in-game
+ *   - every default rule below can be removed with the `disabledRules` option (see RULES); the in-game
  *     limits can't be
  *   - LOCKS override the slot rules above (deliberately, same as the Python tool); locking all four
  *     stratagem slots also waives the "exactly one backpack" and "at least one support" rules
@@ -46,11 +46,11 @@
   GenerationError.prototype = Object.create(Error.prototype);
   GenerationError.prototype.constructor = GenerationError;
 
-  // -- The default rules (what the website's Rules menu lists) ---------------------
+  // -- The default rules (what the website's Rules list shows) ---------------------
   // kind "guarantee" = checked on the finished build; "limit" = enforced while the stratagems are being picked.
-  // `disabledRules: ["armor", "capEagle", ...]` switches any of them off. The in-game limits are not listed
+  // `disabledRules: ["armor", "capEagle", ...]` removes any of them. The in-game limits are not listed
   // here on purpose: nothing can turn those off.
-  // The website shows every default rule as a row next to the player's own rules (there are no switches any more).
+  // The website shows every default rule as a row next to the player's own rules; the x on a row adds its id to disabledRules.
   //  - `preset: { tag, min?, max? }` is a plain count of one tag over the whole build ("Anti-Tank >= 1", "Vehicle <= 1").
   //    The player edits such a row by handing the engine a requirement for that tag with the rule's id in disabledRules,
   //    which behaves exactly like the preset did (tests/engine_rules.js checks that). The numbers in `preset` are the
@@ -102,6 +102,7 @@
     demoEscalation: 4, balance: 4,                // bottom
   };
   var TIER_COUNT = 5;
+  var TIER_NAMES = ["your own rules", "high priority", "medium priority", "low priority", "lowest priority"];
   // "capSupport" was one switch for the three support limits; a saved or hand-written disabledRules list may still use it.
   var RULE_ALIASES = { capRegular: ["capSupport"], capExpend: ["capSupport"], capMixed: ["capSupport"] };
   function tierOf(id) { return Object.prototype.hasOwnProperty.call(RULE_TIER, id) ? RULE_TIER[id] : 2; }
@@ -496,7 +497,7 @@
       var unmet = [];
       var shortfall = 0; // tie-breaker between imperfect builds: how far short the numeric rules fell
       function fail(id, label, extra) {
-        if (id !== "require" && !ruleOn(id)) return; // switched off in the Rules menu
+        if (id !== "require" && !ruleOn(id)) return; // removed from the Rules list
         var entry = { id: id, label: label, tier: tierOf(id) };
         if (extra) Object.keys(extra).forEach(function (k) { entry[k] = extra[k]; });
         unmet.push(entry);
@@ -643,6 +644,9 @@
       if (!pick) throw noBuildError(o);
 
       pick.factionOverridden = pick === r2;
+      // Why the faction had to be relaxed: the rules the best faction-only build still missed (null = no faction-only
+      // build could even be completed). Shown by the page's "Why?" detail.
+      pick.strictUnmet = pick.factionOverridden ? (r1 ? r1.unmet : null) : [];
       if (pick.factionOverridden) {
         var all = [pick.primary, pick.secondary, pick.throwable].concat(pick.strategems);
         pick.suboptimalNames = new Set(
@@ -670,6 +674,7 @@
     has: has,
     worksFor: worksFor,
     RULE_TIER: RULE_TIER,
+    TIER_NAMES: TIER_NAMES,
     RULES: RULES,
     normalizeRequirements: normalizeRequirements,
     normalizeRule: normalizeRule,

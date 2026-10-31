@@ -33,7 +33,7 @@ with tempfile.TemporaryDirectory() as tmp:
     work = Path(tmp) / "proj"
     (work / "docs").mkdir(parents=True)
     (work / "tools").mkdir()
-    for f in ("hd2gear.csv", "hd2warbonds.csv"):
+    for f in ("hd2gear.csv", "hd2warbonds.csv", "hd2tags.csv"):
         shutil.copy(ROOT / f, work / f)
     for f in ("app.js", "engine.js", "index.html", "style.css"):
         shutil.copy(ROOT / "docs" / f, work / "docs" / f)

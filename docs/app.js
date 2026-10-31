@@ -17,32 +17,18 @@
   var FACTION_ADJECTIVE = { bug: "Terminid", bot: "Automaton", squid: "Illuminate" };
   var TYPE_LABELS = {
     support: "Support Weapon", backpack: "Backpack", vehicle: "Vehicle", eagle: "Eagle",
-    orbital: "Orbital", sentry: "Sentry", defensive: "Emplacement",
+    orbital: "Orbital", sentry: "Sentry", defensive: "Defensive",
   };
   var WEAPON_CAT_LABELS = { primary: "Primary", secondary: "Secondary", throwable: "Throwable" };
-  // Display titles. Only tags listed here appear in the "Additional rules" dropdown; a tag with no title here
-  // still works in the data and the rules, it just isn't offered (and gets no pill).
-  var TAG_NAMES = {
-    melee: "Melee", expendable: "Expendable", chaff: "Chaff Killer", med: "Medium Killer", armor: "Anti-Tank",
-    demo: "Base Breaker", panic: "Panic Weapon", assist: "Team Assist", backpack: "Backpack",
-    fire: "Fire", stealth: "Stealth", orbital: "Orbital", eagle: "Eagle", sentry: "Sentry",
-    gas: "Gas", vehicle: "Vehicle", arc: "Arc",
-    explosive: "Explosive", laser: "Laser", plasma: "Plasma", handheld: "Hand-Held Shield", mines: "Mines",
-    onehand: "One-Handed", supply: "Supply", support: "Support Weapon",
-    charge: "Charge", shield: "Shield", shotgun: "Shotgun", "assault rifle": "Assault Rifle", smg: "SMG", "marksman rifle": "Marksman Rifle", special: "Special",
-  };
-  // Order here = order of the pills on a card. Tags not listed here still work in the rules,
-  // they just don't get a pill. (Pills need a title in TAG_NAMES above too.)
-  // The three "crayon" pills follow the enemy-level colours: Chaff green, Medium blue, Anti-Tank red. They are deliberately
-  // a little different from the green / blue / red of the stratagem icons (#699655 / #55b9d2 / #dc6455) so the two don't blur.
-  var TAG_COLORS = {
-    melee: "#382E02", expendable: "#0F0D02", chaff: "#27ae32", med: "#2f80ed", armor: "#c62828",
-    demo: "#4b058d", panic: "#2943b9", assist: "#d6336c", backpack: "#555555",
-    // The "meme" tags (elemental / themed builds) all get pills, and so do any meme tags added later: fire, gas, arc,
-    // stealth, explosive, laser, plasma. Colours are first guesses, one hue family per tag.
-    fire: "#c8541a", gas: "#7d8a1d", arc: "#0c8a96", stealth: "#37474f", explosive: "#a0700a",
-    laser: "#8a8210", plasma: "#8f3fe0",
-  };
+  // Tag display titles and pill colours come from hd2tags.csv (built into HD2_DATA.tags), not from this file.
+  // A tag with a title is offered in the rule builder; one with a colour also gets a pill on cards, in the CSV's row order.
+  // A tag with no row still works in the data and the rules, it just isn't offered and gets no pill.
+  // (The three "crayon" pills follow the enemy-level colours: Chaff green, Medium blue, Anti-Tank red.)
+  var TAG_NAMES = {}, TAG_COLORS = {};
+  (DATA.tags || []).forEach(function (t) {
+    TAG_NAMES[t.tag] = t.title;
+    if (t.color) TAG_COLORS[t.tag] = t.color;
+  });
   var TYPE_COLORS = {
     support: "#011419", backpack: "#011419", vehicle: "#011419",
     eagle: "#190301", orbital: "#190301", sentry: "#081901", defensive: "#081901",
@@ -201,13 +187,26 @@
     return h("div", { class: cls },
       h("div", { class: "card-header", style: "background:" + (TYPE_COLORS[item.cat] || "#363426") },
         h("span", { class: "slot-label" }, slotLabel),
-        suboptimal ? h("span", { class: "suboptimal-badge" }, "\u26A0 OFF-FACTION") : null,
+        suboptimal ? h("span", { class: "suboptimal-badge", title: "Not a good pick against " + (FACTION_NAMES[opts.faction] || "this faction") + " \u2014 it\u2019s meant for: " + factionsText(item) }, "\u26A0 OFF-FACTION") : null,
         h("span", { class: "slot-btns" }, rerollBtn, lockBtn)),
       imageNode(item),
       h("div", { class: "card-body" },
         h("div", { class: "name-row" }, h("div", { class: "item-name" }, item.name), apRow(item)),
         warbondRow,
         h("div", { class: "tag-row" }, tagPills(item))));
+  }
+
+  // "Why" text for the results banners. Tier names come from the engine ("your own rules", "high priority", ...).
+  function tierText(u) {
+    var names = Engine.TIER_NAMES || [];
+    return names[u.tier] ? " [" + names[u.tier] + "]" : "";
+  }
+  // Which factions an item is meant for, in words (for the OFF-FACTION tooltip).
+  function factionsText(item) {
+    var f = item.factions || [];
+    if (f.indexOf("none") !== -1) return "no faction (disabled)";
+    if (f.length === 1 && f[0] === "any") return "any faction";
+    return f.map(function (x) { return FACTION_NAMES[x] || x; }).join(", ");
   }
 
   // Plain-language text for a rule the engine reported as unmet.
@@ -239,7 +238,7 @@
     function isOff(item) { return lo.suboptimalNames.has(item.name); }
     function card(key, slotLabel, extra) {
       var item = itemAt(lo, key);
-      var opts = { locked: !!locks[key], suboptimal: isOff(item), wide: !!(extra && extra.wide),
+      var opts = { locked: !!locks[key], suboptimal: isOff(item), faction: faction, wide: !!(extra && extra.wide),
         onLock: function () { toggleLock(entry, key); },
         onReroll: function () { rerollSlot(entry, key); } };
       return itemCard(item, slotLabel, opts);
@@ -255,18 +254,41 @@
         title: unlockedCount ? "Keep the locked slots, reroll all the others" : "Every slot is locked",
         onclick: function () { rerollUnlocked(entry); },
       }, "\uD83C\uDFB2 Reroll all unlocked (" + unlockedCount + ")")));
+    var lockedKeys = SLOT_KEYS.filter(function (k) { return locks[k]; });
+    function lockNote() {
+      return lockedKeys.length
+        ? h("p", { class: "why-line" }, "You have " + lockedKeys.length + " locked slot" + (lockedKeys.length === 1 ? "" : "s") +
+            ". Locked items are never swapped out, so they can be what blocks a rule \u2014 try unlocking one.")
+        : null;
+    }
     if (lo.factionOverridden) {
+      var strict = lo.strictUnmet;
       box.appendChild(h("div", { class: "faction-warning" },
         "\u26A0 Couldn\u2019t build a valid " + label + " loadout with the current warbonds/locks, so the faction " +
         "restriction was relaxed to fill this one out. Items marked ",
         h("span", { class: "suboptimal-badge" }, "\u26A0 OFF-FACTION"),
-        " below aren\u2019t ideal picks against " + label + "."));
+        " below aren\u2019t ideal picks against " + label + ".",
+        h("details", { class: "why" },
+          h("summary", null, "Why?"),
+          strict && strict.length
+            ? h("div", null,
+                h("p", { class: "why-line" }, "The best " + label + "-only build still broke:"),
+                h("ul", null, strict.map(function (u) { return h("li", null, ruleText(u) + tierText(u)); })),
+                h("p", { class: "why-line" }, "Relaxing the faction let it follow every rule, so that\u2019s what you got."))
+            : h("p", { class: "why-line" }, "There weren\u2019t enough " + label + "-eligible items among your owned warbonds, unlocked slots and never-roll choices to fill every slot."),
+          lockNote())));
     }
     if (lo.unmet && lo.unmet.length) {
       box.appendChild(h("div", { class: "rules-warning" },
         "\u26A0 This loadout couldn\u2019t meet every guarantee with the current locks and filters, so it was completed " +
         "without these (everything else still applies):",
-        h("ul", null, lo.unmet.map(function (u) { return h("li", null, ruleText(u)); }))));
+        h("ul", null, lo.unmet.map(function (u) { return h("li", null, ruleText(u) + tierText(u)); })),
+        h("details", { class: "why" },
+          h("summary", null, "Why?"),
+          h("p", { class: "why-line" }, "The generator tries up to " + 1000 + " builds and keeps the one that breaks the least important rules " +
+            "(your own rules first, then high, medium and low priority). None of them could follow everything at once."),
+          lockNote(),
+          h("p", { class: "why-line" }, "To fix it: loosen or remove a rule in Rules, tick more warbonds in My Gear, or unlock a slot."))));
     }
     box.appendChild(h("h3", { class: "section-title" }, "Weapons"));
     box.appendChild(h("div", { class: "card-row" },
@@ -363,7 +385,7 @@
   // Control panel state
   // ---------------------------------------------------------------------------
   var state = {
-    requirements: {},    // tag -> { min?, max? }  (the "Additional rules")
+    requirements: {},    // tag -> { min?, max? }  (the player's plain tag counts, edited default rows included)
     disabledRules: {},   // default rule id -> true when removed from the rules list
     customRules: [],     // the player's own generic rules: scoped counts, categories, if/then, balance (see Engine.normalizeRule)
   };
