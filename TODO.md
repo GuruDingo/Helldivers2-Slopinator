@@ -19,7 +19,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       single-file build embeds them (2.3 MB, works offline). Re-run the fetch (Actions -> Fetch images, or the script)
       when a new item / warbond / wiki image is added. The warbond covers are saved too, but not shown anywhere (header art is parked, 2026-10-30).
 - [x] ~~Host the tool at a URL~~ done 2026-10-30: live at https://gurudingo.github.io/Helldivers2-Slopinator/ (GitHub Pages, `main` / `/docs`). Open choices still: custom domain, analytics (the feedback link is its own item above).
-- [x] ~~Give every tag a display title~~ done 2026-10-30: 41 of 44 tags have titles; titles and pill colours live in `hd2tags.csv`
+- [x] ~~Give every tag a display title~~ done 2026-10-30: 42 of 45 tags have titles; titles and pill colours live in `hd2tags.csv`
       (row order = pill order, blank colour = no pill). Heal, taunt and beam are left untitled on purpose (Boss, 2026-10-30), so they
       are not offered in the Rules dropdown. `hd2-tags.xlsx` (sent earlier) is out of date: edit `hd2tags.csv` instead.
       Note: the Defensive category (mines, relays, emplacement guns) was relabelled from "Emplacement" on 2026-10-30 so it does not clash with the Emplacement tag.
