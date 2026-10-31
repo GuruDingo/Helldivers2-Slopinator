@@ -648,15 +648,13 @@
     all: "whole loadout", ps: "primary + secondary", weapons: "all three weapons", strats: "stratagems",
     primary: "primary", secondary: "secondary", throwable: "throwable",
   };
-  var GROUP_LABELS = { regularSupport: "Regular support weapon" };
   var CATEGORY_ORDER = ["primary", "secondary", "throwable", "support", "backpack", "vehicle", "eagle", "orbital", "sentry", "defensive"];
   function categoryLabel(c) { return WEAPON_CAT_LABELS[c] || TYPE_LABELS[c] || c; }
   function selectorLabel(id) {
-    var m = /^(tag|cat|grp):(.+)$/.exec(id);
+    var m = /^(tag|cat):(.+)$/.exec(id);
     if (!m) return id;
     if (m[1] === "tag") return TAG_NAMES[m[2]] || m[2];
-    if (m[1] === "cat") return categoryLabel(m[2]);
-    return GROUP_LABELS[m[2]] || m[2];
+    return categoryLabel(m[2]);
   }
   function condText(c) {
     return selectorLabel(c.sel) + " " + reqText(c) + (c.scope && c.scope !== "all" ? " (" + SCOPE_LABELS[c.scope] + ")" : "");
@@ -805,11 +803,10 @@
   }
   function selectorSelect() {
     var sel = h("select", { class: "b-sel", "aria-label": "What to count" });
-    var g1 = h("optgroup", { label: "Tags" }), g2 = h("optgroup", { label: "Categories" }), g3 = h("optgroup", { label: "Groups" });
+    var g1 = h("optgroup", { label: "Tags" }), g2 = h("optgroup", { label: "Categories" });
     titledTags().forEach(function (t) { g1.appendChild(h("option", { value: "tag:" + t }, TAG_NAMES[t])); });
     CATEGORY_ORDER.forEach(function (c) { g2.appendChild(h("option", { value: "cat:" + c }, categoryLabel(c))); });
-    Engine.SELECTOR_GROUPS.forEach(function (g) { g3.appendChild(h("option", { value: "grp:" + g }, GROUP_LABELS[g] || g)); });
-    sel.appendChild(g1); sel.appendChild(g2); sel.appendChild(g3);
+    sel.appendChild(g1); sel.appendChild(g2);
     return sel;
   }
   // One "count of X, in Y, at least / at most / exactly N" row. read() gives the condition, or null if the number is not allowed.

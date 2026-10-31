@@ -514,15 +514,21 @@ test("Shield rule: a one-handed primary or a melee weapon satisfies it, a pistol
   Array.from({ length: 40 }, () => engine.generateLoadoutRelaxed({ faction: "any", locks: { primary: pick("AR-23 Liberator"), secondary: pick("P-4 Senator"), strat1: pick("SH-32 Shield Generator Pack") } })).forEach((l) => assert(!flagged(l)));
 });
 
-test("The noammo tag (not a group) drives the supply rule; an old grp:noAmmo selector is read as the tag", () => {
+test("Groups are tags now: noammo drives the supply rule, nonexp the support caps; old grp: selectors are read as the tags", () => {
   const items = HD2Engine.create(HD2_DATA).pools;
   const all = items.primaries.concat(items.secondaries, items.throwables, items.strategems);
   const noammo = all.filter((i) => HD2Engine.has(i, "noammo"));
   assert.strictEqual(noammo.length, 20);
   assert(noammo.every((i) => (HD2Engine.has(i, "charge") || HD2Engine.has(i, "expendable")) && (["primary", "secondary", "support"].includes(i.cat) || HD2Engine.has(i, "rover"))), "noammo only on charge / expendable weapons and Rovers");
-  assert(!HD2Engine.SELECTOR_GROUPS.includes("noAmmo"), "the noAmmo group is gone");
+  assert(HD2Engine.SELECTOR_GROUPS === undefined, "there are no selector groups any more");
   const old = HD2Engine.normalizeRule({ when: [{ sel: "grp:noAmmo", scope: "all", min: 2 }], must: { sel: "tag:supply", scope: "strats", max: 0 } });
   assert(old && old.when[0].sel === "tag:noammo", "old saved selector is translated");
+  const oldReg = HD2Engine.normalizeRule({ must: { sel: "grp:regularSupport", scope: "strats", max: 1 } });
+  assert(oldReg && oldReg.must.sel === "tag:nonexp", "old grp:regularSupport is read as tag:nonexp");
+  const sup = all.filter((i) => i.cat === "support");
+  assert.strictEqual(sup.filter((i) => HD2Engine.has(i, "nonexp")).length, 29);
+  assert(sup.every((i) => HD2Engine.has(i, "nonexp") !== HD2Engine.has(i, "expendable")), "every support weapon is exactly one of expendable / non-expendable");
+  assert(all.filter((i) => i.cat !== "support").every((i) => !HD2Engine.has(i, "nonexp")), "nonexp only on support weapons");
   const engine = HD2Engine.create(HD2_DATA);
   const pick = (n) => all.find((i) => i.name === n);
   for (let k = 0; k < 40; k++) {

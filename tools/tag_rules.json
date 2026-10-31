@@ -20,6 +20,10 @@
     { "tag": "panic", "categories": ["primary", "secondary", "throwable"], "note": "Panic Weapon is a weapon-slot tag only; the engine ignores it on stratagems (Boss, 2026-10-30). Claude removes it from stratagems when it finds it." }
   ],
 
+  "exactly_one_of": [
+    { "category": "support", "tags": ["expendable", "nonexp"], "note": "Replaces the old regularSupport group (Boss, 2026-10-31): every support weapon is either expendable or non-expendable." }
+  ],
+
   "min_items_per_tag": 3,
   "acknowledged_rare_tags": ["heal", "handheld", "supply", "tank", "taunt"]
 }

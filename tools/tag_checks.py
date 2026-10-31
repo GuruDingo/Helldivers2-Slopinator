@@ -5,6 +5,8 @@ Everything here only FLAGS problems. Nothing edits the CSV. The rules live in to
                         a list of item names that are deliberate exceptions)
   weapon_only_tags      a tag that only items in the listed categories may carry (today: panic is for primaries,
                         secondaries and throwables, never stratagems); it is flagged on any other item
+  exactly_one_of        every item in a category must carry exactly one of the listed tags (today: a support weapon is
+                        either expendable or nonexp)
   min_items_per_tag     a tag used by fewer items than this is flagged, unless it is listed in ...
   acknowledged_rare_tags   tags Boss has already seen and accepted as rare
 Also flagged: a tag listed twice on one item.
@@ -47,6 +49,17 @@ def check_tags(items, rules):
                 flags.append(
                     f"'{it['name']}' ({it['cat']}) has '{rule['tag']}', which only "
                     f"{'/'.join(rule['categories'])} items may have - remove it"
+                )
+
+    for rule in rules.get("exactly_one_of", []):
+        for it in items:
+            if it["cat"] != rule["category"]:
+                continue
+            have = [t for t in rule["tags"] if t in it["tags"]]
+            if len(have) != 1:
+                flags.append(
+                    f"'{it['name']}' ({it['cat']}) must have exactly one of {'/'.join(rule['tags'])}, "
+                    f"but has {'both' if have else 'neither'}"
                 )
 
     counts = {}

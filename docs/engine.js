@@ -80,10 +80,10 @@
     { id: "supply", kind: "guarantee", label: "No supply pack alongside 2+ no-ammo items",
       rules: [{ when: [{ sel: "tag:noammo", scope: "all", min: 2 }], must: { sel: "tag:supply", scope: "strats", max: 0 } }] },
     { id: "capRegular", kind: "limit", label: "At most 1 regular (non-expendable) support weapon", fill: true,
-      rules: [{ must: { sel: "grp:regularSupport", scope: "strats", max: 1 } }] },
+      rules: [{ must: { sel: "tag:nonexp", scope: "strats", max: 1 } }] },
     { id: "capExpend", kind: "limit", label: "At most 2 expendable support weapons", preset: { tag: "expendable", max: 2 } },
     { id: "capMixed", kind: "limit", label: "Never a regular and an expendable support weapon together", fill: true,
-      rules: [{ when: [{ sel: "grp:regularSupport", scope: "strats", min: 1 }], must: { sel: "tag:expendable", scope: "strats", max: 0 } }] },
+      rules: [{ when: [{ sel: "tag:nonexp", scope: "strats", min: 1 }], must: { sel: "tag:expendable", scope: "strats", max: 0 } }] },
     { id: "capVehicle", kind: "limit", label: "At most 1 vehicle", preset: { tag: "vehicle", max: 1 } },
     { id: "capEagle", kind: "limit", label: "At most 2 Eagles", preset: { tag: "eagle", max: 2 } },
     { id: "capMine", kind: "limit", label: "At most 1 mine", preset: { tag: "mines", max: 1 } },
@@ -151,22 +151,19 @@
   //   rule       { must: condition }                       -> must hold
   //              { when: [condition, ...], must: condition } -> must hold whenever every `when` condition holds
   //              { spread: { tags: [...], max } }          -> the counts of those tags differ by at most max
-  // Selectors: "tag:<tag>", "cat:<category>", or a named group (SELECTOR_GROUPS). Scopes: SCOPES.
+  // Selectors: "tag:<tag>" or "cat:<category>". Scopes: SCOPES.
   // Rules are plain data so the page can save them and show them as sentences.
-  var SELECTOR_GROUPS = {
-    regularSupport: function (i) { return i.cat === "support" && !has(i, "expendable"); },   // a support weapon that is not expendable
-  };
-  // Selectors that were renamed: a saved or hand-written rule may still use the old name (the "noAmmo" group became the noammo tag).
-  var SELECTOR_ALIASES = { "grp:noAmmo": "tag:noammo" };
+  // Selectors that were renamed: a saved or hand-written rule may still use the old name. There used to be two named groups;
+  // they are ordinary tags now (noAmmo -> noammo, regularSupport -> nonexp).
+  var SELECTOR_ALIASES = { "grp:noAmmo": "tag:noammo", "grp:regularSupport": "tag:nonexp" };
   var SCOPES = ["all", "weapons", "ps", "strats", "primary", "secondary", "throwable"];
   var selectorCache = {};
   function makeSelector(id) {
     if (Object.prototype.hasOwnProperty.call(selectorCache, id)) return selectorCache[id];
-    var m = /^(tag|cat|grp):(.+)$/.exec(String(id));
+    var m = /^(tag|cat):(.+)$/.exec(String(id));
     var fn = null;
     if (m && m[1] === "tag") fn = function (i) { return has(i, m[2]); };
     else if (m && m[1] === "cat") fn = function (i) { return i.cat === m[2]; };
-    else if (m && Object.prototype.hasOwnProperty.call(SELECTOR_GROUPS, m[2])) fn = SELECTOR_GROUPS[m[2]];
     selectorCache[id] = fn;
     return fn;
   }
@@ -681,7 +678,6 @@
     normalizeRule: normalizeRule,
     normalizeRules: normalizeRules,
     SCOPES: SCOPES,
-    SELECTOR_GROUPS: Object.keys(SELECTOR_GROUPS),
     scoreUnmet: scoreUnmet,
     WEAPON_CATEGORIES: WEAPON_CATEGORIES,
     STRATAGEM_CATEGORIES: STRATAGEM_CATEGORIES,
