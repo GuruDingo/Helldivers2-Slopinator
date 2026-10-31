@@ -59,9 +59,10 @@ def load_warbonds():
 
 def load_tags():
     """hd2tags.csv columns: tag, group (the section it sits in inside the rule builder's dropdowns; sections appear in the
-    order they first show up in the file), title (shown in the rule builder and on pills), pill_color (hex; blank = no
+    order they first show up in the file), title (shown in the rule builder and on pills), description (one short line
+    shown under the rule builder's dropdown when the tag is picked), pill_color (hex; blank = no
     pill) and pill_order (1, 2, 3... = left to right on a card; required with a pill colour, blank otherwise).
-    Returns (rows, errors); rows are {"tag","group","title","color","pillOrder"} in file order."""
+    Returns (rows, errors); rows are {"tag","group","title","description","color","pillOrder"} in file order."""
     rows, errors, seen, orders = [], [], set(), {}
     if not TAGS_CSV.exists():
         return rows, [f"{TAGS_CSV.name} is missing."]
@@ -73,6 +74,7 @@ def load_tags():
             where = f"{TAGS_CSV.name} line {n}"
             group = (r.get("group") or "").strip()
             title = (r.get("title") or "").strip()
+            description = (r.get("description") or "").strip()
             color = (r.get("pill_color") or "").strip()
             order_raw = (r.get("pill_order") or "").strip()
             if tag in seen:
@@ -80,6 +82,8 @@ def load_tags():
             seen.add(tag)
             if not title:
                 errors.append(f"{where}: tag '{tag}' needs a title.")
+            if not description:
+                errors.append(f"{where}: tag '{tag}' needs a description (one short line shown under the dropdown).")
             if not group:
                 errors.append(f"{where}: tag '{tag}' needs a group (the section it appears under in the rule builder).")
             if color and not re.fullmatch(r"#[0-9a-fA-F]{6}", color):
@@ -95,7 +99,7 @@ def load_tags():
                     orders[order] = tag
             if bool(color) != (order is not None):
                 errors.append(f"{where}: '{tag}' needs both a pill_color and a pill_order for a pill, or neither.")
-            rows.append({"tag": tag, "group": group, "title": title, "color": color, "pillOrder": order})
+            rows.append({"tag": tag, "group": group, "title": title, "description": description, "color": color, "pillOrder": order})
     return rows, errors
 
 

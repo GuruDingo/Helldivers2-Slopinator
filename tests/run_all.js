@@ -13,6 +13,7 @@ const steps = [
   ["Image tool tests", "python3", ["tests/fetch_images_test.py"]],
   ["Permanent item id tests", "python3", ["tests/id_lock_test.py"]],
   ["Tag check tests", "python3", ["tests/tag_checks_test.py"]],
+  ["Tags CSV tests", "python3", ["tests/tags_csv_test.py"]],
   ["Rule tests", "node", ["tests/engine_rules.js"]],
   ["Engine parity (generic rules vs hand-written)", "node", ["tests/engine_parity.js"]],
   ["Regression (invariants + odds)", "node", ["tests/regression.js"]],

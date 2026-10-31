@@ -375,6 +375,21 @@ function check(label, cond, extra) {
   console.log("Rule builder");
   const setv = (el, v) => { el.value = v; el.dispatchEvent(new win.Event("change", { bubbles: true })); };
   const bRow = (role) => doc.querySelector('#builder-body .b-row[data-role="' + role + '"]');
+  check("each rule-builder row explains its pick: description, item count and a few examples", (() => {
+    setv(bRow("must").querySelector(".b-sel"), "tag:fire");
+    const t = bRow("must").querySelector(".b-hint summary").textContent;
+    const n = win.HD2_DATA.items.filter((i) => i.factions.indexOf("none") === -1 && i.tags.indexOf("fire") !== -1).length;
+    return t.indexOf("Sets enemies on fire") === 0 && t.indexOf(n + " items (e.g. ") !== -1;
+  })(), bRow("must").querySelector(".b-hint summary").textContent);
+  check("...tapping it opens the full list of items", (() => { const d = bRow("must").querySelector(".b-hint"); return d.querySelector(".b-hint-all").textContent.split(", ").length === Number(/(\d+) items/.exec(d.querySelector("summary").textContent)[1]); })());
+  check("...a category gets one too, and retired items are not counted", (() => {
+    setv(bRow("must").querySelector(".b-sel"), "cat:vehicle");
+    const t = bRow("must").querySelector(".b-hint summary").textContent;
+    const n = win.HD2_DATA.items.filter((i) => i.factions.indexOf("none") === -1 && i.cat === "vehicle").length;
+    return t.indexOf("Vehicles") === 0 && t.indexOf(" " + n + " items") !== -1;
+  })(), bRow("must").querySelector(".b-hint summary").textContent);
+  check("...every titled tag has a description in the data", win.HD2_DATA.tags.every((r) => r.description && r.description.length > 3));
+  setv(bRow("must").querySelector(".b-sel"), bRow("must").querySelector(".b-sel").options[0].value);
   const build = (when, must) => {
     doc.querySelectorAll("#builder-body #b-when .chip-x").forEach((b) => click(b));
     when.forEach((w) => { click($("b-add-if")); const rows = doc.querySelectorAll('#builder-body .b-row[data-role="when"]'); const r = rows[rows.length - 1]; setv(r.querySelector(".b-sel"), w[0]); setv(r.querySelector(".b-scope"), w[1]); setv(r.querySelector(".b-op"), w[2]); r.querySelector(".b-n").value = String(w[3]); });

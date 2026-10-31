@@ -24,9 +24,10 @@
   // A tag with a title is offered in the rule builder, under its group; one with a colour and a pill_order also gets a pill on
   // cards (left to right by pill_order). A tag with no row still works in the data and the rules, it just isn't offered.
   // (The three "crayon" pills follow the enemy-level colours: Chaff green, Medium blue, Anti-Tank red.)
-  var TAG_NAMES = {}, TAG_COLORS = {}, TAG_GROUPS = [], PILL_ORDER = [];
+  var TAG_NAMES = {}, TAG_COLORS = {}, TAG_DESC = {}, TAG_GROUPS = [], PILL_ORDER = [];
   (DATA.tags || []).forEach(function (t) {
     TAG_NAMES[t.tag] = t.title;
+    TAG_DESC[t.tag] = t.description || "";
     var g = TAG_GROUPS.filter(function (x) { return x.name === t.group; })[0];
     if (!g) { g = { name: t.group, tags: [] }; TAG_GROUPS.push(g); }
     g.tags.push(t.tag);
@@ -868,6 +869,31 @@
     sel.appendChild(g2);
     return sel;
   }
+  // The line under a rule-builder dropdown: what the picked tag / category is, how many items have it, and a few examples
+  // (tap it to see all of them). Retired items (faction "none") are left out.
+  var CATEGORY_DESC = {
+    primary: "Primary weapons", secondary: "Secondary weapons (pistols and melee)", throwable: "Grenades and other throwables",
+    support: "Support weapons", backpack: "Backpacks and Guard Dog Rovers", vehicle: "Vehicles, FRVs, tanks and exosuits",
+    eagle: "Eagle air strikes", orbital: "Orbital strikes", sentry: "Sentries", defensive: "Mines, emplacements and the shield relay",
+  };
+  function itemsFor(selId) {
+    var m = /^(tag|cat):(.+)$/.exec(selId);
+    if (!m) return [];
+    return DATA.items.filter(function (i) {
+      return i.factions.indexOf("none") === -1 && (m[1] === "tag" ? i.tags.indexOf(m[2]) !== -1 : i.cat === m[2]);
+    });
+  }
+  function hintFor(selId) {
+    var m = /^(tag|cat):(.+)$/.exec(selId);
+    var items = itemsFor(selId);
+    var text = m ? (m[1] === "tag" ? TAG_DESC[m[2]] : CATEGORY_DESC[m[2]]) || "" : "";
+    var names = items.map(function (i) { return i.name; });
+    var eg = names.slice(0, 3).join(", ") + (names.length > 3 ? "\u2026" : "");
+    var body = h("div", { class: "b-hint-all" }, names.join(", "));
+    return h("details", { class: "b-hint" },
+      h("summary", null, (text ? text + " \u2014 " : "") + names.length + " item" + (names.length === 1 ? "" : "s") + (names.length ? " (e.g. " + eg + ")" : "")),
+      body);
+  }
   // One "count of X, in Y, at least / at most / exactly N" row. read() gives the condition, or null if the number is not allowed.
   function condRow(role, prefix, onRemove) {
     var sel = selectorSelect();
@@ -879,6 +905,9 @@
     var label = h("span", { class: "b-prefix" }, prefix);
     var kids = [label, sel, scope, op, n];
     if (onRemove) kids.push(h("button", { type: "button", class: "chip-x", "aria-label": "Remove this condition", onclick: onRemove }, "×"));
+    var hint = h("div", { class: "b-hint-slot" }, hintFor(sel.value));
+    kids.push(hint);
+    sel.addEventListener("change", function () { hint.textContent = ""; hint.appendChild(hintFor(sel.value)); });
     var el = h("div", { class: "b-row", "data-role": role }, kids);
     el.setPrefix = function (t) { label.textContent = t; };
     el.read = function () {
