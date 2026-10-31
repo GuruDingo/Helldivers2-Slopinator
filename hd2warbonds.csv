@@ -1,37 +1,37 @@
-key,name,img_url
-base,Base Game,https://helldivers.wiki.gg/images/Helldivers_2_Key_Art_16x9.png
-super_citizen,Super Citizen Edition,https://helldivers.wiki.gg/images/Super_Citizen_Edition_DLC_Overview2.png
-req_p,Requisition: Patriotic Administration Center,
-req_o,Requisition: Orbital Cannons,
-req_h,Requisition: Hangar,
-req_b,Requisition: Bridge,
-req_e,Requisition: Engineering Bay,
-req_r,Requisition: Robotics Workshop,
-superstore,Superstore,
-fomo,Campaign/Event Rewards,
-helldivers_mobilize,Helldivers Mobilize,https://helldivers.wiki.gg/images/Helldivers_Mobilize_Warbond_Cover.png
-steeled_veterans,Steeled Veterans,https://helldivers.wiki.gg/images/Steeled_Veterans_Premium_Warbond_Cover.png
-cutting_edge,Cutting Edge,https://helldivers.wiki.gg/images/Cutting_Edge_Premium_Warbond_Cover.png
-democratic_detonation,Democratic Detonation,https://helldivers.wiki.gg/images/Democratic_Detonation_Premium_Warbond_Cover.png
-polar_patriots,Polar Patriots,https://helldivers.wiki.gg/images/Polar_Patriots_Premium_Warbond_Cover.png
-viper_commandos,Viper Commandos,https://helldivers.wiki.gg/images/Viper_Commandos_Premium_Warbond_Cover.png
-freedoms_flame,Freedom's Flame,https://helldivers.wiki.gg/images/Freedom's_Flame_Premium_Warbond_Cover.png
-chemical_agents,Chemical Agents,https://helldivers.wiki.gg/images/Chemical_Agents_Premium_Warbond_Cover.png
-truth_enforcers,Truth Enforcers,https://helldivers.wiki.gg/images/Truth_Enforcers_Premium_Warbond_Cover.png
-urban_legends,Urban Legends,https://helldivers.wiki.gg/images/Urban_Legends_Premium_Warbond_Cover.png
-servants_of_freedom,Servants of Freedom,https://helldivers.wiki.gg/images/Servants_of_Freedom_Premium_Warbond_Cover.png
-borderline_justice,Borderline Justice,https://helldivers.wiki.gg/images/Borderline_Justice_Premium_Warbond_Cover.png
-masters_of_ceremony,Masters of Ceremony,https://helldivers.wiki.gg/images/Masters_of_Ceremony_Premium_Warbond_Cover.png
-force_of_law,Force of Law,https://helldivers.wiki.gg/images/Force_of_Law_Premium_Warbond_Cover.png
-control_group,Control Group,https://helldivers.wiki.gg/images/Control_Group_Premium_Warbond_Cover.png
-odst,Halo: ODST,https://helldivers.wiki.gg/images/Halo_ODST_Legendary_Warbond_Cover.png
-dust_devils,Dust Devils,https://helldivers.wiki.gg/images/Dust_Devils_Premium_Warbond_Cover.png
-python_commandos,Python Commandos,https://helldivers.wiki.gg/images/Python_Commandos_Premium_Warbond_Cover.png
-killzone,Killzone,https://helldivers.wiki.gg/images/Righteous_Revenants_Legendary_Warbond_Cover.png
-redacted_regiment,Redacted Regiment,https://helldivers.wiki.gg/images/Redacted_Regiment_Premium_Warbond_Cover.png
-siege_breakers,Siege Breakers,https://helldivers.wiki.gg/images/Siege_Breakers_Premium_Warbond_Cover.png
-entrenched_division,Entrenched Division,https://helldivers.wiki.gg/images/Entrenched_Division_Premium_Warbond_Cover.png
-exo_experts,Exo Experts,https://helldivers.wiki.gg/images/Exo_Experts_Premium_Warbond_Cover.png
-40k,Warhammer 40k,https://helldivers.wiki.gg/images/Castellan's_Creed_Legendary_Warbond_Cover.png
-ironclad_democracy,Ironclad Democracy,https://helldivers.wiki.gg/images/Ironclad_Democracy_Premium_Warbond_Cover.png
-scope_of_authority,Scope of Authority,https://helldivers.wiki.gg/images/Scope_of_Authority_Premium_Warbond_Cover.png
+key,name
+base,Base Game
+super_citizen,Super Citizen Edition
+req_p,Requisition: Patriotic Administration Center
+req_o,Requisition: Orbital Cannons
+req_h,Requisition: Hangar
+req_b,Requisition: Bridge
+req_e,Requisition: Engineering Bay
+req_r,Requisition: Robotics Workshop
+superstore,Superstore
+fomo,Campaign/Event Rewards
+helldivers_mobilize,Helldivers Mobilize
+steeled_veterans,Steeled Veterans
+cutting_edge,Cutting Edge
+democratic_detonation,Democratic Detonation
+polar_patriots,Polar Patriots
+viper_commandos,Viper Commandos
+freedoms_flame,Freedom's Flame
+chemical_agents,Chemical Agents
+truth_enforcers,Truth Enforcers
+urban_legends,Urban Legends
+servants_of_freedom,Servants of Freedom
+borderline_justice,Borderline Justice
+masters_of_ceremony,Masters of Ceremony
+force_of_law,Force of Law
+control_group,Control Group
+odst,Halo: ODST
+dust_devils,Dust Devils
+python_commandos,Python Commandos
+killzone,Killzone
+redacted_regiment,Redacted Regiment
+siege_breakers,Siege Breakers
+entrenched_division,Entrenched Division
+exo_experts,Exo Experts
+40k,Warhammer 40k
+ironclad_democracy,Ironclad Democracy
+scope_of_authority,Scope of Authority

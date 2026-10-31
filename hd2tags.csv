@@ -1,45 +1,45 @@
 tag,group,title,pill_color,pill_order
 assault rifle,Weapon type,Assault Rifle,,
 marksman rifle,Weapon type,Marksman Rifle,,
+melee,Weapon type,Melee,#382E02,1
+onehand,Weapon type,One-Handed,#757575,20
 shotgun,Weapon type,Shotgun,,
 smg,Weapon type,SMG,,
 special,Weapon type,Special,,
-melee,Weapon type,Melee,#382E02,1
-onehand,Weapon type,One-Handed,#757575,20
 support,Weapon type,Support Weapon,,
-nonexp,Weapon type,Non-Expendable Support,,
 expendable,Weapon type,Expendable,#0F0D02,2
+nonexp,Weapon type,Non-Expendable Support,,
+arc,Damage type,Arc,#0c8a96,12
+explosive,Damage type,Explosive,#a0700a,14
 fire,Damage type,Fire,#c8541a,10
 gas,Damage type,Gas,#7d8a1d,11
-arc,Damage type,Arc,#0c8a96,12
+impact,Damage type,Impact,#e6a100,19
 laser,Damage type,Laser,#8a8210,15
 plasma,Damage type,Plasma,#8f3fe0,16
-explosive,Damage type,Explosive,#a0700a,14
-impact,Damage type,Impact,#e6a100,19
-chaff,Enemy role,Chaff Killer,#27ae32,3
-med,Enemy role,Medium Killer,#2f80ed,4
 armor,Enemy role,Anti-Tank,#c62828,5
 demo,Enemy role,Base Breaker,#4b058d,6
+chaff,Enemy role,Chaff Killer,#27ae32,3
+med,Enemy role,Medium Killer,#2f80ed,4
 panic,Enemy role,Panic Weapon,#2943b9,7
+charge,Ammo,Cooldown,,
 noammo,Ammo,No Ammo,#7b5e3b,17
-charge,Ammo,Charge,,
 supply,Ammo,Supply,,
-assist,Utility,Team Assist,#d6336c,8
-stun,Utility,Stun,#9575cd,21
-smoke,Utility,Smoke,,
-stealth,Utility,Stealth,#37474f,13
+jump,Utility,Jump,,
 shield,Utility,Shield,#4a6fa5,18
 handheld,Utility,Hand-Held Shield,,
-jump,Utility,Jump,,
+smoke,Utility,Smoke,,
+stealth,Utility,Stealth,#37474f,13
+stun,Utility,Stun,#9575cd,21
+assist,Utility,Team Assist,#d6336c,8
 backpack,Stratagem type,Backpack,#555555,9
-orbital,Stratagem type,Orbital,,
 eagle,Stratagem type,Eagle,,
-sentry,Stratagem type,Sentry,,
-vehicle,Stratagem type,Vehicle,,
-mines,Stratagem type,Mines,,
 emplacement,Stratagem type,Emplacement,,
-mech,Stratagem type,Mech,,
 frv,Stratagem type,FRV,,
-tank,Stratagem type,Tank,,
-rover,Stratagem type,Rover,,
+mech,Stratagem type,Mech,,
+mines,Stratagem type,Mines,,
 mortar,Stratagem type,Mortar,,
+orbital,Stratagem type,Orbital,,
+rover,Stratagem type,Rover,,
+sentry,Stratagem type,Sentry,,
+tank,Stratagem type,Tank,,
+vehicle,Stratagem type,Vehicle,,

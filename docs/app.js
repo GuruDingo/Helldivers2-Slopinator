@@ -843,12 +843,12 @@
   // Builds Engine generic rules (see engine.js, "Generic rules") from drop-downs. Every rule goes through
   // Engine.normalizeRule, the same check the saved settings pass on load.
   var SCOPE_ORDER = ["all", "ps", "weapons", "strats", "primary", "secondary", "throwable"];
-  // The titled tags that some item carries, in the sections hd2tags.csv puts them in (sections in file order, tags A-Z inside each).
+  // The titled tags that some item carries, in the sections hd2tags.csv puts them in (sections and the tags inside them in the file's order).
   function groupedTags() {
     var present = {};
     titledTags().forEach(function (t) { present[t] = true; });
     return TAG_GROUPS.map(function (g) {
-      return { name: g.name, tags: g.tags.filter(function (t) { return present[t]; }).sort(function (a, b) { return TAG_NAMES[a].localeCompare(TAG_NAMES[b]); }) };
+      return { name: g.name, tags: g.tags.filter(function (t) { return present[t]; }) };
     }).filter(function (g) { return g.tags.length; });
   }
   function titledTags() {

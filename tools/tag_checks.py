@@ -8,7 +8,7 @@ Everything here only FLAGS problems. Nothing edits the CSV. The rules live in to
   exactly_one_of        every item in a category must carry exactly one of the listed tags (today: a support weapon is
                         either expendable or nonexp)
   min_items_per_tag     a tag used by fewer items than this is flagged, unless it is listed in ...
-  acknowledged_rare_tags   tags Boss has already seen and accepted as rare
+  acknowledged_rare_tags   tags already reviewed and accepted as rare
 Also flagged: a tag listed twice on one item.
 """
 import json

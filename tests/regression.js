@@ -30,7 +30,7 @@ function mulberry32(a) {
   };
 }
 
-const dataHash = crypto.createHash("sha256").update(JSON.stringify({ warbonds: globalThis.HD2_DATA.warbonds, items: globalThis.HD2_DATA.items })).digest("hex").slice(0, 16);
+const dataHash = crypto.createHash("sha256").update(JSON.stringify({ warbonds: globalThis.HD2_DATA.warbonds.map((w) => w.key), items: globalThis.HD2_DATA.items })).digest("hex").slice(0, 16);
 const scenarios = JSON.parse(fs.readFileSync(path.join(__dirname, "scenarios.json"), "utf8"));
 const problems = [];
 const problem = (sc, msg) => { if (problems.length < 40) problems.push(`[${sc.name}] ${msg}`); };

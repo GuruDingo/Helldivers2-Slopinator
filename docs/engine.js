@@ -1,5 +1,5 @@
 /*
- * Helldivers 2 Slopinator - generation engine (JavaScript port of hd2loadout.py)
+ * Helldivers 2 Slopinator - generation engine
  *
  * Pure logic: no DOM, no file access, so it runs the same in a browser and in Node
  * (which is how tests/ checks it against the original Python).
@@ -18,7 +18,7 @@
  *     at least N, at most N, or exactly N (a count of 0 is allowed for "at most" / "exactly")
  *   - every default rule below can be removed with the `disabledRules` option (see RULES); the in-game
  *     limits can't be
- *   - LOCKS override the slot rules above (deliberately, same as the Python tool); locking all four
+ *   - LOCKS override the slot rules above (deliberately); locking all four
  *     stratagem slots also waives the "exactly one backpack" and "at least one support" rules
  *   - if the rules can't all be met (locks, warbonds, exclusions...), the build is completed anyway
  *     and loadout.unmet lists the rules it missed. Among imperfect builds, the one that misses the
@@ -92,7 +92,7 @@
   // -- Rule priority --------------------------------------------------------
   // When a build can't meet every rule, imperfect builds are ranked by which rules they miss. 0 = most
   // important. A build that misses only lower tiers always beats one that misses a higher tier, however
-  // many low-tier rules it misses (set by Boss, 2026-10-29).
+  // many low-tier rules it misses (a deliberate ranking).
   var RULE_TIER = {
     require: 0,                                   // the player's own "Require N+ of a tag" requirements
     custom: 0,                                    // the player's own scoped / if-then rules (same level)
@@ -258,12 +258,8 @@
   function create(data, options) {
     options = options || {};
     var rng = options.rng || Math.random; // injectable so tests can use a seeded generator
-    // The original Python tool had a quirk in the stratagem fill loop: it updated its running counters
-    // (support slot used, backpack taken, ...) BEFORE the later checks that could still reject the
-    // pick, so a rejected stratagem could block later, perfectly legal ones. That is fixed here: a
-    // pick only changes the counters if it is actually accepted. Pass { legacyCounterLeak: true } to
-    // get the old behaviour back (only tests/ does, to compare against the original Python).
-    var legacyCounterLeak = !!options.legacyCounterLeak;
+    // In the stratagem fill loop a pick only changes the running counters (backpack taken, Eagles so far, ...) if it is
+    // actually accepted, so a rejected stratagem can never block later, perfectly legal ones.
 
     var items = data.items;
     var primaries = items.filter(function (i) { return i.cat === "primary"; });
@@ -348,7 +344,6 @@
       // Running state, seeded from locked stratagems. Locked stratagems themselves are never
       // rejected for breaking a cap - locks are the player's deliberate override.
       var st = {
-        supportRegular: lockedStrats.some(function (s) { return s && s.cat === "support" && !has(s, "expendable"); }),
         supportExpend: lockedStrats.filter(function (s) { return s && s.cat === "support" && has(s, "expendable"); }).length,
         backpack: lockedStrats.some(function (s) { return s && has(s, "backpack"); }),
         vehicle: lockedStrats.some(function (s) { return s && s.cat === "vehicle"; }),
@@ -366,7 +361,6 @@
         vehicle: ["vehicle", "frv", "tank", "mech"],
       };
       function neededFor(cap, s, soFar) {
-        if (legacyCounterLeak) return false; // the original Python tool had no such override
         return CAP_TAGS[cap].some(function (t) {
           var want = reqMin(t);
           return has(s, t) && want !== undefined &&
@@ -377,20 +371,16 @@
       var IN_GAME_LIMITS = ["frv", "tank", "mech"];
 
       // Returns false if the stratagem breaks a cap. It updates `state` as it goes, so the caller
-      // passes a scratch copy and only keeps it when the pick is accepted (see legacyCounterLeak).
-      var maxTags = legacyCounterLeak ? [] : Object.keys(requirements).filter(function (t) { return requirements[t].max !== undefined; });
+      // passes a scratch copy and only keeps it when the pick is accepted.
+      var maxTags = Object.keys(requirements).filter(function (t) { return requirements[t].max !== undefined; });
       // Generic limits enforced while picking: the default support limits, plus any of the player's own rules that only
-      // cap a count. (The original tool, legacyCounterLeak, has its support limits written out in admit() below.)
+      // cap a count.
       var fillRules = [];
-      if (!legacyCounterLeak) {
-        RULES.forEach(function (r) { if (r.fill && r.rules && ruleOn(r.id)) fillRules = fillRules.concat(r.rules); });
-        customRules.forEach(function (r) { if (isUpperOnly(r)) fillRules.push(r); });
-      }
+      RULES.forEach(function (r) { if (r.fill && r.rules && ruleOn(r.id)) fillRules = fillRules.concat(r.rules); });
+      customRules.forEach(function (r) { if (isUpperOnly(r)) fillRules.push(r); });
       function admit(s, state, soFar) {
-        if (!legacyCounterLeak) {
-          for (var h = 0; h < IN_GAME_LIMITS.length; h++) {
-            if (has(s, IN_GAME_LIMITS[h]) && state[IN_GAME_LIMITS[h]] >= 1) return false;
-          }
+        for (var h = 0; h < IN_GAME_LIMITS.length; h++) {
+          if (has(s, IN_GAME_LIMITS[h]) && state[IN_GAME_LIMITS[h]] >= 1) return false;
         }
         // "At most N" / "exactly N" requirements: never pick a stratagem that would go over.
         for (var mx = 0; mx < maxTags.length; mx++) {
@@ -404,19 +394,7 @@
             if (touchesStrat(fillRules[fr], s) && evalRule(fillRules[fr], ctxAfter)) return false;
           }
         }
-        if (legacyCounterLeak) {
-          if (s.cat === "support" && !has(s, "expendable")) {
-            if (ruleOn("capSupport") && (state.supportRegular || state.supportExpend > 0)) return false;
-            state.supportRegular = true;
-          } else if (s.cat === "support" && has(s, "expendable")) {
-            var moreExpendOld = neededFor("expend", s, soFar);
-            if (ruleOn("capSupport")) {
-              if (state.supportRegular && !moreExpendOld) return false;
-              if (state.supportExpend >= 2 && !moreExpendOld) return false;
-            }
-            state.supportExpend += 1;
-          }
-        } else if (s.cat === "support" && has(s, "expendable")) {
+        if (s.cat === "support" && has(s, "expendable")) {
           if (ruleOn("capExpend") && state.supportExpend >= 2 && !neededFor("expend", s, soFar)) return false;
           state.supportExpend += 1;
         }
@@ -436,9 +414,7 @@
           if (ruleOn("capMine") && state.mine >= 1 && !neededFor("mine", s, soFar)) return false;
           state.mine += 1;
         }
-        if (!legacyCounterLeak) {
-          IN_GAME_LIMITS.forEach(function (t) { if (has(s, t)) state[t] += 1; });
-        }
+        IN_GAME_LIMITS.forEach(function (t) { if (has(s, t)) state[t] += 1; });
         return true;
       }
 
@@ -454,35 +430,29 @@
       // stratagems; the remaining slots are then filled as usual. Other requirements are left to the random fill
       // (the build is re-rolled until it fits), exactly as before.
       var DEFAULT_CAPS = { eagle: 2, mines: 1, vehicle: 1, backpack: 1, expendable: 2 };
-      if (!legacyCounterLeak) {
-        Object.keys(DEFAULT_CAPS).forEach(function (tag) {
-          var wantMin = reqMin(tag);
-          if (wantMin === undefined || wantMin <= DEFAULT_CAPS[tag]) return;
-          for (var m = 0; m < stratPool.length && freeSlots.length; m++) {
-            var cand = stratPool[m];
-            if (!has(cand, tag) || chosen.indexOf(cand) !== -1) continue;
-            var soFarNow = [primary, secondary, throwable].concat(chosen.filter(Boolean));
-            if (soFarNow.filter(function (i) { return has(i, tag); }).length >= wantMin) break;
-            var attemptState = Object.assign({}, st);
-            if (!admit(cand, attemptState, soFarNow)) continue;
-            st = attemptState;
-            chosen[freeSlots.shift()] = cand;
-          }
-        });
-      }
+      Object.keys(DEFAULT_CAPS).forEach(function (tag) {
+        var wantMin = reqMin(tag);
+        if (wantMin === undefined || wantMin <= DEFAULT_CAPS[tag]) return;
+        for (var m = 0; m < stratPool.length && freeSlots.length; m++) {
+          var cand = stratPool[m];
+          if (!has(cand, tag) || chosen.indexOf(cand) !== -1) continue;
+          var soFarNow = [primary, secondary, throwable].concat(chosen.filter(Boolean));
+          if (soFarNow.filter(function (i) { return has(i, tag); }).length >= wantMin) break;
+          var attemptState = Object.assign({}, st);
+          if (!admit(cand, attemptState, soFarNow)) continue;
+          st = attemptState;
+          chosen[freeSlots.shift()] = cand;
+        }
+      });
 
       for (var k = 0; k < stratPool.length; k++) {
         if (!freeSlots.length) break;
         var s = stratPool[k];
         if (chosen.indexOf(s) !== -1) continue; // already placed by the requirement pass above
         var soFar = [primary, secondary, throwable].concat(chosen.filter(Boolean));
-        if (legacyCounterLeak) {
-          if (!admit(s, st, soFar)) continue;     // may have changed st even though it rejected s
-        } else {
-          var trial = Object.assign({}, st);
-          if (!admit(s, trial, soFar)) continue;  // rejected: st is untouched
-          st = trial;
-        }
+        var trial = Object.assign({}, st);
+        if (!admit(s, trial, soFar)) continue;    // rejected: st is untouched
+        st = trial;
         chosen[freeSlots.shift()] = s;
       }
       if (chosen.some(function (s) { return !s; })) return null; // couldn't fill every slot at all
@@ -490,8 +460,7 @@
       // ---- Rule checks --------------------------------------------------------------------
       // Every rule is evaluated and every failure is collected (instead of stopping at the first),
       // so a build that can't meet all the rules can still be completed and report exactly which
-      // ones it missed. A build with no failures is a "strict" build - the only kind the original
-      // Python version would ever return.
+      // ones it missed. A build with no failures is a "strict" build.
       var unmet = [];
       var shortfall = 0; // tie-breaker between imperfect builds: how far short the numeric rules fell
       function fail(id, label, extra) {
@@ -677,9 +646,7 @@
     normalizeRequirements: normalizeRequirements,
     normalizeRule: normalizeRule,
     normalizeRules: normalizeRules,
-    SCOPES: SCOPES,
     scoreUnmet: scoreUnmet,
-    WEAPON_CATEGORIES: WEAPON_CATEGORIES,
     STRATAGEM_CATEGORIES: STRATAGEM_CATEGORIES,
   };
 });

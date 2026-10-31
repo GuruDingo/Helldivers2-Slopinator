@@ -73,17 +73,22 @@ function check(label, cond, extra) {
   check("first visit wrote the owned list to localStorage", Object.keys(JSON.parse(win.localStorage.getItem("hd2_tracker"))).length === ACTIVE - win.HD2_DATA.items.filter((i) => i.warbond === "base" && i.factions.indexOf("none") === -1).length); // everything except the always-owned Base Game items
   check("7 lock inputs", doc.querySelectorAll("#lock-grid input").length === 7);
   check("datalists filled", $("dl-primary").children.length > 40 && $("dl-strat").children.length > 60);
-  check("the rule builder lists the 44 titled tags, in sections from hd2tags.csv, A-Z inside each", (() => {
+  check("the rule builder lists the 44 titled tags, in sections from hd2tags.csv, in file order inside each", (() => {
     const tagGroups = Array.from(doc.querySelectorAll('#builder-body .b-row[data-role="must"] optgroup')).filter((g) => g.label !== "Categories");
     const opts = tagGroups.flatMap((g) => Array.from(g.children));
     const t = opts.map((x) => x.textContent);
     const csv = win.HD2_DATA.tags;
     const expectedSections = []; csv.forEach((r) => { if (expectedSections.indexOf(r.group) === -1) expectedSections.push(r.group); });
     return opts.length === 44 && tagGroups.map((g) => g.label).join("|") === expectedSections.join("|")
-      && tagGroups.every((g) => Array.from(g.children).every((o, k, a) => csv.find((r) => "tag:" + r.tag === o.value).group === g.label && (k === 0 || a[k - 1].textContent.localeCompare(o.textContent) <= 0)))
-      && ["Team Assist", "Fire", "Laser", "Plasma", "Hand-Held Shield", "Explosive", "One-Handed", "Supply", "Support Weapon", "Charge", "Shotgun", "SMG", "Special", "Stun", "Smoke", "Jump", "Mech", "FRV", "Tank", "Rover", "Mortar", "Emplacement", "Impact", "No Ammo", "Non-Expendable Support"].every((n) => t.includes(n))
+      && tagGroups.every((g) => Array.from(g.children).every((o, k, a) => csv.find((r) => "tag:" + r.tag === o.value).group === g.label && (k === 0 || csv.findIndex((r) => "tag:" + r.tag === a[k - 1].value) < csv.findIndex((r) => "tag:" + r.tag === o.value))))
+      && ["Team Assist", "Fire", "Laser", "Plasma", "Hand-Held Shield", "Explosive", "One-Handed", "Supply", "Support Weapon", "Cooldown", "Shotgun", "SMG", "Special", "Stun", "Smoke", "Jump", "Mech", "FRV", "Tank", "Rover", "Mortar", "Emplacement", "Impact", "No Ammo", "Non-Expendable Support"].every((n) => t.includes(n))
       && !opts.some((x) => ["tag:heal", "tag:taunt", "tag:beam"].includes(x.value)) && opts.some((x) => x.value === "tag:assist");
   })(), Array.from(doc.querySelectorAll('#builder-body .b-row[data-role="must"] optgroup')).map((g) => g.label + ": " + Array.from(g.children).map((x) => x.textContent).join(", ")).join(" | "));
+  check("...Expendable and Non-Expendable Support come right after Support Weapon; Hand-Held Shield right after Shield; Charge is titled Cooldown", (() => {
+    const t = Array.from(doc.querySelectorAll('#builder-body .b-row[data-role="must"] optgroup option')).map((o) => o.textContent);
+    const at = (n) => t.indexOf(n);
+    return at("Expendable") === at("Support Weapon") + 1 && at("Non-Expendable Support") === at("Expendable") + 1 && at("Hand-Held Shield") === at("Shield") + 1 && at("Cooldown") >= 0 && at("Charge") === -1;
+  })(), "");
   check("autocomplete options carry names only (no category labels)",
     Array.from(doc.querySelectorAll("#dl-strat option")).every((o) => !o.hasAttribute("label")) &&
     $("dl-strat").querySelector("option[value='AC-8 Autocannon']") !== null);

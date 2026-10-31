@@ -2,7 +2,7 @@
 build_gear.py - turns the three editable CSV files into the data file the website reads.
 
     hd2gear.csv        one row per item (you edit this in Excel)
-    hd2warbonds.csv    warbond keys + display names + cover image URLs, in display order
+    hd2warbonds.csv    warbond keys + display names, in display order
     hd2tags.csv        tag display titles + pill colours (row order = pill order on a card)
     docs/img/manifest.json  (optional) the saved copies of the wiki images, written by tools/fetch_images.py
         ->  docs/gear-data.js
@@ -15,7 +15,7 @@ Run it from anywhere after you change either CSV:
 It refuses to write anything if it finds a real problem (unknown category, unknown
 warbond key, duplicate names...), so a typo in the CSV can't silently break the site.
 
-Tag consistency is NOT checked here; that is a separate manual procedure (see TAG_CHECK.md).
+Tag consistency is NOT checked here; that is a separate manual procedure (see tools/tag_checks.py).
 """
 
 import argparse
@@ -47,9 +47,8 @@ def split_list(raw):
 
 def load_warbonds():
     with open(WARBOND_CSV, newline="", encoding="utf-8-sig") as f:
-        rows = [(r["key"].strip(), r["name"].strip(), (r.get("img_url") or "").strip())
-                for r in csv.DictReader(f) if r["key"].strip()]
-    keys = [k for k, _, _ in rows]
+        rows = [(r["key"].strip(), r["name"].strip()) for r in csv.DictReader(f) if r["key"].strip()]
+    keys = [k for k, _ in rows]
     dupes = {k for k in keys if keys.count(k) > 1}
     if dupes:
         sys.exit(f"ERROR: duplicate warbond keys in {WARBOND_CSV.name}: {sorted(dupes)}")
@@ -165,7 +164,7 @@ def load_items(warbond_keys):
                 "armorPen": armor_pen,
             })
 
-    # ids are permanent (Boss, 2026-10-31): a whole number that is never renumbered or reused, because people's saved
+    # ids are permanent: a whole number that is never renumbered or reused, because people's saved
     # settings in their browsers (owned / blocked / faction edits) are keyed by it. Row position does not matter and
     # release order is the release_date column. The build also checks hd2ids.lock.json (see check_id_lock).
     seen_ids = {}
@@ -261,7 +260,7 @@ def data_js_text(warbonds, items, images, tags=()):
     img_lines = ",\n".join("  " + json.dumps(u) + ":" + json.dumps(r) for u, r in images.items())
     body = (
         "{\n"
-        ' "warbonds": [\n' + lines([{"key": k, "name": n, "imgUrl": u} for k, n, u in warbonds]) + "\n ],\n"
+        ' "warbonds": [\n' + lines([{"key": k, "name": n} for k, n in warbonds]) + "\n ],\n"
         ' "items": [\n' + lines(items) + "\n ],\n"
         ' "tags": [\n' + lines(tags) + "\n ],\n"
         # Saved copies of the wiki images (see tools/fetch_images.py); the page uses these instead of the wiki links.
@@ -312,7 +311,7 @@ def main():
     args = ap.parse_args()
 
     warbonds = load_warbonds()
-    items, errors, warnings = load_items({k for k, _, _ in warbonds})
+    items, errors, warnings = load_items({k for k, _ in warbonds})
 
     tags, tag_errors = load_tags()
     errors += tag_errors

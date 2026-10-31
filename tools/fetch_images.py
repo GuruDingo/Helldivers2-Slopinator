@@ -9,7 +9,6 @@ no longer hotlinks them.
 
 What it collects (the wiki address stays the source of truth; nothing in the CSVs changes):
     hd2gear.csv        img_url          -> docs/img/items/       (resized, WebP)
-    hd2warbonds.csv    img_url          -> docs/img/warbonds/    (resized, WebP)
     docs/app.js        every wiki image the page links (faction emblems, warbond title icons, requisition slip)
                        plus the 13 armor-penetration icons          -> docs/img/icons/ (kept as they are: SVG stays SVG)
 
@@ -49,7 +48,7 @@ DELAY = 0.4  # seconds between downloads
 AP_LEVELS = range(-1, 12)  # armor-penetration icons, -1 .. 11
 
 # kind -> (folder, longest side in pixels or None to keep as is)
-KINDS = {"items": ("items", 320), "warbonds": ("warbonds", 480), "icons": ("icons", None)}
+KINDS = {"items": ("items", 320), "icons": ("icons", None)}
 RASTER = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
 
 
@@ -90,7 +89,6 @@ def plan():
     jobs, seen = [], {}
     wanted = (
         [(u, "items") for u in read_csv_urls(GEAR_CSV, "img_url")]
-        + [(u, "warbonds") for u in read_csv_urls(WARBOND_CSV, "img_url")]
         + [(u, "icons") for u in app_icon_urls()]
     )
     taken = {}
@@ -128,7 +126,7 @@ def download(url):
 
 
 def process(data, kind, rel):
-    """Bytes to write for this image: resized WebP for items / warbonds, the original for icons."""
+    """Bytes to write for this image: resized WebP for items, the original for icons."""
     ext = Path(rel).suffix.lower()
     limit = KINDS[kind][1]
     if ext == ".svg":
