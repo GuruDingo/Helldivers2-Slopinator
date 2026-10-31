@@ -20,7 +20,7 @@
     orbital: "Orbital", sentry: "Sentry", defensive: "Emplacement",
   };
   var WEAPON_CAT_LABELS = { primary: "Primary", secondary: "Secondary", throwable: "Throwable" };
-  // Display titles. Only tags listed here appear in the "Additional rules" dropdown; a tag with no title here
+  // Display titles. Only tags listed here appear in the rule builder's tag list; a tag with no title here
   // still works in the data and the rules, it just isn't offered (and gets no pill).
   var TAG_NAMES = {
     melee: "Melee", expendable: "Expendable", chaff: "Chaff Killer", med: "Medium Killer", armor: "Anti-Tank",
@@ -363,7 +363,7 @@
   // Control panel state
   // ---------------------------------------------------------------------------
   var state = {
-    requirements: {},    // tag -> { min?, max? }  (the "Additional rules")
+    requirements: {},    // tag -> { min?, max? }  (the player's plain tag counts, edited default rows included)
     disabledRules: {},   // default rule id -> true when removed from the rules list
     customRules: [],     // the player's own generic rules: scoped counts, categories, if/then, balance (see Engine.normalizeRule)
   };

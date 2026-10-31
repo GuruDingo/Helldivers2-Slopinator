@@ -1,4 +1,6 @@
-# Release dates: what to check (2026-10-30)
+# Release dates: where they came from (2026-10-30)
+
+**Boss accepted the current dates as correct on 2026-10-30.** The notes below record how each date was found and are no longer a to-do list.
 
 `hd2gear.csv` now has a `release_date` column (YYYY-MM-DD) and the rows are ordered oldest to newest: id 1 is the oldest item, the highest id the newest. Items released on the same day keep their previous relative order. The dates are a best effort; this file lists what was looked up and what is only assumed, so you can correct the assumed ones.
 
