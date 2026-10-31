@@ -13,7 +13,7 @@
  *   - max 1 vehicle, max 2 eagle, max 1 mine stratagem - but a "Require N+ <tag>" request for that same tag
  *     (eagle, mines, vehicle/frv/tank/mech, backpack, expendable) overrides the cap, so "Eagle >= 3" can be met
  *   - IN-GAME LIMITS that nothing overrides: at most one FRV, one tank and one exosuit (mech)
- *   - supply stratagems are blocked once 2+ "no-ammo" factors are present
+ *   - supply stratagems are blocked once 2+ "no-ammo" items (the noammo tag) are present
  *   - the player's own tag counts (requirements) say how many items with a tag the build must have:
  *     at least N, at most N, or exactly N (a count of 0 is allowed for "at most" / "exactly")
  *   - every default rule below can be removed with the `disabledRules` option (see RULES); the in-game
@@ -78,7 +78,7 @@
     { id: "shield", kind: "guarantee", label: "A hand-held shield needs a one-handed primary or a melee weapon",
       rules: [{ when: [{ sel: "tag:handheld", scope: "strats", min: 1 }, { sel: "tag:onehand", scope: "primary", max: 0 }], must: { sel: "tag:melee", scope: "ps", min: 1 } }] },
     { id: "supply", kind: "guarantee", label: "No supply pack alongside 2+ no-ammo items",
-      rules: [{ when: [{ sel: "grp:noAmmo", scope: "all", min: 2 }], must: { sel: "tag:supply", scope: "strats", max: 0 } }] },
+      rules: [{ when: [{ sel: "tag:noammo", scope: "all", min: 2 }], must: { sel: "tag:supply", scope: "strats", max: 0 } }] },
     { id: "capRegular", kind: "limit", label: "At most 1 regular (non-expendable) support weapon", fill: true,
       rules: [{ must: { sel: "grp:regularSupport", scope: "strats", max: 1 } }] },
     { id: "capExpend", kind: "limit", label: "At most 2 expendable support weapons", preset: { tag: "expendable", max: 2 } },
@@ -155,8 +155,9 @@
   // Rules are plain data so the page can save them and show them as sentences.
   var SELECTOR_GROUPS = {
     regularSupport: function (i) { return i.cat === "support" && !has(i, "expendable"); },   // a support weapon that is not expendable
-    noAmmo: function (i) { return has(i, "charge") || (i.cat === "support" && has(i, "expendable")); }, // charge weapon or expendable support
   };
+  // Selectors that were renamed: a saved or hand-written rule may still use the old name (the "noAmmo" group became the noammo tag).
+  var SELECTOR_ALIASES = { "grp:noAmmo": "tag:noammo" };
   var SCOPES = ["all", "weapons", "ps", "strats", "primary", "secondary", "throwable"];
   var selectorCache = {};
   function makeSelector(id) {
@@ -218,11 +219,11 @@
   }
 
   function cleanCond(c) {
-    if (!c || typeof c !== "object" || typeof c.sel !== "string" || !makeSelector(c.sel)) return null;
+    if (!c || typeof c !== "object" || typeof c.sel !== "string" || !makeSelector(SELECTOR_ALIASES[c.sel] || c.sel)) return null;
     var scope = c.scope === undefined ? "all" : c.scope;
     if (SCOPES.indexOf(scope) === -1) return null;
     if (c.sel.indexOf("cat:") === 0 && WEAPON_CATEGORIES.concat(STRATAGEM_CATEGORIES).indexOf(c.sel.slice(4)) === -1) return null;
-    var out = { sel: c.sel, scope: scope };
+    var out = { sel: SELECTOR_ALIASES[c.sel] || c.sel, scope: scope };
     var num = function (v) { return typeof v === "number" && v >= 0 && v <= 7 && Math.floor(v) === v; };
     if (c.min !== undefined) { if (!num(c.min)) return null; out.min = c.min; }
     if (c.max !== undefined) { if (!num(c.max)) return null; out.max = c.max; }

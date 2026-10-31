@@ -648,7 +648,7 @@
     all: "whole loadout", ps: "primary + secondary", weapons: "all three weapons", strats: "stratagems",
     primary: "primary", secondary: "secondary", throwable: "throwable",
   };
-  var GROUP_LABELS = { regularSupport: "Regular support weapon", noAmmo: "No-ammo item (charge weapon or expendable support)" };
+  var GROUP_LABELS = { regularSupport: "Regular support weapon" };
   var CATEGORY_ORDER = ["primary", "secondary", "throwable", "support", "backpack", "vehicle", "eagle", "orbital", "sentry", "defensive"];
   function categoryLabel(c) { return WEAPON_CAT_LABELS[c] || TYPE_LABELS[c] || c; }
   function selectorLabel(id) {

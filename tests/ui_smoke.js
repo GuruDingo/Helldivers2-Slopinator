@@ -365,7 +365,7 @@ function check(label, cond, extra) {
     const m = bRow("must"); setv(m.querySelector(".b-sel"), must[0]); setv(m.querySelector(".b-scope"), must[1]); setv(m.querySelector(".b-op"), must[2]); m.querySelector(".b-n").value = String(must[3]);
     click($("b-add"));
   };
-  check("the builder offers tags, categories and groups, and every scope", Array.from(bRow("must").querySelectorAll("optgroup")).map((g) => g.label).join("|") === "Tags|Categories|Groups" && bRow("must").querySelectorAll(".b-scope option").length === 7 && !!bRow("must").querySelector('option[value="cat:orbital"]') && !!bRow("must").querySelector('option[value="grp:noAmmo"]'));
+  check("the builder offers tags, categories and groups, and every scope", Array.from(bRow("must").querySelectorAll("optgroup")).map((g) => g.label).join("|") === "Tags|Categories|Groups" && bRow("must").querySelectorAll(".b-scope option").length === 7 && !!bRow("must").querySelector('option[value="cat:orbital"]') && !!bRow("must").querySelector('option[value="grp:regularSupport"]') && !bRow("must").querySelector('option[value="grp:noAmmo"]'));
   build([], ["cat:orbital", "all", "max", 0]);
   check("a category rule becomes a row (and 'Clear custom rules' appears)", chipTexts().includes("Orbital ≤ 0") && !$("custom-clear").hidden && /1 added/.test($("rules-summary").textContent), chipTexts().join("|"));
   check("...and is saved with the other settings", JSON.stringify(JSON.parse(win.localStorage.getItem("hd2_settings")).customRules) === '[{"must":{"sel":"cat:orbital","scope":"all","max":0}}]', win.localStorage.getItem("hd2_settings"));

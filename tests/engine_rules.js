@@ -514,4 +514,21 @@ test("Shield rule: a one-handed primary or a melee weapon satisfies it, a pistol
   Array.from({ length: 40 }, () => engine.generateLoadoutRelaxed({ faction: "any", locks: { primary: pick("AR-23 Liberator"), secondary: pick("P-4 Senator"), strat1: pick("SH-32 Shield Generator Pack") } })).forEach((l) => assert(!flagged(l)));
 });
 
+test("The noammo tag (not a group) drives the supply rule; an old grp:noAmmo selector is read as the tag", () => {
+  const items = HD2Engine.create(HD2_DATA).pools;
+  const all = items.primaries.concat(items.secondaries, items.throwables, items.strategems);
+  const noammo = all.filter((i) => HD2Engine.has(i, "noammo"));
+  assert.strictEqual(noammo.length, 20);
+  assert(noammo.every((i) => (HD2Engine.has(i, "charge") || HD2Engine.has(i, "expendable")) && (["primary", "secondary", "support"].includes(i.cat) || HD2Engine.has(i, "rover"))), "noammo only on charge / expendable weapons and Rovers");
+  assert(!HD2Engine.SELECTOR_GROUPS.includes("noAmmo"), "the noAmmo group is gone");
+  const old = HD2Engine.normalizeRule({ when: [{ sel: "grp:noAmmo", scope: "all", min: 2 }], must: { sel: "tag:supply", scope: "strats", max: 0 } });
+  assert(old && old.when[0].sel === "tag:noammo", "old saved selector is translated");
+  const engine = HD2Engine.create(HD2_DATA);
+  const pick = (n) => all.find((i) => i.name === n);
+  for (let k = 0; k < 40; k++) {
+    const l = engine.generateLoadoutRelaxed({ faction: "any", locks: { strat1: pick("AX/ARC-3 K-9"), strat2: pick("ARC-3 Arc Thrower") } });
+    assert(l.strategems.every((i) => !HD2Engine.has(i, "supply")) || l.unmet.some((u) => u.id === "supply"), "K-9 + Arc Thrower count as two no-ammo items, so no supply pack");
+  }
+});
+
 console.log("\n" + passed + " engine rule tests passed" + (process.exitCode ? " (with failures)" : ""));
