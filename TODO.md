@@ -3,6 +3,10 @@
 Items we agreed to come back to. Nothing below is started unless marked.
 
 ## UI / design
+- [ ] **Feedback link** (Boss, 2026-10-30): add a visible "Report a bug / wrong data" link on the site (footer or near the title) that
+      points to the GitHub repo's Issues page, ideally with a short issue template (which item, what is wrong, which page). Wanted
+      before the tool is shared publicly (Reddit), since players will report wrong data and missing items. Open: Issues only, or
+      also a contact option for people without a GitHub account?
 - [x] ~~Show armor penetration on weapon cards~~ done 2026-10-30: `armor_pen` column in `hd2gear.csv` for all 141 weapons
       (main attack, `2/4` for two-mode weapons), validated by the build, exported as `armorPen`, and shown on the loadout
       cards as the wiki's icons (both, side by side, for two-mode weapons). Possible follow-ups: use it for the "anti-tank" tag/rules and sub-faction advice; check
@@ -14,7 +18,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       exports them as `HD2_DATA.images`, the page prefers the saved copy (wiki link only as a fallback), and the
       single-file build embeds them (2.3 MB, works offline). Re-run the fetch (Actions -> Fetch images, or the script)
       when a new item / warbond / wiki image is added. The warbond covers are saved too, but not shown anywhere (header art is parked, 2026-10-30).
-- [x] ~~Host the tool at a URL~~ done 2026-10-30: live at https://gurudingo.github.io/Helldivers2-Slopinator/ (GitHub Pages, `main` / `/docs`). Open choices still: custom domain, analytics/feedback.
+- [x] ~~Host the tool at a URL~~ done 2026-10-30: live at https://gurudingo.github.io/Helldivers2-Slopinator/ (GitHub Pages, `main` / `/docs`). Open choices still: custom domain, analytics (the feedback link is its own item above).
 - [x] ~~Give every tag a display title~~ done 2026-10-30: 41 of 44 tags have titles; titles and pill colours live in `hd2tags.csv`
       (row order = pill order, blank colour = no pill). Heal, taunt and beam are left untitled on purpose (Boss, 2026-10-30), so they
       are not offered in the Rules dropdown. `hd2-tags.xlsx` (sent earlier) is out of date: edit `hd2tags.csv` instead.
