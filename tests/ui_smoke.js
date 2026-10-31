@@ -72,7 +72,7 @@ function check(label, cond, extra) {
   check("first visit wrote the owned list to localStorage", Object.keys(JSON.parse(win.localStorage.getItem("hd2_tracker"))).length === ACTIVE - win.HD2_DATA.items.filter((i) => i.warbond === "base" && i.factions.indexOf("none") === -1).length); // everything except the always-owned Base Game items
   check("7 lock inputs", doc.querySelectorAll("#lock-grid input").length === 7);
   check("datalists filled", $("dl-primary").children.length > 40 && $("dl-strat").children.length > 60);
-  check("the rule builder lists only titled tags (32) under Tags, by title", (() => { const o = Array.from(doc.querySelector('#builder-body .b-row[data-role="must"] optgroup').children); const t = o.map((x) => x.textContent); return o.length === 32 && t.includes("Team Assist") && t.includes("Fire") && t.includes("Laser") && t.includes("Plasma") && t.includes("Hand-Held Shield") && t.includes("Explosive") && t.includes("One-Handed") && t.includes("Supply") && t.includes("Support Weapon") && t.includes("Charge") && t.includes("Shotgun") && t.includes("SMG") && t.includes("Special") && t.every((x, i) => i === 0 || t[i - 1].localeCompare(x) <= 0) && !o.some((x) => ["tag:stun", "tag:mortar"].includes(x.value)) && o.some((x) => x.value === "tag:assist"); })(), Array.from(doc.querySelector('#builder-body .b-row[data-role="must"] optgroup').children).map((x) => x.textContent).join(", "));
+  check("the rule builder lists only titled tags (41) under Tags, by title", (() => { const o = Array.from(doc.querySelector('#builder-body .b-row[data-role="must"] optgroup').children); const t = o.map((x) => x.textContent); return o.length === 41 && t.includes("Team Assist") && t.includes("Fire") && t.includes("Laser") && t.includes("Plasma") && t.includes("Hand-Held Shield") && t.includes("Explosive") && t.includes("One-Handed") && t.includes("Supply") && t.includes("Support Weapon") && t.includes("Charge") && t.includes("Shotgun") && t.includes("SMG") && t.includes("Special") && t.every((x, i) => i === 0 || t[i - 1].localeCompare(x) <= 0) && ["Stun", "Smoke", "Jump", "Mech", "FRV", "Tank", "Rover", "Mortar", "Emplacement"].every((n) => t.includes(n)) && !o.some((x) => ["tag:heal", "tag:taunt", "tag:beam"].includes(x.value)) && o.some((x) => x.value === "tag:assist"); })(), Array.from(doc.querySelector('#builder-body .b-row[data-role="must"] optgroup').children).map((x) => x.textContent).join(", "));
   check("autocomplete options carry names only (no category labels)",
     Array.from(doc.querySelectorAll("#dl-strat option")).every((o) => !o.hasAttribute("label")) &&
     $("dl-strat").querySelector("option[value='AC-8 Autocannon']") !== null);
@@ -94,6 +94,14 @@ function check(label, cond, extra) {
   check("no error banner", errors().length === 0, errors());
   $("count").value = "3"; generate();
   check("3 loadouts -> 21 cards + 3 headings", cards() === 21 && doc.querySelectorAll("#results h2").length === 3, cards());
+  check("pills follow hd2tags.csv: titles from the CSV, in the CSV's row order", (() => {
+    const order = win.HD2_DATA.tags.filter((t) => t.color).map((t) => t.title);
+    return Array.from(doc.querySelectorAll("#results .tag-row")).every((row) => {
+      const names = Array.from(row.querySelectorAll(".tag-pill")).map((p) => p.textContent);
+      const idx = names.map((n) => order.indexOf(n));
+      return idx.every((v, i) => v >= 0 && (i === 0 || idx[i - 1] < v));
+    });
+  })(), "");
   setFaction("bot"); $("count").value = "1"; generate();
   check("faction bot generates", cards() === 7);
   check("picking Automatons switches the page theme", doc.documentElement.getAttribute("data-faction") === "bot");
@@ -291,6 +299,7 @@ function check(label, cond, extra) {
   check("unmeetable requirement still builds 7 cards (no error)", cards() === 28 || cards() === 7, cards() + " " + errors());
   check("...and lists the unmet requirement in a banner", /Rule: at least 4 Vehicle/.test((doc.querySelector("#results .rules-warning") || {}).textContent || ""),
     (doc.querySelector("#results .rules-warning") || {}).textContent);
+  check("...with a Why? detail and the rule's priority shown", !!doc.querySelector("#results .rules-warning details.why") && /\[your own rules\]/.test((doc.querySelector("#results .rules-warning") || {}).textContent || ""), (doc.querySelector("#results .rules-warning") || {}).textContent);
   check("...with no red error message", errors().length === 0, errors());
   check("'at least 4 vehicles' replaced the default 'at most 1' (the default's side of the clash is dropped)", chipTexts().includes("Vehicle ≥ 4") && !chipTexts().includes("Vehicle ≤ 1"), chipTexts().join("|"));
   chips().forEach((c) => click(c.querySelector("button")));
@@ -398,6 +407,8 @@ function check(label, cond, extra) {
   check("free sources only -> small pool, premium warbonds not owned", (() => { const m = /Rolling from (\d+) of (\d+)/.exec(poolText()); return m && Number(m[1]) > 6 && Number(m[1]) < Number(m[2]) / 2; })(), poolText());
   generate();
   check("bug + free sources only (no premium warbonds) -> off-faction banner shown", !!doc.querySelector("#results .faction-warning"));
+  check("...with a Why? detail that names the reason", /Why\?/.test((doc.querySelector("#results .faction-warning details.why") || {}).textContent || ""), (doc.querySelector("#results .faction-warning") || {}).textContent);
+  check("...and each OFF-FACTION badge on a card explains itself", Array.from(doc.querySelectorAll("#results .item-card .suboptimal-badge, #results .item-card2 .suboptimal-badge")).every((b) => /meant for/.test(b.title)), "");
 
   console.log("Warbond pills");
   setFaction("any");

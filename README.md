@@ -12,6 +12,7 @@ No server, no accounts, nothing to host except the files in `docs/`.
 ```
 hd2gear.csv            gear database - you edit this (Excel is fine)
 hd2warbonds.csv        warbond keys + display names + cover image URLs (img_url), in display order
+hd2tags.csv            tag display titles + pill colours (row order = pill order on a card)
 tools/build_gear.py    validates both CSVs and writes docs/gear-data.js
 tools/fetch_images.py  saves the wiki images into docs/img/ (see "Saved images")
 docs/                  the website (this folder is what gets published)
@@ -36,7 +37,7 @@ Do this when a release adds weapons, stratagems or a warbond. The wiki's page fo
 4. **Rebuild**: `python tools/build_gear.py`. It checks for typos (unknown category or warbond, duplicate names or nicknames, bad `armor_pen`) and rebuilds `docs/gear-data.js`; it writes nothing if it finds an error. Warnings about a missing picture or `armor_pen` are only reminders.
 5. **Save the new pictures**: GitHub's Actions tab -> "Fetch images" -> Run workflow (or `python tools/fetch_images.py`), then merge the `images-fetched` branch it creates. Only missing files are downloaded. Until that is done the new items show their wiki pictures, so nothing breaks. See "Saved images".
 6. **Check the tags** (this is a manual step, not part of the build): follow `TAG_CHECK.md` (`python tools/tag_checks.py`). It flags missing implied tags and tags used by fewer than three items; nothing is changed without your say-so.
-   - A new **meme tag** (an elemental or themed build tag such as fire, arc, gas, stealth, explosive, laser or plasma) also needs a display title in `TAG_NAMES` and a pill colour in `TAG_COLORS` in `docs/app.js`; all meme tags get pills. Any other new tag only needs a title if it should appear in the Rules dropdown.
+   - A new **meme tag** (an elemental or themed build tag such as fire, arc, gas, stealth, explosive, laser or plasma) also needs a row in `hd2tags.csv` with a title and a pill colour (`pill_color`, like `#c8541a`); all meme tags get pills, and the row's position sets the pill order. Any other new tag only needs a row with a title (leave `pill_color` blank for no pill) if it should appear in the Rules dropdown. The build checks for duplicate tags, missing titles and malformed colours.
 7. **Re-save the odds baseline and run every test**: `node tests/regression.js --update-baseline`, then `node tests/run_all.js`. New items change the odds, so the regression test's baseline needs refreshing after an intentional change like this.
 8. **Publish**: commit the CSVs, `docs/gear-data.js`, `docs/img/` and `tests/baseline.json` on a branch, open a pull request (the test run attaches a downloadable build so you can try it first), merge it, and hard-refresh the live site.
 

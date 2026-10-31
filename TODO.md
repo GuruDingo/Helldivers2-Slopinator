@@ -15,12 +15,11 @@ Items we agreed to come back to. Nothing below is started unless marked.
       single-file build embeds them (2.3 MB, works offline). Re-run the fetch (Actions -> Fetch images, or the script)
       when a new item / warbond / wiki image is added. The warbond covers are saved too, but not shown anywhere (header art is parked, 2026-10-30).
 - [x] ~~Host the tool at a URL~~ done 2026-10-30: live at https://gurudingo.github.io/Helldivers2-Slopinator/ (GitHub Pages, `main` / `/docs`). Open choices still: custom domain, analytics/feedback, shareable-loadout links.
-- [~] **Give every tag a display title.** 32 of 42 tags have titles now (the 9 old ones, "assist" is shown as
-      "Team Assist", plus Fire, Stealth, Orbital, Eagle, Sentry, Gas, Vehicle, Arc, and since 2026-10-30 Explosive, Laser,
-      Plasma and Hand-Held Shield, then Mines, then One-Handed, Supply, Support Weapon, Charge, Shield, Shotgun, Assault Rifle, SMG, Marksman Rifle and Special). Only titled tags appear in the Rules dropdown; the other 10 are hidden until
-      they get a title. `hd2-tags.xlsx` (sent earlier) is now
-      out of date. Possible next step: move tag titles/pill colours into a `hd2tags.csv` instead of `TAG_NAMES` in
-      `docs/app.js`.
+- [~] **Give every tag a display title.** 41 of 44 tags have titles now (2026-10-30 added Stun, Smoke, Jump, Mech, FRV, Tank,
+      Rover, Mortar and Emplacement). Titles and pill colours now live in `hd2tags.csv` (done 2026-10-30; row order = pill
+      order, blank colour = no pill). Only titled tags appear in the Rules dropdown; the 3 left without a title are heal,
+      taunt and beam. `hd2-tags.xlsx` (sent earlier) is out of date: edit `hd2tags.csv` instead.
+      Note: the tag "Emplacement" (3 items) shares its name with the Emplacement *category* (mines, relays, etc.) in the rule builder.
 - [ ] **Check the "meme" elemental builds are tagged properly** (fire, arc, gas, explosive, stealth, laser/beam, ...),
       and explore which other meme tags are worth having. Then expand the pill options and colours to include the
       meme tags. (Done 2026-10-30 for the seven known meme tags, see Done; any new meme tag gets a pill from now on.)
@@ -38,7 +37,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       chronological order) instead of `hd2gear.csv` order. The CSV is in release order and has a `release_date` column
       (exposed to the page as `released`, accepted as correct by Boss). Waiting on Boss: he will define the menu order of the
       Requisition stratagems (2026-10-31). Plan: keep ids as release order and add a `menu_order` column for My Gear.
-- [ ] **Odds transparency**: explain why a build was flagged or why the faction was relaxed (tooltips / details).
+- [x] ~~**Odds transparency**~~ done 2026-10-30: the faction-relaxed and rules-not-met banners have a "Why?" detail (which rules the faction-only build broke, rule priority, locks as a possible cause, how to fix); OFF-FACTION badges say who the item is meant for.
 
 ## Rules
 - [ ] **Redo the rule priority list later, with MORE rules in it** (Boss, 2026-10-29). Boss, 2026-10-30: assume a FULL RESET of rule priority when this is tackled, which also settles what tier an edited default row has (today it becomes one of the player's own requirements and ranks at the top). Today's tiers only cover the
@@ -56,10 +55,10 @@ Items we agreed to come back to. Nothing below is started unless marked.
 - [x] ~~**More default rules as editable rows**~~ done 2026-10-30 (Boss: "all seven", if/then rules for players, locks win): all 17 default rules are rows; the engine has category / group selectors, slot scopes, if/then and balance rules (see README, Rules panel). Nine of them can be removed but not edited in place; edited rows rank as the player's own requirements until the full priority reset below. Two deliberate behaviour changes: a chaff requirement no longer replaces the chaff-in-primary/secondary default, and an expendable-support minimum no longer allows mixed supports. `capSupport` is now `capRegular` / `capExpend` / `capMixed` (old saved name still works).
 - [~] **"Rules" menu** - first version done 2026-10-29, rebuilt 2026-10-30 as one list of rows (every default rule a row, no
       switches) with one "Add your own rule" builder (tags, categories, scopes, if/then, balance). Possible follow-ups:
-      - [ ] **Challenge mode**: presets such as "no support weapon" or "all Eagles", built from rules.
+      - [x] ~~Challenge mode~~ dropped (Boss, 2026-10-30): players make their own challenges with custom rules.
       - [ ] Per-rule priority editing (drag to re-rank the tiers) - today the tiers are fixed in `RULE_TIER`.
       - [x] Rules for item categories (e.g. "no Orbitals"): done 2026-10-30 via the rule builder.
-      - [ ] Optional: let a tag with no title be chosen in the rule builder (the dropdown still lists only the 32 titled tags).
+      - [ ] Optional: let a tag with no title be chosen in the rule builder (the dropdown still lists only the 41 titled tags).
 - [ ] **Faction rules: sub-factions.** Extend the faction rules (`works_for` / the `factions` column) to
       specify sub-factions (e.g. unit types within Terminids / Automatons / Illuminate).
 - [x] ~~Editable faction recommendations~~ done 2026-10-29 (My Gear > "Edit factions"; see README). Possible follow-ups:

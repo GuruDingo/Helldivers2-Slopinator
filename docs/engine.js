@@ -102,6 +102,7 @@
     demoEscalation: 4, balance: 4,                // bottom
   };
   var TIER_COUNT = 5;
+  var TIER_NAMES = ["your own rules", "high priority", "medium priority", "low priority", "lowest priority"];
   // "capSupport" was one switch for the three support limits; a saved or hand-written disabledRules list may still use it.
   var RULE_ALIASES = { capRegular: ["capSupport"], capExpend: ["capSupport"], capMixed: ["capSupport"] };
   function tierOf(id) { return Object.prototype.hasOwnProperty.call(RULE_TIER, id) ? RULE_TIER[id] : 2; }
@@ -643,6 +644,9 @@
       if (!pick) throw noBuildError(o);
 
       pick.factionOverridden = pick === r2;
+      // Why the faction had to be relaxed: the rules the best faction-only build still missed (null = no faction-only
+      // build could even be completed). Shown by the page's "Why?" detail.
+      pick.strictUnmet = pick.factionOverridden ? (r1 ? r1.unmet : null) : [];
       if (pick.factionOverridden) {
         var all = [pick.primary, pick.secondary, pick.throwable].concat(pick.strategems);
         pick.suboptimalNames = new Set(
@@ -670,6 +674,7 @@
     has: has,
     worksFor: worksFor,
     RULE_TIER: RULE_TIER,
+    TIER_NAMES: TIER_NAMES,
     RULES: RULES,
     normalizeRequirements: normalizeRequirements,
     normalizeRule: normalizeRule,
