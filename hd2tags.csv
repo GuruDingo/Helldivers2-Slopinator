@@ -15,23 +15,25 @@ stealth,Stealth,#37474f
 explosive,Explosive,#a0700a
 laser,Laser,#8a8210
 plasma,Plasma,#8f3fe0
+noammo,No Ammo,#7b5e3b
+shield,Shield,#4a6fa5
+impact,Impact,#e6a100
+onehand,One-Handed,#757575
+stun,Stun,#9575cd
 orbital,Orbital,
 eagle,Eagle,
 sentry,Sentry,
 vehicle,Vehicle,
 handheld,Hand-Held Shield,
 mines,Mines,
-onehand,One-Handed,
 supply,Supply,
 support,Support Weapon,
 charge,Charge,
-shield,Shield,
 shotgun,Shotgun,
 assault rifle,Assault Rifle,
 smg,SMG,
 marksman rifle,Marksman Rifle,
 special,Special,
-stun,Stun,
 smoke,Smoke,
 jump,Jump,
 mech,Mech,
@@ -40,4 +42,3 @@ tank,Tank,
 rover,Rover,
 mortar,Mortar,
 emplacement,Emplacement,
-impact,Impact,
