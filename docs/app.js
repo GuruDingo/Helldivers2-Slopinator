@@ -17,7 +17,7 @@
   var FACTION_ADJECTIVE = { bug: "Terminid", bot: "Automaton", squid: "Illuminate" };
   var TYPE_LABELS = {
     support: "Support Weapon", backpack: "Backpack", vehicle: "Vehicle", eagle: "Eagle",
-    orbital: "Orbital", sentry: "Sentry", defensive: "Emplacement",
+    orbital: "Orbital", sentry: "Sentry", defensive: "Defensive",
   };
   var WEAPON_CAT_LABELS = { primary: "Primary", secondary: "Secondary", throwable: "Throwable" };
   // Tag display titles and pill colours come from hd2tags.csv (built into HD2_DATA.tags), not from this file.

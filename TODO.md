@@ -19,7 +19,7 @@ Items we agreed to come back to. Nothing below is started unless marked.
       Rover, Mortar and Emplacement). Titles and pill colours now live in `hd2tags.csv` (done 2026-10-30; row order = pill
       order, blank colour = no pill). Only titled tags appear in the Rules dropdown; the 3 left without a title are heal,
       taunt and beam. `hd2-tags.xlsx` (sent earlier) is out of date: edit `hd2tags.csv` instead.
-      Note: the tag "Emplacement" (3 items) shares its name with the Emplacement *category* (mines, relays, etc.) in the rule builder.
+      Note: the Defensive category (mines, relays, emplacement guns) was relabelled from "Emplacement" on 2026-10-30 so it does not clash with the Emplacement tag.
 - [ ] **Check the "meme" elemental builds are tagged properly** (fire, arc, gas, explosive, stealth, laser/beam, ...),
       and explore which other meme tags are worth having. Then expand the pill options and colours to include the
       meme tags. (Done 2026-10-30 for the seven known meme tags, see Done; any new meme tag gets a pill from now on.)
