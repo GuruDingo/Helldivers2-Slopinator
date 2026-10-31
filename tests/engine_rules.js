@@ -510,4 +510,24 @@ test("Groups are tags now: noammo drives the supply rule, nonexp the support cap
   }
 });
 
+test("alwaysOwned: an item stays in the pool when its warbond is not owned (MG-43 and Orbital Precision Strike now sit in shops)", () => {
+  const items = globalThis.HD2_DATA.items;
+  const always = items.filter((i) => i.alwaysOwned).map((i) => i.name).sort();
+  assert.deepStrictEqual(always, ["MG-43 Machine Gun", "Orbital Precision Strike"]);
+  const e = HD2Engine.create(globalThis.HD2_DATA);
+  const locks = { strat1: e.resolve("MG-43 Machine Gun"), strat2: e.resolve("Orbital Precision Strike") };
+  for (let i = 0; i < 20; i++) {
+    const l = e.generateLoadoutRelaxed({ faction: "any", ownedWarbonds: ["base", "req_e", "req_h", "req_o", "req_r"], locks });
+    const names = l.strategems.map((s) => s.name);
+    assert(names.includes("MG-43 Machine Gun") && names.includes("Orbital Precision Strike"));
+  }
+  const free = HD2Engine.create(globalThis.HD2_DATA);
+  let seen = 0;
+  for (let i = 0; i < 300; i++) {
+    const l = free.generateLoadoutRelaxed({ faction: "any", ownedWarbonds: ["base", "req_e", "req_h", "req_o", "req_r"] });
+    l.strategems.forEach((s) => { assert(["base", "req_e", "req_h", "req_o", "req_r"].includes(s.warbond) || s.alwaysOwned, s.name + " from " + s.warbond); if (s.alwaysOwned) seen++; });
+  }
+  assert(seen > 0, "an always-owned item is rolled even though its shop is not owned");
+});
+
 console.log("\n" + passed + " engine rule tests passed" + (process.exitCode ? " (with failures)" : ""));

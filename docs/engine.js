@@ -329,7 +329,7 @@
       function reqMin(t) { return Object.prototype.hasOwnProperty.call(requirements, t) ? requirements[t].min : undefined; }
       function reqMax(t) { return Object.prototype.hasOwnProperty.call(requirements, t) ? requirements[t].max : undefined; }
       function inPool(x) {
-        return worksFor(x, faction) && ownedSet.has(x.warbond) && !excluded.has(x.name);
+        return worksFor(x, faction) && (ownedSet.has(x.warbond) || x.alwaysOwned) && !excluded.has(x.name);
       }
       function pool(list) { return list.filter(inPool); }
 
