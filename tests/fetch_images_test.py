@@ -44,7 +44,7 @@ with tempfile.TemporaryDirectory() as tmp:
     import fetch_images as fi  # noqa: E402
 
     jobs = fi.plan()
-    check("every image the site uses is planned, once each", len({u for u, _, _ in jobs}) == len(jobs) and len(jobs) > 250, len(jobs))
+    check("every image the site uses is planned, once each", len({u for u, _, _ in jobs}) == len(jobs) and len(jobs) > 220, len(jobs))
     check("all 13 armor-penetration icons are planned", sum(1 for u, _, _ in jobs if "Armor_AP" in u) == 13)
     check("a /thumb/ address is saved under the plain file name", any(r == "img/icons/Longshot_Title_Icon.png" for _, _, r in jobs))
     check("raster pictures become .webp, SVGs (the stratagem icons) and icons keep their format",

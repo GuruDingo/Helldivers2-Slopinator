@@ -12,8 +12,9 @@ RULES = {
         {"if": "laser", "then": "charge", "category": ["primary", "support"]},
     ],
     "weapon_only_tags": [{"tag": "panic", "categories": ["primary", "secondary", "throwable"]}],
+    "exactly_one_of": [{"category": "support", "tags": ["expendable", "nonexp"]}],
     "min_items_per_tag": 3,
-    "acknowledged_rare_tags": ["known"],
+    "acknowledged_rare_tags": ["known", "expendable", "nonexp"],
 }
 failed = 0
 
@@ -44,6 +45,11 @@ flags = check_tags(filler + [it("LasP", "primary", "laser,common"), it("LasS", "
 check("a rule limited to a list of categories flags each listed one", all(f"'{n}' has 'laser' but not 'charge'" in "\n".join(flags) for n in ("LasP", "LasS")), flags)
 check("...and leaves the other categories alone", not any("'LasO'" in f for f in flags), flags)
 
+flags = check_tags(filler + [it("SupA", "support", "common,support,expendable"), it("SupB", "support", "common,support,nonexp"),
+                             it("SupNone", "support", "common,support"), it("SupBoth", "support", "common,support,expendable,nonexp"),
+                             it("Prim", "primary", "common")], RULES)
+check("a support weapon must have exactly one of expendable / nonexp",
+      any("SupNone" in f for f in flags) and any("SupBoth" in f for f in flags) and not any("'SupA'" in f or "'SupB'" in f or "'Prim'" in f for f in flags), flags)
 flags = check_tags(filler + [it("Twice", "primary", "common,demo,explosive,demo")], RULES)
 check("a tag listed twice is flagged", any("'Twice' lists the same tag twice: demo" in f for f in flags), flags)
 

@@ -34,6 +34,7 @@ function check(label, cond, extra) {
   win.confirm = () => true;
   const $ = (id) => doc.getElementById(id);
   const ACTIVE = win.HD2_DATA.items.filter((i) => i.factions.indexOf("none") === -1).length; // every item that can roll (the tests used to hard-code this number)
+  const idOf = (name) => win.HD2_DATA.items.find((i) => i.name === name).id;
   const click = (el) => el.dispatchEvent(new win.MouseEvent("click", { bubbles: true, cancelable: true }));
   const generate = () => $("controls").dispatchEvent(new win.Event("submit", { bubbles: true, cancelable: true }));
   const setFaction = (v) => {
@@ -72,7 +73,22 @@ function check(label, cond, extra) {
   check("first visit wrote the owned list to localStorage", Object.keys(JSON.parse(win.localStorage.getItem("hd2_tracker"))).length === ACTIVE - win.HD2_DATA.items.filter((i) => i.warbond === "base" && i.factions.indexOf("none") === -1).length); // everything except the always-owned Base Game items
   check("7 lock inputs", doc.querySelectorAll("#lock-grid input").length === 7);
   check("datalists filled", $("dl-primary").children.length > 40 && $("dl-strat").children.length > 60);
-  check("the rule builder lists only titled tags (41) under Tags, by title", (() => { const o = Array.from(doc.querySelector('#builder-body .b-row[data-role="must"] optgroup').children); const t = o.map((x) => x.textContent); return o.length === 41 && t.includes("Team Assist") && t.includes("Fire") && t.includes("Laser") && t.includes("Plasma") && t.includes("Hand-Held Shield") && t.includes("Explosive") && t.includes("One-Handed") && t.includes("Supply") && t.includes("Support Weapon") && t.includes("Charge") && t.includes("Shotgun") && t.includes("SMG") && t.includes("Special") && t.every((x, i) => i === 0 || t[i - 1].localeCompare(x) <= 0) && ["Stun", "Smoke", "Jump", "Mech", "FRV", "Tank", "Rover", "Mortar", "Emplacement"].every((n) => t.includes(n)) && !o.some((x) => ["tag:heal", "tag:taunt", "tag:beam"].includes(x.value)) && o.some((x) => x.value === "tag:assist"); })(), Array.from(doc.querySelector('#builder-body .b-row[data-role="must"] optgroup').children).map((x) => x.textContent).join(", "));
+  check("the rule builder lists the 44 titled tags, in sections from hd2tags.csv, in file order inside each", (() => {
+    const tagGroups = Array.from(doc.querySelectorAll('#builder-body .b-row[data-role="must"] optgroup')).filter((g) => g.label !== "Categories");
+    const opts = tagGroups.flatMap((g) => Array.from(g.children));
+    const t = opts.map((x) => x.textContent);
+    const csv = win.HD2_DATA.tags;
+    const expectedSections = []; csv.forEach((r) => { if (expectedSections.indexOf(r.group) === -1) expectedSections.push(r.group); });
+    return opts.length === 44 && tagGroups.map((g) => g.label).join("|") === expectedSections.join("|")
+      && tagGroups.every((g) => Array.from(g.children).every((o, k, a) => csv.find((r) => "tag:" + r.tag === o.value).group === g.label && (k === 0 || csv.findIndex((r) => "tag:" + r.tag === a[k - 1].value) < csv.findIndex((r) => "tag:" + r.tag === o.value))))
+      && ["Team Assist", "Fire", "Laser", "Plasma", "Hand-Held Shield", "Explosive", "One-Handed", "Supply", "Support Weapon", "Cooldown", "Shotgun", "SMG", "Special", "Stun", "Smoke", "Jump", "Mech", "FRV", "Tank", "Rover", "Mortar", "Emplacement", "Impact", "No Ammo", "Non-Expendable Support"].every((n) => t.includes(n))
+      && !opts.some((x) => ["tag:heal", "tag:taunt", "tag:beam"].includes(x.value)) && opts.some((x) => x.value === "tag:assist");
+  })(), Array.from(doc.querySelectorAll('#builder-body .b-row[data-role="must"] optgroup')).map((g) => g.label + ": " + Array.from(g.children).map((x) => x.textContent).join(", ")).join(" | "));
+  check("...Expendable and Non-Expendable Support come right after Support Weapon; Hand-Held Shield right after Shield; Charge is titled Cooldown", (() => {
+    const t = Array.from(doc.querySelectorAll('#builder-body .b-row[data-role="must"] optgroup option')).map((o) => o.textContent);
+    const at = (n) => t.indexOf(n);
+    return at("Expendable") === at("Support Weapon") + 1 && at("Non-Expendable Support") === at("Expendable") + 1 && at("Hand-Held Shield") === at("Shield") + 1 && at("Cooldown") >= 0 && at("Charge") === -1;
+  })(), "");
   check("autocomplete options carry names only (no category labels)",
     Array.from(doc.querySelectorAll("#dl-strat option")).every((o) => !o.hasAttribute("label")) &&
     $("dl-strat").querySelector("option[value='AC-8 Autocannon']") !== null);
@@ -94,8 +110,8 @@ function check(label, cond, extra) {
   check("no error banner", errors().length === 0, errors());
   $("count").value = "3"; generate();
   check("3 loadouts -> 21 cards + 3 headings", cards() === 21 && doc.querySelectorAll("#results h2").length === 3, cards());
-  check("pills follow hd2tags.csv: titles from the CSV, in the CSV's row order", (() => {
-    const order = win.HD2_DATA.tags.filter((t) => t.color).map((t) => t.title);
+  check("pills follow hd2tags.csv: titles from the CSV, left to right by pill_order", (() => {
+    const order = win.HD2_DATA.tags.filter((t) => t.color && t.pillOrder).sort((x, y) => x.pillOrder - y.pillOrder).map((t) => t.title);
     return Array.from(doc.querySelectorAll("#results .tag-row")).every((row) => {
       const names = Array.from(row.querySelectorAll(".tag-pill")).map((p) => p.textContent);
       const idx = names.map((n) => order.indexOf(n));
@@ -247,7 +263,7 @@ function check(label, cond, extra) {
   click(blockBtn("AR-23 Liberator"));
   check("Block button pressed", blockBtn("AR-23 Liberator").getAttribute("aria-pressed") === "true");
   check("pool line counts it", new RegExp("Rolling from " + (ACTIVE - 1) + " of " + ACTIVE + ".*1 blocked").test(poolText()), poolText());
-  check("block saved", JSON.parse(win.localStorage.getItem("hd2_blocked")).includes("AR-23 Liberator"));
+  check("block saved (by the item's permanent id, not its name)", JSON.parse(win.localStorage.getItem("hd2_blocked")).includes(idOf("AR-23 Liberator")) && !JSON.parse(win.localStorage.getItem("hd2_blocked")).includes("AR-23 Liberator"));
   $("lock-primary").value = "AR-23 Liberator"; generate();
   check("locking a blocked item -> error", errors().some((e) => /isn't in your gear pool \(blocked\)/.test(e)), errors());
   $("lock-primary").value = "";
@@ -359,13 +375,28 @@ function check(label, cond, extra) {
   console.log("Rule builder");
   const setv = (el, v) => { el.value = v; el.dispatchEvent(new win.Event("change", { bubbles: true })); };
   const bRow = (role) => doc.querySelector('#builder-body .b-row[data-role="' + role + '"]');
+  check("each rule-builder row explains its pick: description, item count and a few examples", (() => {
+    setv(bRow("must").querySelector(".b-sel"), "tag:fire");
+    const t = bRow("must").querySelector(".b-hint summary").textContent;
+    const n = win.HD2_DATA.items.filter((i) => i.factions.indexOf("none") === -1 && i.tags.indexOf("fire") !== -1).length;
+    return t.indexOf("Sets enemies on fire") === 0 && t.indexOf(n + " items (e.g. ") !== -1;
+  })(), bRow("must").querySelector(".b-hint summary").textContent);
+  check("...tapping it opens the full list of items", (() => { const d = bRow("must").querySelector(".b-hint"); return d.querySelector(".b-hint-all").textContent.split(", ").length === Number(/(\d+) items/.exec(d.querySelector("summary").textContent)[1]); })());
+  check("...a category gets one too, and retired items are not counted", (() => {
+    setv(bRow("must").querySelector(".b-sel"), "cat:vehicle");
+    const t = bRow("must").querySelector(".b-hint summary").textContent;
+    const n = win.HD2_DATA.items.filter((i) => i.factions.indexOf("none") === -1 && i.cat === "vehicle").length;
+    return t.indexOf("Vehicles") === 0 && t.indexOf(" " + n + " items") !== -1;
+  })(), bRow("must").querySelector(".b-hint summary").textContent);
+  check("...every titled tag has a description in the data", win.HD2_DATA.tags.every((r) => r.description && r.description.length > 3));
+  setv(bRow("must").querySelector(".b-sel"), bRow("must").querySelector(".b-sel").options[0].value);
   const build = (when, must) => {
     doc.querySelectorAll("#builder-body #b-when .chip-x").forEach((b) => click(b));
     when.forEach((w) => { click($("b-add-if")); const rows = doc.querySelectorAll('#builder-body .b-row[data-role="when"]'); const r = rows[rows.length - 1]; setv(r.querySelector(".b-sel"), w[0]); setv(r.querySelector(".b-scope"), w[1]); setv(r.querySelector(".b-op"), w[2]); r.querySelector(".b-n").value = String(w[3]); });
     const m = bRow("must"); setv(m.querySelector(".b-sel"), must[0]); setv(m.querySelector(".b-scope"), must[1]); setv(m.querySelector(".b-op"), must[2]); m.querySelector(".b-n").value = String(must[3]);
     click($("b-add"));
   };
-  check("the builder offers tags, categories and groups, and every scope", Array.from(bRow("must").querySelectorAll("optgroup")).map((g) => g.label).join("|") === "Tags|Categories|Groups" && bRow("must").querySelectorAll(".b-scope option").length === 7 && !!bRow("must").querySelector('option[value="cat:orbital"]') && !!bRow("must").querySelector('option[value="grp:noAmmo"]'));
+  check("the builder offers tags and categories (no groups any more), and every scope", Array.from(bRow("must").querySelectorAll("optgroup")).map((g) => g.label).join("|") === win.HD2_DATA.tags.map((r) => r.group).filter((g, k, a) => a.indexOf(g) === k).concat("Categories").join("|") && bRow("must").querySelectorAll(".b-scope option").length === 7 && !!bRow("must").querySelector('option[value="cat:orbital"]') && !bRow("must").querySelector('option[value^="grp:"]') && !!bRow("must").querySelector('option[value="tag:nonexp"]'));
   build([], ["cat:orbital", "all", "max", 0]);
   check("a category rule becomes a row (and 'Clear custom rules' appears)", chipTexts().includes("Orbital ≤ 0") && !$("custom-clear").hidden && /1 added/.test($("rules-summary").textContent), chipTexts().join("|"));
   check("...and is saved with the other settings", JSON.stringify(JSON.parse(win.localStorage.getItem("hd2_settings")).customRules) === '[{"must":{"sel":"cat:orbital","scope":"all","max":0}}]', win.localStorage.getItem("hd2_settings"));
@@ -440,7 +471,7 @@ function check(label, cond, extra) {
   check("Own nothing -> 6 / everything (Base Game stays) and saves {}", $("grand-total").textContent === "6 / " + ACTIVE + " items owned" && win.localStorage.getItem("hd2_tracker") === "{}", $("grand-total").textContent + " " + win.localStorage.getItem("hd2_tracker"));
   const firstBox = firstBlock.querySelector("input[data-item]");
   firstBox.checked = true; firstBox.dispatchEvent(change());
-  check("tick saves to localStorage", !!JSON.parse(win.localStorage.getItem("hd2_tracker"))[firstBox.getAttribute("data-item")]);
+  check("tick saves to localStorage", !!JSON.parse(win.localStorage.getItem("hd2_tracker"))[idOf(firstBox.getAttribute("data-item"))]);
   click(firstBlock.querySelector("[data-none]"));
   click(firstBlock.querySelector("[data-all]"));
   const n1 = Number(firstBlock.querySelector(".pool-count").textContent);
@@ -577,7 +608,7 @@ function check(label, cond, extra) {
   check("...the count says 1 item edited", /^1 item edited/.test($("fac-count").textContent), $("fac-count").textContent);
   check("...the Automaton pool grew by one", denom("bot") === botBefore + 1, botBefore + " -> " + denom("bot"));
   check("...and the Randomizer line mentions the edits", /Using your edited faction lists \(1 item\)/.test(poolText()), poolText());
-  check("the edit is saved to localStorage", JSON.stringify(JSON.parse(win.localStorage.getItem("hd2_factions"))[CONC]) === '["bug","bot"]', win.localStorage.getItem("hd2_factions"));
+  check("the edit is saved to localStorage", JSON.stringify(JSON.parse(win.localStorage.getItem("hd2_factions"))[idOf(CONC)]) === '["bug","bot"]', win.localStorage.getItem("hd2_factions"));
   tick(facBox(CONC, "squid"), true);
   check("ticking all three stores 'any'", itemFactions(CONC) === "any" && rowOf(CONC).classList.contains("fac-custom"), itemFactions(CONC));
   tick(facBox(CONC, "bot"), false); tick(facBox(CONC, "squid"), false);
@@ -623,7 +654,7 @@ function check(label, cond, extra) {
   check("first click only asks for confirmation", /^Click again to enable \d+$/.test($("fac-all").textContent) && itemFactions(NARROW) === DEFAULTS[NARROW] && itemFactions(NARROW2) === DEFAULTS[NARROW2], $("fac-all").textContent);
   click($("fac-all"));
   check("second click ticks all three for the item shown only", itemFactions(NARROW) === "any" && facTicks(NARROW) === "bug,bot,squid" && rowOf(NARROW).classList.contains("fac-custom") && rowOf(NARROW2).hidden && itemFactions(NARROW2) === DEFAULTS[NARROW2], itemFactions(NARROW) + " / " + itemFactions(NARROW2) + " hidden=" + rowOf(NARROW2).hidden);
-  check("...saved as an edit, and the edit survives a reload of the saved data", JSON.parse(win.localStorage.getItem("hd2_factions"))[NARROW].join() === "any");
+  check("...saved as an edit, and the edit survives a reload of the saved data", JSON.parse(win.localStorage.getItem("hd2_factions"))[idOf(NARROW)].join() === "any");
   check("...and the per-item revert puts it back", (click(rowOf(NARROW).querySelector(".fac-revert")), itemFactions(NARROW) === DEFAULTS[NARROW]));
   search("");
   click($("fac-all")); click($("fac-all"));
@@ -682,15 +713,31 @@ function check(label, cond, extra) {
   // edits survive a reload and are applied when the page starts
   const dom2 = new JSDOM(bundleHtml, {
     runScripts: "dangerously", pretendToBeVisual: true, url: "http://localhost/",
-    beforeParse(w) { w.localStorage.setItem("hd2_factions", JSON.stringify({ [CONC]: ["bot"], [LIB]: [], "No Such Item": ["bug"], "Eagle Airstrike": ["nonsense"] })); },
+    beforeParse(w) { w.localStorage.setItem("hd2_factions", JSON.stringify({ [CONC]: ["bot"], [LIB]: [], "No Such Item": ["bug"], "Eagle Airstrike": ["nonsense"], "M-102 Fast Recon Vehicle": ["squid"] })); },
   });
   await new Promise((resolve) => dom2.window.addEventListener("load", resolve));
   const d2 = dom2.window.document, items2 = dom2.window.HD2_DATA.items;
   const f2 = (n) => items2.find((i) => i.name === n).factions.join(",");
   check("a reloaded page applies the saved edits", f2(CONC) === "bot" && f2(LIB) === "", f2(CONC) + " / " + f2(LIB));
   check("...ignores unknown items and invalid values", f2("Eagle Airstrike") === defaultOf("Eagle Airstrike"));
-  check("...and notes the 2 edits on the Randomizer tab", /edited faction lists \(2 items\)/.test(d2.getElementById("pool-text").textContent), d2.getElementById("pool-text").textContent);
+  check("...an entry saved under a name that has since changed still finds its item", f2("M-102 Gunner FRV") === "squid", f2("M-102 Gunner FRV"));
+  const id2 = (n) => items2.find((i) => i.name === n).id;
+  check("...and the old name-keyed save is rewritten with ids", (() => { const sv = JSON.parse(dom2.window.localStorage.getItem("hd2_factions")); return Object.keys(sv).every((k) => /^\d+$/.test(k)) && sv[id2(CONC)].join() === "bot" && sv[id2("M-102 Gunner FRV")].join() === "squid"; })(), dom2.window.localStorage.getItem("hd2_factions"));
+  check("...and notes the 3 edits on the Randomizer tab", /edited faction lists \(3 items\)/.test(d2.getElementById("pool-text").textContent), d2.getElementById("pool-text").textContent);
   dom2.window.close();
+  // an older save keyed by item names (owned + blocked) is read, then rewritten with ids
+  const domM = new JSDOM(bundleHtml, {
+    runScripts: "dangerously", pretendToBeVisual: true, url: "http://localhost/",
+    beforeParse(w) {
+      w.localStorage.setItem("hd2_tracker", JSON.stringify({ "AR-23P Liberator Penetrator": true, "G-16 Impact": true, "M-102 Fast Recon Vehicle": true }));
+      w.localStorage.setItem("hd2_blocked", JSON.stringify(["G-16 Impact"]));
+    },
+  });
+  await new Promise((resolve) => domM.window.addEventListener("load", resolve));
+  const idM = (n) => domM.window.HD2_DATA.items.find((i) => i.name === n).id;
+  const trM = JSON.parse(domM.window.localStorage.getItem("hd2_tracker")), blM = JSON.parse(domM.window.localStorage.getItem("hd2_blocked"));
+  check("an old name-keyed owned / blocked save is rewritten with ids", Object.keys(trM).every((k) => /^\d+$/.test(k)) && trM[idM("AR-23P Liberator Penetrator")] && trM[idM("G-16 Impact")] && trM[idM("M-102 Gunner FRV")] && blM.length === 1 && blM[0] === idM("G-16 Impact"), JSON.stringify(trM) + " " + JSON.stringify(blM));
+  domM.window.close();
   // edited rules survive a reload too; damaged saved rules are skipped
   const dom4 = new JSDOM(bundleHtml, {
     runScripts: "dangerously", pretendToBeVisual: true, url: "http://localhost/",

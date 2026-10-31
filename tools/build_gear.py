@@ -2,7 +2,7 @@
 build_gear.py - turns the three editable CSV files into the data file the website reads.
 
     hd2gear.csv        one row per item (you edit this in Excel)
-    hd2warbonds.csv    warbond keys + display names + cover image URLs, in display order
+    hd2warbonds.csv    warbond keys + display names, in display order
     hd2tags.csv        tag display titles + pill colours (row order = pill order on a card)
     docs/img/manifest.json  (optional) the saved copies of the wiki images, written by tools/fetch_images.py
         ->  docs/gear-data.js
@@ -15,7 +15,7 @@ Run it from anywhere after you change either CSV:
 It refuses to write anything if it finds a real problem (unknown category, unknown
 warbond key, duplicate names...), so a typo in the CSV can't silently break the site.
 
-Tag consistency is NOT checked here; that is a separate manual procedure (see TAG_CHECK.md).
+Tag consistency is NOT checked here; that is a separate manual procedure (see tools/tag_checks.py).
 """
 
 import argparse
@@ -30,6 +30,7 @@ ROOT = Path(__file__).resolve().parent.parent
 GEAR_CSV = ROOT / "hd2gear.csv"
 WARBOND_CSV = ROOT / "hd2warbonds.csv"
 TAGS_CSV = ROOT / "hd2tags.csv"
+ID_LOCK = ROOT / "hd2ids.lock.json"
 OUT_JS = ROOT / "docs" / "gear-data.js"
 DIST_HTML = ROOT / "dist" / "hd2-randomizer.html"
 IMG_MANIFEST = ROOT / "docs" / "img" / "manifest.json"  # written by tools/fetch_images.py
@@ -46,9 +47,8 @@ def split_list(raw):
 
 def load_warbonds():
     with open(WARBOND_CSV, newline="", encoding="utf-8-sig") as f:
-        rows = [(r["key"].strip(), r["name"].strip(), (r.get("img_url") or "").strip())
-                for r in csv.DictReader(f) if r["key"].strip()]
-    keys = [k for k, _, _ in rows]
+        rows = [(r["key"].strip(), r["name"].strip()) for r in csv.DictReader(f) if r["key"].strip()]
+    keys = [k for k, _ in rows]
     dupes = {k for k in keys if keys.count(k) > 1}
     if dupes:
         sys.exit(f"ERROR: duplicate warbond keys in {WARBOND_CSV.name}: {sorted(dupes)}")
@@ -58,9 +58,12 @@ def load_warbonds():
 
 
 def load_tags():
-    """hd2tags.csv: tag, title (shown in the rule builder and on pills), pill_color (hex; blank = no pill).
-    Row order is the pill order on a card. Returns (rows, errors) where rows are {"tag","title","color"}."""
-    rows, errors, seen = [], [], set()
+    """hd2tags.csv columns: tag, group (the section it sits in inside the rule builder's dropdowns; sections appear in the
+    order they first show up in the file), title (shown in the rule builder and on pills), description (one short line
+    shown under the rule builder's dropdown when the tag is picked), pill_color (hex; blank = no
+    pill) and pill_order (1, 2, 3... = left to right on a card; required with a pill colour, blank otherwise).
+    Returns (rows, errors); rows are {"tag","group","title","description","color","pillOrder"} in file order."""
+    rows, errors, seen, orders = [], [], set(), {}
     if not TAGS_CSV.exists():
         return rows, [f"{TAGS_CSV.name} is missing."]
     with open(TAGS_CSV, newline="", encoding="utf-8-sig") as f:
@@ -68,16 +71,35 @@ def load_tags():
             tag = (r.get("tag") or "").strip()
             if not tag:
                 continue
+            where = f"{TAGS_CSV.name} line {n}"
+            group = (r.get("group") or "").strip()
             title = (r.get("title") or "").strip()
+            description = (r.get("description") or "").strip()
             color = (r.get("pill_color") or "").strip()
+            order_raw = (r.get("pill_order") or "").strip()
             if tag in seen:
-                errors.append(f"{TAGS_CSV.name} line {n}: duplicate tag '{tag}'.")
+                errors.append(f"{where}: duplicate tag '{tag}'.")
             seen.add(tag)
             if not title:
-                errors.append(f"{TAGS_CSV.name} line {n}: tag '{tag}' needs a title.")
+                errors.append(f"{where}: tag '{tag}' needs a title.")
+            if not description:
+                errors.append(f"{where}: tag '{tag}' needs a description (one short line shown under the dropdown).")
+            if not group:
+                errors.append(f"{where}: tag '{tag}' needs a group (the section it appears under in the rule builder).")
             if color and not re.fullmatch(r"#[0-9a-fA-F]{6}", color):
-                errors.append(f"{TAGS_CSV.name} line {n}: pill_color '{color}' for '{tag}' must look like #1a2b3c (or be blank for no pill).")
-            rows.append({"tag": tag, "title": title, "color": color})
+                errors.append(f"{where}: pill_color '{color}' for '{tag}' must look like #1a2b3c (or be blank for no pill).")
+            order = None
+            if order_raw:
+                if not re.fullmatch(r"[1-9]\d*", order_raw):
+                    errors.append(f"{where}: pill_order '{order_raw}' for '{tag}' must be a whole number (1, 2, 3...) or blank.")
+                else:
+                    order = int(order_raw)
+                    if order in orders:
+                        errors.append(f"{where}: pill_order {order} is used by both '{orders[order]}' and '{tag}'.")
+                    orders[order] = tag
+            if bool(color) != (order is not None):
+                errors.append(f"{where}: '{tag}' needs both a pill_color and a pill_order for a pill, or neither.")
+            rows.append({"tag": tag, "group": group, "title": title, "description": description, "color": color, "pillOrder": order})
     return rows, errors
 
 
@@ -146,12 +168,16 @@ def load_items(warbond_keys):
                 "armorPen": armor_pen,
             })
 
-    # the CSV is kept in release order: ids count up from 1 and release_date never goes backwards
-    for pos, it in enumerate(items, start=1):
-        if it["id"] != str(pos):
-            warnings.append(f"{it['name']}: id {it['id'] or '(none)'} is not its row number {pos} (rows are numbered in release order)")
-        if pos > 1 and it["released"] and items[pos - 2]["released"] and it["released"] < items[pos - 2]["released"]:
-            warnings.append(f"{it['name']}: release_date {it['released']} is earlier than the row above ({items[pos - 2]['released']}); rows should be oldest first")
+    # ids are permanent: a whole number that is never renumbered or reused, because people's saved
+    # settings in their browsers (owned / blocked / faction edits) are keyed by it. Row position does not matter and
+    # release order is the release_date column. The build also checks hd2ids.lock.json (see check_id_lock).
+    seen_ids = {}
+    for it in items:
+        if not re.fullmatch(r"[1-9]\d*", it["id"]):
+            errors.append(f"{it['name']}: id '{it['id']}' must be a whole number (1, 2, 3...)")
+        elif it["id"] in seen_ids:
+            errors.append(f"id {it['id']} is used by both '{seen_ids[it['id']]}' and '{it['name']}'")
+        seen_ids[it["id"]] = it["name"]
 
     # duplicate names / nicknames (the lock + exclude boxes resolve by either one)
     seen_names = {}
@@ -170,6 +196,53 @@ def load_items(warbond_keys):
                 errors.append(f"nickname '{nick}' of '{it['name']}' is also the full name of '{seen_names[nick]['name']}'")
             seen_nick[nick] = it["name"]
     return items, errors, warnings
+
+
+def load_id_lock():
+    if not ID_LOCK.exists():
+        return {}
+    try:
+        return json.loads(ID_LOCK.read_text(encoding="utf-8")).get("ids", {})
+    except ValueError:
+        sys.exit(f"ERROR: {ID_LOCK.name} is not valid JSON.")
+
+
+def check_id_lock(items):
+    """Item ids are permanent. hd2ids.lock.json remembers every id that has shipped (with the item's name and category).
+    Returns (errors, notices, new_lock). An id may never disappear, change category (that would mean the id now points
+    at a different kind of item), or be reused; a new id must be higher than every locked id. A renamed item is fine:
+    saved settings follow the id."""
+    errors, notices = [], []
+    lock = load_id_lock()
+    by_id = {it["id"]: it for it in items if re.fullmatch(r"[1-9]\d*", it["id"])}
+    top = max((int(k) for k in lock), default=0)
+    for k, v in lock.items():
+        it = by_id.get(k)
+        if it is None:
+            errors.append(f"id {k} ('{v['name']}') is in {ID_LOCK.name} but missing from {GEAR_CSV.name}. Ids are permanent: "
+                          f"never delete or renumber an item - set its factions to 'none' to retire it.")
+        elif it["cat"] != v["cat"]:
+            errors.append(f"id {k} was '{v['name']}' ({v['cat']}) and is now '{it['name']}' ({it['cat']}): ids must keep pointing at the same item "
+                          f"(did the rows get renumbered?). Renames are fine, a different kind of item is not.")
+        elif it["name"] != v["name"]:
+            notices.append(f"id {k} renamed: '{v['name']}' -> '{it['name']}' (saved settings follow the id)")
+    for k, it in by_id.items():
+        if k not in lock and lock and int(k) <= top:
+            errors.append(f"new item '{it['name']}' has id {k}, which is not above the highest id that has shipped ({top}). "
+                          f"New items get the next free number (highest id + 1); ids are never reused.")
+    new_lock = {k: {"name": by_id[k]["name"], "cat": by_id[k]["cat"]} if k in by_id else v for k, v in lock.items()}
+    for k, it in by_id.items():
+        if k not in new_lock:
+            new_lock[k] = {"name": it["name"], "cat": it["cat"]}
+    return errors, notices, dict(sorted(new_lock.items(), key=lambda kv: int(kv[0])))
+
+
+def write_id_lock(new_lock):
+    lines = ",\n".join(f"  {json.dumps(k)}: {json.dumps(v, ensure_ascii=False)}" for k, v in new_lock.items())
+    text = ('{\n "_about": "Every item id that has shipped. Ids are permanent: saved settings in players\' browsers are keyed by them. '
+            'Maintained by tools/build_gear.py; do not edit by hand.",\n "ids": {\n' + lines + "\n }\n}\n")
+    if not ID_LOCK.exists() or ID_LOCK.read_text(encoding="utf-8") != text:
+        ID_LOCK.write_text(text, encoding="utf-8")
 
 
 def load_image_map():
@@ -191,7 +264,7 @@ def data_js_text(warbonds, items, images, tags=()):
     img_lines = ",\n".join("  " + json.dumps(u) + ":" + json.dumps(r) for u, r in images.items())
     body = (
         "{\n"
-        ' "warbonds": [\n' + lines([{"key": k, "name": n, "imgUrl": u} for k, n, u in warbonds]) + "\n ],\n"
+        ' "warbonds": [\n' + lines([{"key": k, "name": n} for k, n in warbonds]) + "\n ],\n"
         ' "items": [\n' + lines(items) + "\n ],\n"
         ' "tags": [\n' + lines(tags) + "\n ],\n"
         # Saved copies of the wiki images (see tools/fetch_images.py); the page uses these instead of the wiki links.
@@ -242,7 +315,7 @@ def main():
     args = ap.parse_args()
 
     warbonds = load_warbonds()
-    items, errors, warnings = load_items({k for k, _, _ in warbonds})
+    items, errors, warnings = load_items({k for k, _ in warbonds})
 
     tags, tag_errors = load_tags()
     errors += tag_errors
@@ -251,6 +324,10 @@ def main():
         if t["tag"] not in used:
             warnings.append(f"{TAGS_CSV.name}: tag '{t['tag']}' isn't on any item in hd2gear.csv.")
 
+    id_errors, id_notices, new_lock = check_id_lock(items)
+    errors += id_errors
+    for n in id_notices:
+        print("note:", n)
     for w in warnings:
         print("warning:", w)
     if errors:
@@ -258,6 +335,7 @@ def main():
             print("ERROR:", e)
         sys.exit(f"\n{len(errors)} problem(s) found - nothing was written.")
 
+    write_id_lock(new_lock)
     images = load_image_map()
     write_data_js(warbonds, items, images, tags)
     live = sum(1 for i in items if "none" not in i["factions"])

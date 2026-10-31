@@ -5,6 +5,8 @@
     { "if": "handheld", "then": "shield" },
     { "if": "beam",    "then": "laser" },
     { "if": "laser",   "then": "charge", "category": ["primary", "secondary", "support", "backpack"] },
+    { "if": "charge",     "then": "noammo", "category": ["primary", "secondary", "support", "backpack"] },
+    { "if": "expendable", "then": "noammo", "category": ["primary", "secondary", "support", "backpack"] },
     { "if": "heal",    "then": "assist" },
     { "if": "taunt",   "then": "assist" },
     { "if": "stun",    "then": "assist" },
@@ -15,7 +17,11 @@
   ],
 
   "weapon_only_tags": [
-    { "tag": "panic", "categories": ["primary", "secondary", "throwable"], "note": "Panic Weapon is a weapon-slot tag only; the engine ignores it on stratagems (Boss, 2026-10-30). Claude removes it from stratagems when it finds it." }
+    { "tag": "panic", "categories": ["primary", "secondary", "throwable"], "note": "Panic Weapon is a weapon-slot tag only; the engine ignores it on stratagems. Remove it from stratagems when found." }
+  ],
+
+  "exactly_one_of": [
+    { "category": "support", "tags": ["expendable", "nonexp"], "note": "Replaces the old regularSupport group: every support weapon is either expendable or non-expendable." }
   ],
 
   "min_items_per_tag": 3,

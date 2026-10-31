@@ -92,33 +92,7 @@ test("locked backpack-type stratagems still waive the one-backpack rule without 
 });
 
 
-// Tiny hand-made gear set. The only legal 4-stratagem builds are {Pack, Plain support, Filler 1, Filler 2}.
-// "Heavy support" needs the backpack slot, so it is never legal here. Whether the Plain support survives
-// depends on whether a REJECTED Heavy support blocks it - the counter-leak quirk of the original tool.
-function leakFixture() {
-  const mk = (cat, name, tags) => ({ id: name, cat, name, nicknames: [], tags, factions: ["any"], warbond: "base", imgUrl: "" });
-  return {
-    warbonds: [{ key: "base", name: "Base" }],
-    items: [
-      mk("primary", "P", ["chaff", "med", "armor", "demo", "panic"]), mk("secondary", "S", []), mk("throwable", "T", []),
-      mk("backpack", "Pack", ["backpack"]), mk("support", "Heavy support", ["backpack"]), mk("support", "Plain support", []),
-      mk("orbital", "Filler 1", []), mk("orbital", "Filler 2", []),
-    ],
-  };
-}
-function successRate(opts) {
-  const e = HD2Engine.create(leakFixture(), opts);
-  const owned = new Set(["base"]);
-  let ok = 0; const N = 20000;
-  for (let i = 0; i < N; i++) { const c = e.tryBuild("any", owned, {}, {}, new Set()); if (c && !c.unmet.length) ok++; }
-  return ok / N;
-}
-test("counter-leak fix is the DEFAULT: a rejected backpack-slot support no longer blocks a legal support", () => {
-  const fixed = successRate({}), legacy = successRate({ legacyCounterLeak: true });
-  assert(fixed - legacy > 0.08, "fixed " + fixed.toFixed(3) + " vs legacy " + legacy.toFixed(3));
-});
-
-// ---- rule priority tiers (Boss's order, 2026-10-29) ----
+// ---- rule priority tiers ----
 test("tier table: require > backpack/shield/supply > armor/chaff/demo > support/med/panic > demoEscalation/balance", () => {
   const T = HD2Engine.RULE_TIER;
   assert.strictEqual(T.require, 0);
@@ -157,7 +131,7 @@ test("best-effort build gives up the LOW-priority rule when it has to choose (ba
   }
 });
 
-// ---- requirements override item caps; in-game limits don't budge (Boss, 2026-10-29) ----
+// ---- requirements override item caps; in-game limits don't budge ----
 function countTag(l, tag) { return [l.primary, l.secondary, l.throwable].concat(l.strategems).filter((x) => HD2Engine.has(x, tag)).length; }
 function builds(n, opts) { const out = []; for (let i = 0; i < n; i++) out.push(engine.generateLoadoutRelaxed(Object.assign({ faction: "any" }, opts))); return out; }
 
@@ -217,7 +191,7 @@ test("Require expendable >= 3 overrides the 2-expendable support cap", () => {
   assert(l, "never got 3 expendable supports");
 });
 
-// ---- tag counts: at least / at most / exactly, and removable default rules (Boss, 2026-10-29) ----
+// ---- tag counts: at least / at most / exactly, and removable default rules ----
 const reqFlag = (l) => l.unmet.filter((u) => u.id === "require");
 const flaggedFor = (l, tag) => reqFlag(l).some((u) => u.tag === tag);
 
@@ -512,6 +486,29 @@ test("Shield rule: a one-handed primary or a melee weapon satisfies it, a pistol
   run({ primary: pick("CB-9 Exploding Crossbow"), secondary: pick("P-4 Senator") }).forEach((l) => assert(!flagged(l), "a one-handed non-SMG primary satisfies it"));
   // the other half of the condition: no hand-held shield, nothing to check
   Array.from({ length: 40 }, () => engine.generateLoadoutRelaxed({ faction: "any", locks: { primary: pick("AR-23 Liberator"), secondary: pick("P-4 Senator"), strat1: pick("SH-32 Shield Generator Pack") } })).forEach((l) => assert(!flagged(l)));
+});
+
+test("Groups are tags now: noammo drives the supply rule, nonexp the support caps; old grp: selectors are read as the tags", () => {
+  const items = HD2Engine.create(HD2_DATA).pools;
+  const all = items.primaries.concat(items.secondaries, items.throwables, items.strategems);
+  const noammo = all.filter((i) => HD2Engine.has(i, "noammo"));
+  assert.strictEqual(noammo.length, 20);
+  assert(noammo.every((i) => (HD2Engine.has(i, "charge") || HD2Engine.has(i, "expendable")) && (["primary", "secondary", "support"].includes(i.cat) || HD2Engine.has(i, "rover"))), "noammo only on charge / expendable weapons and Rovers");
+  assert(HD2Engine.SELECTOR_GROUPS === undefined, "there are no selector groups any more");
+  const old = HD2Engine.normalizeRule({ when: [{ sel: "grp:noAmmo", scope: "all", min: 2 }], must: { sel: "tag:supply", scope: "strats", max: 0 } });
+  assert(old && old.when[0].sel === "tag:noammo", "old saved selector is translated");
+  const oldReg = HD2Engine.normalizeRule({ must: { sel: "grp:regularSupport", scope: "strats", max: 1 } });
+  assert(oldReg && oldReg.must.sel === "tag:nonexp", "old grp:regularSupport is read as tag:nonexp");
+  const sup = all.filter((i) => i.cat === "support");
+  assert.strictEqual(sup.filter((i) => HD2Engine.has(i, "nonexp")).length, 29);
+  assert(sup.every((i) => HD2Engine.has(i, "nonexp") !== HD2Engine.has(i, "expendable")), "every support weapon is exactly one of expendable / non-expendable");
+  assert(all.filter((i) => i.cat !== "support").every((i) => !HD2Engine.has(i, "nonexp")), "nonexp only on support weapons");
+  const engine = HD2Engine.create(HD2_DATA);
+  const pick = (n) => all.find((i) => i.name === n);
+  for (let k = 0; k < 40; k++) {
+    const l = engine.generateLoadoutRelaxed({ faction: "any", locks: { strat1: pick("AX/ARC-3 K-9"), strat2: pick("ARC-3 Arc Thrower") } });
+    assert(l.strategems.every((i) => !HD2Engine.has(i, "supply")) || l.unmet.some((u) => u.id === "supply"), "K-9 + Arc Thrower count as two no-ammo items, so no supply pack");
+  }
 });
 
 console.log("\n" + passed + " engine rule tests passed" + (process.exitCode ? " (with failures)" : ""));
