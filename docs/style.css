@@ -292,3 +292,5 @@ hr.divider { border: none; border-top: 1px solid var(--accent); margin: 1.5rem 0
 .b-row .chip-x { background: none; border: none; color: #aaa; cursor: pointer; font-size: 1.1rem; padding: 0 4px; }
 .b-row .chip-x:hover { color: #f44336; }
 .rules-subtitle { font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: #888; margin: .9rem 0 .2rem; }
+.disclaimer .feedback { margin: 0 0 .6rem; font-size: .8rem; }
+.disclaimer .feedback a { color: #9ab; }

@@ -206,7 +206,7 @@
         h("div", { class: "tag-row" }, tagPills(item))));
   }
 
-  // "Why" text for the results banners. Tier names come from the engine ("your own rules", "high priority", ...).
+  // "Why" text for the results banners. Tier names come from the engine ("Required", "Overwrite", "Core", "Preferred").
   function tierText(u) {
     var names = Engine.TIER_NAMES || [];
     return names[u.tier] ? " [" + names[u.tier] + "]" : "";
@@ -550,7 +550,8 @@
     onFactionEdit();
   }
 
-  function isBase(item) { return item.warbond === "base"; }
+  // Base Game gear, plus the two base-game stratagems that sit in a requisition block (alwaysOwned), is always owned.
+  function isBase(item) { return item.warbond === "base" || !!item.alwaysOwned; }
   function isOwned(item) { return isBase(item) || !!owned[item.name]; }
   function inPool(item) { return isOwned(item) && !blocked[item.name]; }
 
@@ -720,7 +721,7 @@
   function ruleRows() {
     var rows = [];
     // Default rows run from the highest priority tier to the lowest, the support / vehicle / Eagle limits last.
-    var byTier = Engine.RULES.map(function (r, i) { return { r: r, i: i, t: Engine.RULE_TIER[r.id] || 9 }; })
+    var byTier = Engine.RULES.map(function (r, i) { return { r: r, i: i, t: Engine.RULE_TIER.hasOwnProperty(r.id) ? Engine.RULE_TIER[r.id] : 9 }; })
       .sort(function (x, y) { return x.t - y.t || x.i - y.i; }).map(function (x) { return x.r; });
     byTier.forEach(function (r) {
       if (r.preset) {
@@ -768,7 +769,7 @@
   }
   function tierNote(id) {
     var t = Engine.RULE_TIER[id];
-    return t ? TIER_TITLES[t].toLowerCase() : "limit";
+    return t !== undefined ? TIER_TITLES[t].toLowerCase() : "limit";
   }
   function renderRequireChips() {
     var box = $("require-chips");
@@ -986,7 +987,7 @@
     onRulesChanged();
   }
 
-  var TIER_TITLES = { 1: "High priority", 2: "Medium priority", 3: "Low priority", 4: "Lowest priority" };
+  var TIER_TITLES = { 0: "Required", 1: "Overwrite", 2: "Core", 3: "Preferred" };
   // Called after any change to the rules: redraws the rows and the summary and saves the settings.
   function onRulesChanged() {
     renderRequireChips();
@@ -1172,11 +1173,17 @@
   }
 
   function makeBlock(w, label, withIcon) {
-    var items = ALL_ITEMS.filter(function (i) { return i.warbond === w.key; });
+    // Items with a menu_order come first, in that order (the game's own menu order); the rest keep file order.
+    var items = ALL_ITEMS.filter(function (i) { return i.warbond === w.key; })
+      .map(function (i, k) { return { i: i, k: k }; })
+      .sort(function (x, y) {
+        var a = x.i.menuOrder == null ? 1e9 : x.i.menuOrder, b = y.i.menuOrder == null ? 1e9 : y.i.menuOrder;
+        return a - b || x.k - y.k;
+      }).map(function (x) { return x.i; });
     var base = w.key === "base";
     var rows = items.map(function (item) {
       var cb = h("input", { type: "checkbox", "data-item": item.name, "aria-label": "I own " + item.name });
-      if (base) { cb.disabled = true; cb.title = "Base Game gear is always owned"; }
+      if (base || item.alwaysOwned) { cb.disabled = true; cb.title = "Base Game gear is always owned"; }
       cb.addEventListener("change", function () {
         if (cb.checked) owned[item.name] = true; else delete owned[item.name];
         onGearChange();

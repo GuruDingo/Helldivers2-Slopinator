@@ -66,11 +66,11 @@ function check(label, cond, extra) {
   check("new browser starts with everything owned", $("grand-total").textContent === ACTIVE + " / " + ACTIVE + " items owned", $("grand-total").textContent);
   check("pool line on the Randomizer tab", new RegExp("Rolling from " + ACTIVE + " of " + ACTIVE + " items\\.").test(poolText()), poolText());
   check("old Warbonds / Exclude sections are gone", !$("warbond-grid") && !$("exclude-input"));
-  check("Base Game rows: checked and locked", (() => { const b = Array.from(doc.querySelectorAll("#gear-list .wb-block")).find((x) => /Base Game/.test(x.textContent)); const boxes = Array.from(b.querySelectorAll("input[data-item]")); return boxes.length === 6 && boxes.every((c) => c.checked && c.disabled) && !b.querySelector("[data-all]"); })());
+  check("Base Game rows: checked and locked", (() => { const b = Array.from(doc.querySelectorAll("#gear-list .wb-block")).find((x) => /Base Game/.test(x.textContent)); const boxes = Array.from(b.querySelectorAll("input[data-item]")); return boxes.length === 4 && boxes.every((c) => c.checked && c.disabled) && !b.querySelector("[data-all]"); })());
   const DEFAULTS = {}; win.HD2_DATA.items.forEach((i) => { DEFAULTS[i.name] = i.factions.join(","); });
   const defaultOf = (name) => DEFAULTS[name];
   const customCount = () => doc.querySelectorAll("#gear-list .gear-row.fac-custom").length;
-  check("first visit wrote the owned list to localStorage", Object.keys(JSON.parse(win.localStorage.getItem("hd2_tracker"))).length === ACTIVE - win.HD2_DATA.items.filter((i) => i.warbond === "base" && i.factions.indexOf("none") === -1).length); // everything except the always-owned Base Game items
+  check("first visit wrote the owned list to localStorage", Object.keys(JSON.parse(win.localStorage.getItem("hd2_tracker"))).length === ACTIVE - win.HD2_DATA.items.filter((i) => (i.warbond === "base" || i.alwaysOwned) && i.factions.indexOf("none") === -1).length); // everything except the always-owned Base Game items
   check("7 lock inputs", doc.querySelectorAll("#lock-grid input").length === 7);
   check("datalists filled", $("dl-primary").children.length > 40 && $("dl-strat").children.length > 60);
   check("the rule builder lists the 44 titled tags, in sections from hd2tags.csv, in file order inside each", (() => {
@@ -294,8 +294,8 @@ function check(label, cond, extra) {
   const chipFor = (tag) => doc.querySelector('#require-chips .chip[data-tag="' + tag + '"]');
   const removeChip = (tag) => click(chipFor(tag).querySelector("button"));
   // Every default rule is a row, listed from the highest priority tier to the lowest, the limits last.
-  const DEFAULT_ROWS = ["Backpack = 1", "A hand-held shield needs a one-handed primary or a melee weapon", "No supply pack alongside 2+ no-ammo items",
-    "Anti-Tank ≥ 1", "A chaff killer in primary or secondary", "Base Breaker ≥ 1",
+  const DEFAULT_ROWS = ["A hand-held shield needs a one-handed primary or a melee weapon",
+    "Backpack = 1", "Anti-Tank ≥ 1", "A chaff killer in primary or secondary", "Base Breaker ≥ 1", "No supply pack alongside 2+ no-ammo items",
     "At least one support weapon", "Medium Killer ≥ 1", "Panic Weapon ≥ 1",
     "Chaff / medium / anti-tank counts within 3 of each other", "Two base breakers when no weapon is one",
     "At most 1 regular (non-expendable) support weapon", "Expendable ≤ 2", "Never a regular and an expendable support weapon together",
@@ -303,7 +303,7 @@ function check(label, cond, extra) {
   const ruleChip = (id) => doc.querySelector('#require-chips .chip[data-rule="' + id + '"]');
   check("every default rule starts as a dim row (no switches), highest priority first", chipTexts().join("|") === DEFAULT_ROWS.join("|") && chips().every((c) => c.classList.contains("preset")) && !doc.querySelector("#rules-default") && !doc.querySelector('#rules-section input[role="switch"]'), chipTexts().join("|"));
   check("...with no reset buttons yet, and nothing counted in the summary", $("presets-reset").hidden && $("custom-clear").hidden && $("rules-summary").textContent === "");
-  check("a default row's tooltip names its priority", /high priority/.test(ruleChip("shield").title) && /medium priority/.test(chipFor("armor").title) && /limit/.test(chipFor("vehicle").title), ruleChip("shield").title + " / " + chipFor("armor").title);
+  check("a default row's tooltip names its priority", /required/.test(ruleChip("shield").title) && /core/.test(chipFor("armor").title) && /limit/.test(chipFor("vehicle").title), ruleChip("shield").title + " / " + chipFor("armor").title);
   addRule("demo", "min", 3);
   check("adding a rule for a default row's tag edits that row (not a second chip)", chips().length === 17 && chipTexts().includes("Base Breaker ≥ 3") && !chipFor("demo").classList.contains("preset"), chipTexts().join("|"));
   check("...shows the reset button and counts one edited rule", !$("presets-reset").hidden && /1 edited/.test($("rules-summary").textContent), $("rules-summary").textContent);
@@ -315,7 +315,7 @@ function check(label, cond, extra) {
   check("unmeetable requirement still builds 7 cards (no error)", cards() === 28 || cards() === 7, cards() + " " + errors());
   check("...and lists the unmet requirement in a banner", /Rule: at least 4 Vehicle/.test((doc.querySelector("#results .rules-warning") || {}).textContent || ""),
     (doc.querySelector("#results .rules-warning") || {}).textContent);
-  check("...with a Why? detail and the rule's priority shown", !!doc.querySelector("#results .rules-warning details.why") && /\[your own rules\]/.test((doc.querySelector("#results .rules-warning") || {}).textContent || ""), (doc.querySelector("#results .rules-warning") || {}).textContent);
+  check("...with a Why? detail and the rule's priority shown", !!doc.querySelector("#results .rules-warning details.why") && /\[Overwrite\]/.test((doc.querySelector("#results .rules-warning") || {}).textContent || ""), (doc.querySelector("#results .rules-warning") || {}).textContent);
   check("...with no red error message", errors().length === 0, errors());
   check("'at least 4 vehicles' replaced the default 'at most 1' (the default's side of the clash is dropped)", chipTexts().includes("Vehicle ≥ 4") && !chipTexts().includes("Vehicle ≤ 1"), chipTexts().join("|"));
   chips().forEach((c) => click(c.querySelector("button")));
@@ -452,6 +452,11 @@ function check(label, cond, extra) {
   check("...and the group header is just 'Requisition'", reqGroup.querySelector(":scope > .wb-header .wb-name").textContent === "Requisition");
   check("...its count covers all the shops' items", (() => { const t = Number(reqGroup.querySelector(":scope > .wb-header .wb-count").getAttribute("data-total")); return t === reqGroup.querySelectorAll(".gear-row").length && t > 30; })());
   check("...the full 'Requisition: ...' names still drive search", Array.from(reqGroup.querySelectorAll(".gear-row")).every((r) => /requisition: /.test(r.getAttribute("data-search"))));
+  const shopNames = (n) => Array.from(reqGroup.querySelectorAll(".wb-group-body .wb-block")[n].querySelectorAll(".tr-name")).map((x) => x.textContent);
+  check("a requisition shop lists its items in the game's menu order (menu_order column)",
+    shopNames(0).slice(0, 4).join("|") === "MG-43 Machine Gun|APW-1 Anti-Materiel Rifle|M-105 Stalwart|EAT-17 Expendable Anti-Tank" && shopNames(2)[4] === "LIFT-850 Jump Pack" && shopNames(3)[0] === "Orbital Precision Strike" && shopNames(5).join("|").startsWith("A/MG-43 Machine Gun Sentry|A/G-16 Gatling Sentry|A/M-12 Mortar Sentry|AX/AR-23 Guard Dog"), shopNames(0).join("|"));
+  check("...the two base-game stratagems moved into shops are still always owned (checked and locked)",
+    ["MG-43 Machine Gun", "Orbital Precision Strike"].every((n) => gearBox(n).checked && gearBox(n).disabled));
   $("count").value = "1";
   click($("gear-select-all"));
   setFaction("bug");
@@ -485,18 +490,18 @@ function check(label, cond, extra) {
   // Blocked-but-owned styling and the per-warbond counts
   const baseBlock = blockBlock("Base Game");
   click(blockBtn("AC-8 Autocannon")); // unblock it again so counts start clean
-  check("Base Game starts at 6 / 6 (no red number)", countText(baseBlock) === "6 / 6" && baseBlock.querySelector(".blocked-part").hidden, countText(baseBlock));
+  check("Base Game starts at 4 / 4 (no red number)", countText(baseBlock) === "4 / 4" && baseBlock.querySelector(".blocked-part").hidden, countText(baseBlock));
   const baseName = baseBlock.querySelector("input[data-item]").getAttribute("data-item");
   click(blockBtn(baseName));
-  check("blocking one Base Game item -> 1 / 5 / 6 with the red number", countText(baseBlock) === "1 / 5 / 6" && !baseBlock.querySelector(".blocked-part").hidden, countText(baseBlock));
+  check("blocking one Base Game item -> 1 / 3 / 4 with the red number", countText(baseBlock) === "1 / 3 / 4" && !baseBlock.querySelector(".blocked-part").hidden, countText(baseBlock));
   check("...and the red number really is red", baseBlock.querySelector(".blocked-count").textContent === "1");
   check("blocked + owned row is red and struck through", rowOf(baseName).classList.contains("is-blocked") && /line-through/.test(nameStyle(baseName).textDecoration || nameStyle(baseName).getPropertyValue("text-decoration")) , nameStyle(baseName).textDecoration);
   const otherBase = baseBlock.querySelectorAll("input[data-item]")[1].getAttribute("data-item");
   check("owned, unblocked rows are not struck through", !/line-through/.test(nameStyle(otherBase).textDecoration || ""), nameStyle(otherBase).textDecoration);
   click(baseBlock.querySelector("[data-block-all]"));
-  check("Block All on Base Game -> 6 / 0 / 6", countText(baseBlock) === "6 / 0 / 6", countText(baseBlock));
+  check("Block All on Base Game -> 4 / 0 / 4", countText(baseBlock) === "4 / 0 / 4", countText(baseBlock));
   click(baseBlock.querySelector("[data-block-none]"));
-  check("Block None -> back to 6 / 6", countText(baseBlock) === "6 / 6", countText(baseBlock));
+  check("Block None -> back to 4 / 4", countText(baseBlock) === "4 / 4", countText(baseBlock));
   check("Base Game has Block All/None but no Own All/None", !baseBlock.querySelector("[data-all]") && !baseBlock.querySelector("[data-none]"));
   check("buttons are labelled Own All / Own None / Block All / Block None", (() => { const l = Array.from(firstBlock.querySelectorAll(".wb-tools button")).map((b) => b.textContent); return l.join("|") === "Own All|Own None|Block All|Block None"; })(), Array.from(firstBlock.querySelectorAll(".wb-tools button")).map((b) => b.textContent).join("|"));
   // an unowned, blocked item: pressed button, but no red strike-through and not counted in the red number
@@ -562,8 +567,8 @@ function check(label, cond, extra) {
   check("clicking the group header opens it", grp().querySelector(":scope > .wb-items").classList.contains("open"));
   check("...and the shops inside open on their own", (() => { const sub = grp().querySelector(".wb-group-body .wb-block"); click(sub.querySelector(".wb-header")); return sub.querySelector(".wb-items").classList.contains("open"); })());
   click(grpBtn("data-none"));
-  check("group Own None clears every Requisition shop", grpOwned() === 0 && grpCount() === "0/" + grpTotal, grpOwned() + " " + grpCount());
-  check("...and each shop's own count follows", Array.from(grp().querySelectorAll(".wb-group-body .wb-block")).every((b) => subCount(b) === "0"));
+  check("group Own None clears every Requisition shop except the two always-owned base-game stratagems", grpOwned() === 2 && grpCount() === "2/" + grpTotal, grpOwned() + " " + grpCount());
+  check("...and each shop's own count follows (1 in the PAC and the Bridge, 0 elsewhere)", Array.from(grp().querySelectorAll(".wb-group-body .wb-block")).map(subCount).join("|") === "1|0|0|1|0|0");
   click(grpBtn("data-all"));
   check("group Own All owns them all again", grpOwned() === grpTotal && grpCount() === grpTotal + "/" + grpTotal);
   click(grpBtn("data-block-all"));

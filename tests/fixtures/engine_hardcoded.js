@@ -78,13 +78,13 @@
   // important. A build that misses only lower tiers always beats one that misses a higher tier, however
   // many low-tier rules it misses (set by Boss, 2026-10-29).
   var RULE_TIER = {
-    require: 0,                                   // the player's own "Require N+ of a tag" requirements
-    backpack: 1, shield: 1, supply: 1,            // high
-    armor: 2, chaff: 2, demo: 2,                  // medium
-    support: 3, med: 3, panic: 3,                 // low
-    demoEscalation: 4, balance: 4,                // bottom
+    // (tier table updated to the live four tiers on 2026-10-31 so the parity test compares rule logic, not ranking)
+    shield: 0,
+    require: 1,
+    backpack: 2, supply: 2, armor: 2, chaff: 2, demo: 2,
+    support: 3, med: 3, panic: 3, demoEscalation: 3, balance: 3,
   };
-  var TIER_COUNT = 5;
+  var TIER_COUNT = 4;
   function tierOf(id) { return Object.prototype.hasOwnProperty.call(RULE_TIER, id) ? RULE_TIER[id] : 2; }
 
   // Lower is better. Misses are compared tier by tier from the top; "shortfall" (how far short the numeric

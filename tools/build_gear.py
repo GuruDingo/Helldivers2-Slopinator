@@ -105,6 +105,7 @@ def load_tags():
 
 def load_items(warbond_keys):
     errors, warnings, items = [], [], []
+    orders_seen = {}
     with open(GEAR_CSV, newline="", encoding="utf-8-sig") as f:
         for line_no, row in enumerate(csv.DictReader(f), start=2):  # line 1 is the header
             name = (row.get("name") or "").strip()
@@ -118,6 +119,20 @@ def load_items(warbond_keys):
             elif not re.fullmatch(r"\d{4}-\d{2}-\d{2}", released):
                 errors.append(f"{where}: release_date '{released}' must look like 2024-02-08")
                 released = ""
+
+            # menu_order: position inside its warbond / requisition block on the My Gear list (blank = after the numbered
+            # ones, in file order). always_owned: "yes" = counts as owned whatever the warbond (the two base-game
+            # stratagems that now sit in a requisition block).
+            order_raw = (row.get("menu_order") or "").strip()
+            menu_order = None
+            if order_raw:
+                if re.fullmatch(r"[1-9]\d*", order_raw):
+                    menu_order = int(order_raw)
+                else:
+                    errors.append(f"{where}: menu_order '{order_raw}' must be a whole number (1, 2, 3...) or blank")
+            always_raw = (row.get("always_owned") or "").strip().lower()
+            if always_raw not in ("", "yes"):
+                errors.append(f"{where}: always_owned '{always_raw}' must be 'yes' or blank")
 
             if not name:
                 errors.append(f"{where}: missing name")
@@ -166,7 +181,14 @@ def load_items(warbond_keys):
                 "released": released,
                 "imgUrl": (row.get("img_url") or "").strip(),
                 "armorPen": armor_pen,
+                "menuOrder": menu_order,
+                "alwaysOwned": always_raw == "yes",
             })
+            if menu_order is not None:
+                key = (warbond, menu_order)
+                if key in orders_seen:
+                    errors.append(f"{where}: menu_order {menu_order} in '{warbond}' is also used by {orders_seen[key]}")
+                orders_seen[key] = name
 
     # ids are permanent: a whole number that is never renumbered or reused, because people's saved
     # settings in their browsers (owned / blocked / faction edits) are keyed by it. Row position does not matter and
